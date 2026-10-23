@@ -1,3 +1,5 @@
+#include "chipset/Clock.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -45,6 +47,11 @@ auto main() -> std::uint32_t
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
+	// Init system
+	nvic::Clock clock{nvic::Clock::FrequencyMode::NTSC};
+
+
+	clock.Start();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -78,6 +85,8 @@ auto main() -> std::uint32_t
 
 		glfwSwapBuffers(window);
 	}
+
+	clock.Stop();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
