@@ -1,4 +1,5 @@
 #include "chipset/Clock.h"
+#include "cpu/CPU.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -49,9 +50,10 @@ auto main() -> std::uint32_t
 
 	// Init system
 	nvic::Clock clock{nvic::Clock::FrequencyMode::NTSC};
-
+	nvic::CPU cpu{clock};
 
 	clock.Start();
+	cpu.Start();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -69,10 +71,15 @@ auto main() -> std::uint32_t
 			ImGui::Begin("Control");
 
 			if (ImGui::Button("Step"))
-				;
+			{
+				cpu.SetRunMode(nvic::CPU::RunMode::Step);
+				cpu.SingleShot();
+			}
 
 			if (ImGui::Button("Run"))
-				;
+			{
+				cpu.SetRunMode(nvic::CPU::RunMode::Continuous);
+			}
 
 			ImGui::End();
 		}
@@ -86,6 +93,7 @@ auto main() -> std::uint32_t
 		glfwSwapBuffers(window);
 	}
 
+	cpu.Stop();
 	clock.Stop();
 
 	ImGui_ImplOpenGL3_Shutdown();

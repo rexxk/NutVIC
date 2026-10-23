@@ -17,12 +17,6 @@ namespace nvic
 			NTSC,
 		};
 
-		enum class RunMode
-		{
-			Step,
-			Continuous,
-		};
-
 	public:
 		Clock(FrequencyMode mode);
 
@@ -39,7 +33,6 @@ namespace nvic
 	private:
 		FrequencyMode m_FrequencyMode{ FrequencyMode::PAL };
 
-		std::atomic<RunMode> m_RunMode{ RunMode::Step };
 		std::atomic<bool> m_Running{ false };
 
 		std::jthread m_ClockThread{};

@@ -1,0 +1,19 @@
+#pragma once
+
+#include <cstdint>
+
+
+namespace nvic
+{
+
+	struct Registers
+	{
+		std::uint8_t A{};
+		std::uint8_t X{};
+		std::uint8_t Y{};
+		std::uint8_t StackPointer{};
+		std::uint8_t Flags{};
+		std::uint16_t PC{};
+	};
+
+}
