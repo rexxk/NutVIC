@@ -28,12 +28,15 @@ namespace nvic
 		auto SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void;
 		auto FindChunk(std::uint16_t address) -> std::uint8_t;
 
+		auto ViewMemory() -> void;
 
 	private:
 		Signals& m_Signals;
 
-		std::array<MemoryChunk, 4> m_Chunks;
+		std::array<MemoryChunk*, 4> m_Chunks;
 
+
+		int m_PageNumber{ 0xFF };
 	};
 
 }

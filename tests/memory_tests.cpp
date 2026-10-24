@@ -7,7 +7,7 @@
 #include <cstdint>
 
 
-TEST(MemoryTests, ReadData)
+TEST(MemoryTests, ReadWriteData)
 {
 	nvic::Signals signals{};
 	nvic::Memory memory{ signals };
@@ -49,3 +49,21 @@ TEST(MemoryTests, ReadData)
 
 	ASSERT_EQ(signals.DataBus, 0xFF);
 }	
+
+TEST(MemoryTests, WriteToROM)
+{
+	nvic::Signals signals{};
+	nvic::Memory memory{ signals };
+
+	nvic::MemoryChunk chunk{ .ReadWrite{false} };
+
+	memory.SetChunk(0, chunk);
+
+	signals.AddressBus = 0x00FF;
+	signals.DataBus = 0x3F;
+
+	memory.Write();
+	memory.Read();
+
+	ASSERT_EQ(signals.DataBus, 0x00);
+}

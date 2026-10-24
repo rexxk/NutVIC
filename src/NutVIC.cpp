@@ -1,6 +1,7 @@
 #include "chipset/Clock.h"
 #include "cpu/CPU.h"
 #include "memory/Memory.h"
+#include "utils/FileTools.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -56,10 +57,18 @@ auto main() -> std::uint32_t
 
 	std::array<nvic::MemoryChunk, 4> ram{};
 
-	memory.SetChunk(0, ram.at(0));
-	memory.SetChunk(1, ram.at(1));
-	memory.SetChunk(2, ram.at(2));
-	memory.SetChunk(3, ram.at(3));
+	for (auto i = 0; i < 4; i++)
+		memory.SetChunk(i, ram.at(i));
+
+	nvic::MemoryChunk lowROM{ .ReadWrite{false} };
+	nvic::MemoryChunk highROM{ .ReadWrite{false} };
+
+	nvic::LoadROM(lowROM, "rom/c64/basic", 2, 0xA000);
+	nvic::LoadROM(highROM, "rom/c64/chargen", 3, 0xD000);
+	nvic::LoadROM(highROM, "rom/c64/kernal", 3, 0xE000);
+
+	memory.SetChunk(2, lowROM);
+	memory.SetChunk(3, highROM);
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
@@ -98,6 +107,7 @@ auto main() -> std::uint32_t
 		}
 
 
+		memory.ViewMemory();
 
 
 		ImGui::Render();
