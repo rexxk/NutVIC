@@ -13,7 +13,7 @@ namespace nvic
 
 	struct MemoryChunk
 	{
-		bool ReadOnly{ false };
+		bool ReadWrite{ true };
 		std::array<std::uint8_t, ChunkSize> Data;
 	};
 
@@ -22,9 +22,12 @@ namespace nvic
 	public:
 		Memory(Signals& signals);
 
-		auto SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void;
+		auto Read() -> void;
+		auto Write() -> void;
 
+		auto SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void;
 		auto FindChunk(std::uint16_t address) -> std::uint8_t;
+
 
 	private:
 		Signals& m_Signals;

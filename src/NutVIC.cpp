@@ -54,8 +54,15 @@ auto main() -> std::uint32_t
 	nvic::CPU cpu{clock};
 	nvic::Memory memory{ cpu.GetSignals() };
 
-	nvic::MemoryChunk charrom{ .ReadOnly{true} };
-	memory.SetChunk(0, charrom);
+	std::array<nvic::MemoryChunk, 4> ram{};
+
+	memory.SetChunk(0, ram.at(0));
+	memory.SetChunk(1, ram.at(1));
+	memory.SetChunk(2, ram.at(2));
+	memory.SetChunk(3, ram.at(3));
+
+//	nvic::MemoryChunk charrom{ .ReadWrite{true} };
+//	memory.SetChunk(0, charrom);
 
 	clock.Start();
 	cpu.Start();
