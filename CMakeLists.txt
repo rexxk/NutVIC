@@ -4,6 +4,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 include(FetchContent)
+include(GoogleTest)
 
 
 # Policy
@@ -17,6 +18,8 @@ FetchContent_MakeAvailable(glfw)
 FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui GIT_TAG docking)
 FetchContent_MakeAvailable(imgui)
 
+FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googletest GIT_TAG main)
+FetchContent_MakeAvailable(googletest)
 
 # Project
 project(NutVIC)
@@ -52,3 +55,8 @@ set_property(TARGET NutVIC PROPERTY DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_D
 set(CMAKE_DEFAULT_STARTUP_PROJECT NutVIC)
 
 add_subdirectory(src)
+
+# Testing
+enable_testing()
+
+add_subdirectory(tests)
