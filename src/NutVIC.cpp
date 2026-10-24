@@ -1,5 +1,6 @@
 #include "chipset/Clock.h"
 #include "cpu/CPU.h"
+#include "memory/Memory.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -51,9 +52,14 @@ auto main() -> std::uint32_t
 	// Init system
 	nvic::Clock clock{nvic::Clock::FrequencyMode::NTSC};
 	nvic::CPU cpu{clock};
+	nvic::Memory memory{ cpu.GetSignals() };
+
+	nvic::MemoryChunk charrom{ .ReadOnly{true} };
+	memory.SetChunk(0, charrom);
 
 	clock.Start();
 	cpu.Start();
+
 
 	while (!glfwWindowShouldClose(window))
 	{

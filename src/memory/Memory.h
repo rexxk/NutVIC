@@ -1,0 +1,36 @@
+#pragma once
+
+#include "cpu/Signals.h"
+
+#include <array>
+#include <cstdint>
+
+
+namespace nvic
+{
+
+	constexpr std::uint16_t ChunkSize = 16 * 1024;
+
+	struct MemoryChunk
+	{
+		bool ReadOnly{ false };
+		std::array<std::uint8_t, ChunkSize> Data;
+	};
+
+	class Memory
+	{
+	public:
+		Memory(Signals& signals);
+
+		auto SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void;
+
+		auto FindChunk(std::uint16_t address) -> std::uint8_t;
+
+	private:
+		Signals& m_Signals;
+
+		std::array<MemoryChunk, 4> m_Chunks;
+
+	};
+
+}
