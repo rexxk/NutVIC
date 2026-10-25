@@ -30,6 +30,8 @@ namespace nvic
 
 		auto ViewMemory() -> void;
 
+		auto GetChunks() -> std::array<MemoryChunk*, 4>& { return m_Chunks; }
+
 	private:
 		Signals& m_Signals;
 

@@ -1,6 +1,7 @@
 #include "chipset/Clock.h"
 #include "cpu/CPU.h"
 #include "memory/Memory.h"
+#include "ui/MemoryPanel.h"
 #include "utils/FileTools.h"
 
 #include <glad/glad.h>
@@ -51,7 +52,7 @@ auto main() -> std::uint32_t
 	ImGui_ImplOpenGL3_Init();
 
 	// Init system
-	nvic::Clock clock{nvic::Clock::FrequencyMode::NTSC};
+	nvic::Clock clock{nvic::Clock::FrequencyMode::PAL};
 	nvic::CPU cpu{clock};
 	nvic::Memory memory{ cpu.GetSignals() };
 
@@ -69,6 +70,9 @@ auto main() -> std::uint32_t
 
 	memory.SetChunk(2, lowROM);
 	memory.SetChunk(3, highROM);
+
+
+	nvic::MemoryPanel memoryPanel(memory, cpu.GetRegisters());
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
@@ -107,7 +111,8 @@ auto main() -> std::uint32_t
 		}
 
 
-		memory.ViewMemory();
+		memoryPanel.Draw();
+//		memory.ViewMemory();
 
 
 		ImGui::Render();
