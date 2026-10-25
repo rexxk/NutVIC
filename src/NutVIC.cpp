@@ -1,6 +1,7 @@
 #include "chipset/Clock.h"
 #include "cpu/CPU.h"
 #include "memory/Memory.h"
+#include "ui/CPUPanel.h"
 #include "ui/MemoryPanel.h"
 #include "utils/FileTools.h"
 
@@ -72,6 +73,7 @@ auto main() -> std::uint32_t
 	memory.SetChunk(3, highROM);
 
 
+	nvic::CPUPanel cpuPanel(cpu.GetRegisters());
 	nvic::MemoryPanel memoryPanel(memory, cpu.GetRegisters());
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
@@ -111,6 +113,7 @@ auto main() -> std::uint32_t
 		}
 
 
+		cpuPanel.Draw();
 		memoryPanel.Draw();
 //		memory.ViewMemory();
 
