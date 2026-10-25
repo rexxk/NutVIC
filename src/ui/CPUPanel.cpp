@@ -11,8 +11,8 @@
 namespace nvic
 {
 
-	CPUPanel::CPUPanel(Registers& registers)
-		: m_Registers(registers)
+	CPUPanel::CPUPanel(Registers& registers, Signals& signals)
+		: m_Registers(registers), m_Signals(signals)
 	{
 
 	}
@@ -47,6 +47,12 @@ namespace nvic
 		if (m_Registers.Flags & Flag_Carry) str += "C"; else str += "c";
 
 		ImGui::Text("%s", str.c_str());
+
+		ImGui::Separator();
+
+		ImGui::Text("Address bus: %04x", m_Signals.AddressBus);
+		ImGui::Text("Data bus: %02x", m_Signals.DataBus);
+
 
 		ImGui::End();
 	}

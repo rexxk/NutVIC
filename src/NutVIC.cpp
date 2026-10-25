@@ -56,6 +56,7 @@ auto main() -> std::uint32_t
 	nvic::Clock clock{nvic::Clock::FrequencyMode::PAL};
 	nvic::CPU cpu{clock};
 	nvic::Memory memory{ cpu.GetSignals() };
+	cpu.SetMemory(&memory);
 
 	std::array<nvic::MemoryChunk, 4> ram{};
 
@@ -73,7 +74,7 @@ auto main() -> std::uint32_t
 	memory.SetChunk(3, highROM);
 
 
-	nvic::CPUPanel cpuPanel(cpu.GetRegisters());
+	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), cpu.GetSignals());
 	nvic::MemoryPanel memoryPanel(memory, cpu.GetRegisters());
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };

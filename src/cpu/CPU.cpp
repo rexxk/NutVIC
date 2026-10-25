@@ -1,5 +1,7 @@
 #include "CPU/CPU.h"
 
+#include "memory/Memory.h"
+
 #include <cstdint>
 #include <print>
 
@@ -9,13 +11,25 @@ namespace nvic
 
 	constexpr std::uint16_t ResetVector = 0xFFFC;
 
+	constexpr auto NotImplementedOpCode = []()
+		{
+			std::println("OpCode is not implemented");
+		};
+
 
 	CPU::CPU(Clock& clock)
 		: m_Clock(clock)
 	{
 		m_Registers.PC = ResetVector;
 
+		for (auto i = 0; i < 256; i++)
+			m_OpCodes.at(i) = NotImplementedOpCode;
 
+	}
+
+	auto CPU::SetMemory(Memory* memory) -> void
+	{
+		m_Memory = memory;
 	}
 
 	auto CPU::ExecuteThread() -> void
@@ -37,7 +51,7 @@ namespace nvic
 			auto startCycle = m_Clock.CPUClockCycles();
 
 			// Execute
-
+			FetchOperand(m_Registers.PC & ResetVector);
 
 
 			cycleCount = m_Clock.CPUClockCycles() - startCycle;
@@ -68,4 +82,16 @@ namespace nvic
 		m_RunMode.store(mode);
 	}
 
+	auto CPU::FetchOperand(bool resetVector) -> void
+	{
+		if (resetVector)
+		{
+			m_Operand = 0x4C;	// JMP
+			return;
+		}
+
+		m_Signals.AddressBus = m_Registers.PC;
+		m_Memory->Read();
+
+	}
 }
