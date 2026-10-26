@@ -7,6 +7,7 @@
 #include "cpu/opcode/MathOps.hpp"
 #include "cpu/opcode/StackOps.hpp"
 #include "cpu/opcode/StatusControl.hpp"
+#include "cpu/opcode/StoreOps.hpp"
 
 #include "memory/Memory.h"
 
@@ -41,6 +42,7 @@ namespace nvic
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
+		m_OpCodes[0x8E] = opcode::Op8E_STXabs;
 		m_OpCodes[0x9A] = opcode::Op9A_TXS;
 		m_OpCodes[0xA2] = opcode::OpA2_LDX;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
