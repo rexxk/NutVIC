@@ -60,6 +60,32 @@ namespace nvic
 				return 6;
 			};
 
+		constexpr auto Op6C_JMPind = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t address{};
+				std::uint16_t jmpAddress{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				address = signals.DataBus;
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				address += signals.DataBus << 8;
+
+				signals.AddressBus = address++;
+				memory.Read();
+				jmpAddress = signals.DataBus;
+
+				signals.AddressBus = address++;
+				memory.Read();
+				jmpAddress += signals.DataBus << 8;
+
+				registers.PC = jmpAddress;
+
+				return 5;
+			};
+
 	}
 
 }

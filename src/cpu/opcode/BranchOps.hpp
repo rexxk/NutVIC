@@ -12,7 +12,7 @@ namespace nvic
 	namespace opcode
 	{
 
-		constexpr auto OpD0_BEQ = [](Registers& registers, Signals& signals, Memory& memory)
+		constexpr auto OpD0_BNE = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				std::int8_t relativeOffset{};
 
@@ -22,7 +22,7 @@ namespace nvic
 				memory.Read();
 				relativeOffset = static_cast<std::int8_t>(signals.DataBus);
 
-				if (registers.Flags & Flag_Zero)
+				if (!(registers.Flags & Flag_Zero))
 				{
 					registers.PC += relativeOffset;
 
