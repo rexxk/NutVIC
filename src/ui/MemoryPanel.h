@@ -20,7 +20,7 @@ namespace nvic
 		Memory& m_Memory;
 		Registers& m_Registers;
 
-		bool m_TraceProgramCounter{ false };
+		bool m_TraceProgramCounter{ true };
 		int m_PageNumber{ 0xFF };
 
 		std::uint8_t m_PageAddress{};

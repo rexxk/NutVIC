@@ -36,6 +36,24 @@ namespace nvic
 			m_Chunks[chunk]->Data.at(address) = m_Signals.DataBus;
 	}
 
+	auto Memory::Push(std::uint16_t address, std::uint8_t value) -> void
+	{
+		std::uint8_t chunk = address >> 14;
+		std::uint16_t addr = address & 0x3FFF;
+
+		if (m_Chunks[chunk]->ReadWrite)
+			m_Chunks[chunk]->Data.at(addr) = value;
+
+	}
+
+	auto Memory::Pop(std::uint16_t address) -> const std::uint8_t
+	{
+		std::uint8_t chunk = address >> 14;
+		std::uint16_t addr = address & 0x3FFF;
+
+		return m_Chunks[chunk]->Data.at(addr);
+	}
+
 	auto Memory::SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void
 	{
 		m_Chunks.at(chunkID) = &chunk;

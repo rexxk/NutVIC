@@ -11,6 +11,27 @@ namespace nvic
 	namespace opcode
 	{
 
+		constexpr auto Op20_JSR = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				std::uint8_t destinationLowAddress = signals.DataBus;
+
+				std::uint8_t highAddress = registers.PC >> 8;
+				memory.Push(0x100 + registers.StackPointer--, highAddress);
+
+				std::uint8_t lowAddress = registers.PC & 0xFF;
+				memory.Push(0x100 + registers.StackPointer--, lowAddress);
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				std::uint8_t destinationHighAddress = signals.DataBus;
+
+				std::uint16_t newAddress = static_cast<std::uint16_t>(destinationHighAddress << 8) + destinationLowAddress;
+				registers.PC = newAddress;
+
+				return 6;
+			};
 
 		constexpr auto Op4C_JMP = [](Registers& registers, Signals& signals, Memory& memory)
 			{
@@ -25,6 +46,18 @@ namespace nvic
 				registers.PC = address;
 
 				return 3;
+			};
+
+		constexpr auto Op60_RTS = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint8_t lowAddress = memory.Pop(0x100 + ++registers.StackPointer);
+				std::uint8_t highAddress = memory.Pop(0x100 + ++registers.StackPointer);
+
+				std::uint16_t newAddress = static_cast<std::uint16_t>(highAddress << 8) + lowAddress;
+
+				registers.PC = newAddress + 1;
+
+				return 6;
 			};
 
 	}

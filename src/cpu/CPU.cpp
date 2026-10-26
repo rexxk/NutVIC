@@ -1,7 +1,11 @@
 #include "CPU/CPU.h"
 
+#include "cpu/opcode/BranchOps.hpp"
+#include "cpu/opcode/CompareOps.hpp"
 #include "cpu/opcode/ExecutionControl.hpp"
 #include "cpu/opcode/LoadOps.hpp"
+#include "cpu/opcode/MathOps.hpp"
+#include "cpu/opcode/StackOps.hpp"
 #include "cpu/opcode/StatusControl.hpp"
 
 #include "memory/Memory.h"
@@ -32,9 +36,17 @@ namespace nvic
 		for (auto i = 0; i < 256; i++)
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
+		m_OpCodes[0x20] = opcode::Op20_JSR;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
+		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
+		m_OpCodes[0x9A] = opcode::Op9A_TXS;
 		m_OpCodes[0xA2] = opcode::OpA2_LDX;
+		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
+		m_OpCodes[0xCA] = opcode::OpCA_DEX;
+		m_OpCodes[0xD0] = opcode::OpD0_BEQ;
+		m_OpCodes[0xD8] = opcode::OpD8_CLD;
+		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
 	}
 
 	auto CPU::SetMemory(Memory* memory) -> void

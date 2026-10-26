@@ -19,6 +19,12 @@ namespace nvic
 				return 2;
 			};
 
+		constexpr auto OpD8_CLD = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				registers.Flags &= ~Flag_Decimal;
+
+				return 2;
+			};
 	}
 
 }

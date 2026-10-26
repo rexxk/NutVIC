@@ -25,6 +25,9 @@ namespace nvic
 		auto Read() -> void;
 		auto Write() -> void;
 
+		auto Push(std::uint16_t address, std::uint8_t value) -> void;
+		auto Pop(std::uint16_t address) -> const std::uint8_t;
+
 		auto SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void;
 		auto FindChunk(std::uint16_t address) -> std::uint8_t;
 
