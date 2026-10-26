@@ -32,6 +32,54 @@ namespace nvic
 				return 2;
 			};
 
+		constexpr auto OpA9_LDA = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				registers.A = signals.DataBus;
+
+				if (registers.A == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.A & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 2;
+			};
+
+		constexpr auto OpAD_LDAabs = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t address{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				address += signals.DataBus;
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				address += static_cast<std::uint16_t>(signals.DataBus << 8);
+
+				signals.AddressBus = address;
+				memory.Read();
+				registers.A = signals.DataBus;
+
+				if (registers.A == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.A & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 4;
+			};
+
 		constexpr auto OpBD_LDAabsX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				std::uint8_t overrun{};

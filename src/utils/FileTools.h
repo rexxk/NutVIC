@@ -10,7 +10,7 @@
 namespace nvic
 {
 
-	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint8_t slot, std::uint16_t address) -> void;
+	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint16_t address) -> void;
 
 
 }

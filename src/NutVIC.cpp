@@ -65,15 +65,15 @@ auto main() -> std::uint32_t
 	for (auto i = 0; i < 16; i++)
 		memory.SetChunk(i, ram.at(i));
 
-	std::vector<nvic::MemoryChunk> lowROM{};
-	std::vector<nvic::MemoryChunk> highROM{};
+	std::vector<nvic::MemoryChunk> basicROM{};
+	std::vector<nvic::MemoryChunk> kernalROM{};
 
-	nvic::LoadROM(lowROM, "rom/c64/basic", 0xA, 0xA000);
+	nvic::LoadROM(basicROM, "rom/c64/basic", 0xA000);
 //	nvic::LoadROM(highROM, "rom/c64/chargen", 3, 0xD000);
-	nvic::LoadROM(highROM, "rom/c64/kernal", 0xE, 0xE000);
+	nvic::LoadROM(kernalROM, "rom/c64/kernal", 0xE000);
 
-	memory.SetChunk(0xA, lowROM);
-	memory.SetChunk(0xE, highROM);
+	memory.SetChunk(0xA, basicROM);
+	memory.SetChunk(0xE, kernalROM);
 
 
 	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), cpu.GetSignals());
@@ -110,6 +110,11 @@ auto main() -> std::uint32_t
 			if (ImGui::Button("Run"))
 			{
 				cpu.SetRunMode(nvic::CPU::RunMode::Continuous);
+			}
+
+			if (ImGui::Button("Reset"))
+			{
+				cpu.Reset();
 			}
 
 			if (cpu.GetRunMode() == nvic::CPU::RunMode::Step)

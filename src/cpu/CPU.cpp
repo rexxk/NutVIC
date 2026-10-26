@@ -4,10 +4,11 @@
 #include "cpu/opcode/CompareOps.hpp"
 #include "cpu/opcode/ExecutionControl.hpp"
 #include "cpu/opcode/LoadOps.hpp"
+#include "cpu/opcode/LogicOps.hpp"
 #include "cpu/opcode/MathOps.hpp"
-#include "cpu/opcode/StackOps.hpp"
 #include "cpu/opcode/StatusControl.hpp"
 #include "cpu/opcode/StoreOps.hpp"
+#include "cpu/opcode/TransferOps.hpp"
 
 #include "memory/Memory.h"
 
@@ -25,7 +26,7 @@ namespace nvic
 		{
 			std::println("OpCode {:02x} is not implemented", signals.DataBus);
 
-			return 1;
+			return 0;
 		};
 
 
@@ -37,19 +38,33 @@ namespace nvic
 		for (auto i = 0; i < 256; i++)
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
+		m_OpCodes[0x09] = opcode::Op09_ORA;
 		m_OpCodes[0x20] = opcode::Op20_JSR;
+		m_OpCodes[0x29] = opcode::Op29_AND;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
+		m_OpCodes[0x85] = opcode::Op85_STAzp;
+		m_OpCodes[0x8D] = opcode::Op8D_STAabs;
 		m_OpCodes[0x8E] = opcode::Op8E_STXabs;
 		m_OpCodes[0x9A] = opcode::Op9A_TXS;
+		m_OpCodes[0x99] = opcode::Op99_STAabsY;
 		m_OpCodes[0xA2] = opcode::OpA2_LDX;
+		m_OpCodes[0xA8] = opcode::OpA8_TAY;
+		m_OpCodes[0xA9] = opcode::OpA9_LDA;
+		m_OpCodes[0xAD] = opcode::OpAD_LDAabs;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
 		m_OpCodes[0xCA] = opcode::OpCA_DEX;
 		m_OpCodes[0xD0] = opcode::OpD0_BNE;
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
+		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
+	}
+
+	auto CPU::Reset() -> void
+	{
+		m_Registers.PC = ResetVector;
 	}
 
 	auto CPU::SetMemory(Memory* memory) -> void
@@ -87,6 +102,9 @@ namespace nvic
 			FetchOperand(m_Registers.PC == ResetVector);
 
 			auto cycles = m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory);
+
+			if (cycles == 0)
+				break;
 
 			m_DecoderHostExecutionTime = __rdtsc() - hostExecutionStartCycle;
 

@@ -29,6 +29,8 @@ namespace nvic
 	public:
 		CPU(Clock& clock);
 
+		auto Reset() -> void;
+
 		auto SetMemory(Memory* memory) -> void;
 		auto SetRunMode(RunMode mode) -> void;
 		auto GetRunMode() const -> const RunMode { return m_RunMode; }

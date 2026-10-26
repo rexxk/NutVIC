@@ -10,7 +10,7 @@
 namespace nvic
 {
 
-	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint8_t slot, std::uint16_t address) -> void
+	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint16_t address) -> void
 	{
 		std::ifstream fs(file, std::ios::in | std::ios::binary);
 
@@ -24,6 +24,7 @@ namespace nvic
 		std::size_t size = fs.tellg();
 		fs.seekg(0, fs.beg);
 
+		auto slot = address >> 12;
 		std::uint16_t chunkStartAddress = slot * 4 * 1024;
 		std::uint16_t chunkAddress = address - chunkStartAddress;
 
