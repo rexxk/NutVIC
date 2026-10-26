@@ -29,6 +29,23 @@ namespace nvic
 				return 2;
 			};
 
+		constexpr auto Op98_TYA = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				registers.A = registers.Y;
+
+				if (registers.A == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.A & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 2;
+			};
+
 		constexpr auto Op9A_TXS = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				registers.StackPointer = registers.X;

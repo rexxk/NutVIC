@@ -53,6 +53,7 @@ namespace nvic
 				std::uint16_t zeropageAddress = signals.DataBus;
 
 				signals.AddressBus = zeropageAddress;
+				memory.Read();
 				std::uint8_t value = signals.DataBus;
 
 				value++;

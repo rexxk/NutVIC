@@ -51,10 +51,11 @@ namespace nvic
 		m_OpCodes[0x85] = opcode::Op85_STAzp;
 		m_OpCodes[0x86] = opcode::Op86_STXzp;
 		m_OpCodes[0x8A] = opcode::Op8A_TXA;
-		m_OpCodes[0x8D] = opcode::Op8D_STAabs;
 		m_OpCodes[0x8E] = opcode::Op8E_STXabs;
 		m_OpCodes[0x91] = opcode::Op91_STAindY;
 		m_OpCodes[0x99] = opcode::Op99_STAabsY;
+		m_OpCodes[0x8D] = opcode::Op8D_STAabs;
+		m_OpCodes[0x98] = opcode::Op98_TYA;
 		m_OpCodes[0x9A] = opcode::Op9A_TXS;
 		m_OpCodes[0xA0] = opcode::OpA0_LDY;
 		m_OpCodes[0xA2] = opcode::OpA2_LDX;
@@ -108,6 +109,9 @@ namespace nvic
 
 //				std::println("Single shot");
 			}
+
+//			if (m_Registers.PC == 0xFD67)
+//				m_RunMode = RunMode::Step;
 
 			hostExecutionStartCycle = __rdtsc();
 
