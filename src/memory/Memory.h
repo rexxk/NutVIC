@@ -9,7 +9,7 @@
 namespace nvic
 {
 
-	constexpr std::uint16_t ChunkSize = 16 * 1024;
+	constexpr std::uint16_t ChunkSize = 4 * 1024;
 
 	struct MemoryChunk
 	{
@@ -33,12 +33,12 @@ namespace nvic
 
 		auto ViewMemory() -> void;
 
-		auto GetChunks() -> std::array<MemoryChunk*, 4>& { return m_Chunks; }
+		auto GetChunks() -> std::array<MemoryChunk*, 16>& { return m_Chunks; }
 
 	private:
 		Signals& m_Signals;
 
-		std::array<MemoryChunk*, 4> m_Chunks;
+		std::array<MemoryChunk*, 16> m_Chunks;
 
 
 		int m_PageNumber{ 0xFF };

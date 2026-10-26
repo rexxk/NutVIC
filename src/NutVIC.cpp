@@ -13,8 +13,10 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
+#include <array>
 #include <cstdint>
 #include <print>
+#include <vector>
 
 
 
@@ -58,17 +60,17 @@ auto main() -> std::uint32_t
 	nvic::Memory memory{ cpu.GetSignals() };
 	cpu.SetMemory(&memory);
 
-	std::array<nvic::MemoryChunk, 4> ram{};
+	std::array<nvic::MemoryChunk, 16> ram{};
 
-	for (auto i = 0; i < 4; i++)
+	for (auto i = 0; i < 16; i++)
 		memory.SetChunk(i, ram.at(i));
 
-	nvic::MemoryChunk lowROM{ .ReadWrite{false} };
-	nvic::MemoryChunk highROM{ .ReadWrite{false} };
+	std::vector<nvic::MemoryChunk> lowROM{};
+	std::vector<nvic::MemoryChunk> highROM{};
 
-	nvic::LoadROM(lowROM, "rom/c64/basic", 2, 0xA000);
-	nvic::LoadROM(highROM, "rom/c64/chargen", 3, 0xD000);
-	nvic::LoadROM(highROM, "rom/c64/kernal", 3, 0xE000);
+	nvic::LoadROM(lowROM, "rom/c64/basic", 0xA, 0xA000);
+//	nvic::LoadROM(highROM, "rom/c64/chargen", 3, 0xD000);
+	nvic::LoadROM(highROM, "rom/c64/kernal", 0xE, 0xE000);
 
 	memory.SetChunk(2, lowROM);
 	memory.SetChunk(3, highROM);

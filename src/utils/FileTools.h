@@ -4,12 +4,13 @@
 
 #include <cstring>
 #include <string>
+#include <vector>
 
 
 namespace nvic
 {
 
-	auto LoadROM(MemoryChunk& lowROM, const std::string& file, std::uint8_t slot, std::uint16_t address) -> void;
+	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint8_t slot, std::uint16_t address, std::uint8_t slotCount) -> void;
 
 
 }

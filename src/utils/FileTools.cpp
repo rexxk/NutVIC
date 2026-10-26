@@ -4,12 +4,13 @@
 #include <fstream>
 #include <print>
 #include <string>
+#include <vector>
 
 
 namespace nvic
 {
 
-	auto LoadROM(MemoryChunk& chunk, const std::string& file, std::uint8_t slot, std::uint16_t address) -> void
+	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint8_t slot, std::uint16_t address, std::uint8_t slotCount) -> void
 	{
 		std::ifstream fs(file, std::ios::in | std::ios::binary);
 
@@ -23,7 +24,7 @@ namespace nvic
 		std::size_t size = fs.tellg();
 		fs.seekg(0, fs.beg);
 
-		std::uint16_t chunkStartAddress = slot * 16 * 1024;
+		std::uint16_t chunkStartAddress = slot * 4 * 1024;
 		std::uint16_t chunkAddress = address - chunkStartAddress;
 
 		std::println("ROM ({}) size: {} bytes\nChunk start address: 0x{:02x}\nChunk address: 0x{:02x}", file, size, chunkStartAddress, chunkAddress);
