@@ -76,7 +76,10 @@ namespace nvic
 			}
 
 			if (sameLine)
+			{
 				ImGui::SameLine();
+				sameLine = false;
+			}
 
 			ImGui::Text("%s", str.c_str());
 		}

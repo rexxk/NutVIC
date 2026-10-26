@@ -110,6 +110,15 @@ auto main() -> std::uint32_t
 				cpu.SetRunMode(nvic::CPU::RunMode::Continuous);
 			}
 
+			if (cpu.GetRunMode() == nvic::CPU::RunMode::Step)
+			{
+				ImGui::Separator();
+				ImGui::Text("Cycles: %d", cpu.GetLastExecutionCycles());
+				ImGui::Text("Execution time: %llu", cpu.GetLastExecutionTime());
+
+				ImGui::Text("Host cycles for opcode: %d", cpu.GetLastExecutionCycles() * clock.CPUClockDelay());
+			}
+
 			ImGui::End();
 		}
 

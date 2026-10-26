@@ -1,5 +1,6 @@
 #include "CPU/CPU.h"
 
+#include "cpu/opcode/ExecutionControl.hpp"
 #include "memory/Memory.h"
 
 #include <cstdint>
@@ -11,9 +12,11 @@ namespace nvic
 
 	constexpr std::uint16_t ResetVector = 0xFFFC;
 
-	constexpr auto NotImplementedOpCode = []()
+	constexpr auto NotImplementedOpCode = [](Registers& registers, Signals& signals, Memory& memory)
 		{
 			std::println("OpCode is not implemented");
+
+			return 1;
 		};
 
 
@@ -25,6 +28,7 @@ namespace nvic
 		for (auto i = 0; i < 256; i++)
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
+		m_OpCodes[0x4C] = opcode::Op4C_JMP;
 	}
 
 	auto CPU::SetMemory(Memory* memory) -> void
@@ -51,10 +55,17 @@ namespace nvic
 			auto startCycle = m_Clock.CPUClockCycles();
 
 			// Execute
-			FetchOperand(m_Registers.PC & ResetVector);
+			FetchOperand(m_Registers.PC == ResetVector);
 
+			auto cycles = m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory);
 
 			cycleCount = m_Clock.CPUClockCycles() - startCycle;
+
+			if (m_RunMode == RunMode::Step)
+			{
+				m_OpCodeExecutionTime = cycleCount;
+				m_OpCodeCycles = cycles;
+			}
 
 			// Delay, wait until cycleCount equals operation cycle time
 		}
@@ -90,8 +101,9 @@ namespace nvic
 			return;
 		}
 
-		m_Signals.AddressBus = m_Registers.PC;
+		m_Signals.AddressBus = m_Registers.PC++;
 		m_Memory->Read();
 
+		m_Operand = m_Signals.DataBus;
 	}
 }

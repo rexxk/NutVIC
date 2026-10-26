@@ -27,6 +27,10 @@ namespace nvic
 		auto DotClockCycles() const -> const std::uint64_t { return m_DotClockTicks.load(); }
 		auto CPUClockCycles() const -> const std::uint64_t { return m_CPUClockTicks.load(); }
 
+		auto ColorClockDelay() const -> const std::uint32_t { return m_ColorClockDelay; }
+		auto DotClockDelay() const -> const std::uint32_t { return m_DotClockDelay; }
+		auto CPUClockDelay() const -> const std::uint32_t { return m_CPUClockDelay; }
+
 	private:
 		auto ClockThread() -> void;
 

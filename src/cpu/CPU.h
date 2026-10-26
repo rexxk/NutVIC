@@ -13,9 +13,9 @@
 namespace nvic
 {
 
-	using OpCodeFn = std::function<void()>;
-
 	class Memory;
+
+	using OpCodeFn = std::function<std::uint8_t(Registers&, Signals&, Memory&)>;
 
 	class CPU
 	{
@@ -31,6 +31,7 @@ namespace nvic
 
 		auto SetMemory(Memory* memory) -> void;
 		auto SetRunMode(RunMode mode) -> void;
+		auto GetRunMode() const -> const RunMode { return m_RunMode; }
 
 		auto GetRegisters() -> Registers& { return m_Registers; }
 		auto GetSignals() -> Signals& { return m_Signals; }
@@ -39,6 +40,9 @@ namespace nvic
 		auto Stop() -> void;
 
 		auto SingleShot() -> void;
+
+		auto GetLastExecutionTime() const -> const std::uint64_t { return m_OpCodeExecutionTime; }
+		auto GetLastExecutionCycles() const -> const std::uint8_t { return m_OpCodeCycles; }
 
 	private:
 		auto ExecuteThread() -> void;
@@ -58,6 +62,8 @@ namespace nvic
 		std::atomic<bool> m_Running{ false };
 		std::atomic<bool> m_SingleShot{ false };
 
+		std::uint64_t m_OpCodeExecutionTime{};
+		std::uint8_t m_OpCodeCycles{};
 
 		std::array<OpCodeFn, 256> m_OpCodes;
 		std::uint8_t m_Operand{};
