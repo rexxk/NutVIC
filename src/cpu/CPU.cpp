@@ -1,6 +1,9 @@
 #include "CPU/CPU.h"
 
 #include "cpu/opcode/ExecutionControl.hpp"
+#include "cpu/opcode/LoadOps.hpp"
+#include "cpu/opcode/StatusControl.hpp"
+
 #include "memory/Memory.h"
 
 #include <chrono>
@@ -30,6 +33,8 @@ namespace nvic
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
+		m_OpCodes[0x78] = opcode::Op78_SEI;
+		m_OpCodes[0xA2] = opcode::OpA2_LDX;
 	}
 
 	auto CPU::SetMemory(Memory* memory) -> void
@@ -44,6 +49,7 @@ namespace nvic
 		std::uint64_t elapsedCycles{};
 
 		std::uint64_t hostStartCycle{};
+		std::uint64_t hostExecutionStartCycle{};
 
 		while (m_Running)
 		{
@@ -60,12 +66,17 @@ namespace nvic
 //				std::println("Single shot");
 			}
 
+			hostExecutionStartCycle = __rdtsc();
+
 			// Execute
 			FetchOperand(m_Registers.PC == ResetVector);
 
 			auto cycles = m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory);
 
+			m_DecoderHostExecutionTime = __rdtsc() - hostExecutionStartCycle;
+
 			cycleCount = m_Clock.CPUClockCycles() - startCycle;
+
 
 			if (m_RunMode == RunMode::Step)
 			{

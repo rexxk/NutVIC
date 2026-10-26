@@ -45,6 +45,7 @@ namespace nvic
 		auto GetLastExecutionCycles() const -> const std::uint8_t { return m_OpCodeCycles; }
 		auto GetDecoderCycleTime() const -> const std::uint64_t { return m_DecoderCycleTime; }
 		auto GetDecoderHostCycleTime() const -> const std::uint64_t { return m_DecoderHostCycleTime; }
+		auto GetDecoderHostExecutionTime() const -> const std::uint64_t { return m_DecoderHostExecutionTime; }
 
 	private:
 		auto ExecuteThread() -> void;
@@ -66,6 +67,7 @@ namespace nvic
 
 		std::uint64_t m_OpCodeExecutionTime{};
 		std::uint8_t m_OpCodeCycles{};
+		std::uint64_t m_DecoderHostExecutionTime{};
 		std::uint64_t m_DecoderCycleTime{};
 		std::uint64_t m_DecoderHostCycleTime{};
 
