@@ -94,6 +94,30 @@ namespace nvic
 				return 4;
 			};
 
+		constexpr auto Op91_STAindY = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t address{};
+				std::uint16_t zeropageAddress{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				zeropageAddress = signals.DataBus;
+
+				signals.AddressBus = zeropageAddress;
+				memory.Read();
+				address = signals.DataBus;
+
+				signals.AddressBus++;
+				memory.Read();
+				address += signals.DataBus << 8;
+
+				signals.AddressBus = address + registers.Y;
+				signals.DataBus = registers.A;
+				memory.Write();
+
+				return 6;
+			};
+
 		constexpr auto Op99_STAabsY = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				std::uint16_t address{};

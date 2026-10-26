@@ -12,6 +12,23 @@ namespace nvic
 	namespace opcode
 	{
 
+		constexpr auto Op8A_TXA = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				registers.A = registers.X;
+
+				if (registers.A == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.A & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 2;
+			};
+
 		constexpr auto Op9A_TXS = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				registers.StackPointer = registers.X;
@@ -29,6 +46,23 @@ namespace nvic
 					registers.Flags &= ~Flag_Zero;
 
 				if (registers.Y & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 2;
+			};
+
+		constexpr auto OpAA_TAX = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				registers.X = registers.A;
+
+				if (registers.X == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.X & 0x80)
 					registers.Flags |= Flag_Negative;
 				else
 					registers.Flags &= ~Flag_Negative;

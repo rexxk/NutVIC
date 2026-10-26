@@ -6,6 +6,7 @@
 #include "cpu/opcode/LoadOps.hpp"
 #include "cpu/opcode/LogicOps.hpp"
 #include "cpu/opcode/MathOps.hpp"
+#include "cpu/opcode/ShiftOps.hpp"
 #include "cpu/opcode/StatusControl.hpp"
 #include "cpu/opcode/StoreOps.hpp"
 #include "cpu/opcode/TransferOps.hpp"
@@ -41,6 +42,7 @@ namespace nvic
 		m_OpCodes[0x09] = opcode::Op09_ORA;
 		m_OpCodes[0x20] = opcode::Op20_JSR;
 		m_OpCodes[0x29] = opcode::Op29_AND;
+		m_OpCodes[0x2A] = opcode::Op2A_ROL;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
@@ -48,20 +50,25 @@ namespace nvic
 		m_OpCodes[0x84] = opcode::Op84_STYzp;
 		m_OpCodes[0x85] = opcode::Op85_STAzp;
 		m_OpCodes[0x86] = opcode::Op86_STXzp;
+		m_OpCodes[0x8A] = opcode::Op8A_TXA;
 		m_OpCodes[0x8D] = opcode::Op8D_STAabs;
 		m_OpCodes[0x8E] = opcode::Op8E_STXabs;
-		m_OpCodes[0x9A] = opcode::Op9A_TXS;
+		m_OpCodes[0x91] = opcode::Op91_STAindY;
 		m_OpCodes[0x99] = opcode::Op99_STAabsY;
+		m_OpCodes[0x9A] = opcode::Op9A_TXS;
 		m_OpCodes[0xA0] = opcode::OpA0_LDY;
 		m_OpCodes[0xA2] = opcode::OpA2_LDX;
 		m_OpCodes[0xA8] = opcode::OpA8_TAY;
 		m_OpCodes[0xA9] = opcode::OpA9_LDA;
+		m_OpCodes[0xAA] = opcode::OpAA_TAX;
 		m_OpCodes[0xAD] = opcode::OpAD_LDAabs;
 		m_OpCodes[0xB1] = opcode::OpB1_LDAindY;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
+		m_OpCodes[0xC1] = opcode::OpC1_CMPidxind;
 		m_OpCodes[0xC8] = opcode::OpC8_INY;
 		m_OpCodes[0xCA] = opcode::OpCA_DEX;
 		m_OpCodes[0xD0] = opcode::OpD0_BNE;
+		m_OpCodes[0xD1] = opcode::OpD1_CMPindY;
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
 		m_OpCodes[0xE6] = opcode::OpE6_INCzp;
