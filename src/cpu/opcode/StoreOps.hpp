@@ -12,6 +12,20 @@ namespace nvic
 	namespace opcode
 	{
 
+		constexpr auto Op84_STYzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t address{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				address = signals.DataBus;
+
+				signals.AddressBus = address;
+				signals.DataBus = registers.Y;
+				memory.Write();
+
+				return 3;
+			};
 		constexpr auto Op85_STAzp = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				std::uint16_t address{};
@@ -22,6 +36,21 @@ namespace nvic
 
 				signals.AddressBus = address;
 				signals.DataBus = registers.A;
+				memory.Write();
+
+				return 3;
+			};
+
+		constexpr auto Op86_STXzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t address{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				address = signals.DataBus;
+
+				signals.AddressBus = address;
+				signals.DataBus = registers.X;
 				memory.Write();
 
 				return 3;

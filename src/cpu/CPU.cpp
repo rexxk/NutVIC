@@ -45,20 +45,26 @@ namespace nvic
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
+		m_OpCodes[0x84] = opcode::Op84_STYzp;
 		m_OpCodes[0x85] = opcode::Op85_STAzp;
+		m_OpCodes[0x86] = opcode::Op86_STXzp;
 		m_OpCodes[0x8D] = opcode::Op8D_STAabs;
 		m_OpCodes[0x8E] = opcode::Op8E_STXabs;
 		m_OpCodes[0x9A] = opcode::Op9A_TXS;
 		m_OpCodes[0x99] = opcode::Op99_STAabsY;
+		m_OpCodes[0xA0] = opcode::OpA0_LDY;
 		m_OpCodes[0xA2] = opcode::OpA2_LDX;
 		m_OpCodes[0xA8] = opcode::OpA8_TAY;
 		m_OpCodes[0xA9] = opcode::OpA9_LDA;
 		m_OpCodes[0xAD] = opcode::OpAD_LDAabs;
+		m_OpCodes[0xB1] = opcode::OpB1_LDAindY;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
+		m_OpCodes[0xC8] = opcode::OpC8_INY;
 		m_OpCodes[0xCA] = opcode::OpCA_DEX;
 		m_OpCodes[0xD0] = opcode::OpD0_BNE;
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
+		m_OpCodes[0xE6] = opcode::OpE6_INCzp;
 		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
 	}
 
@@ -104,7 +110,7 @@ namespace nvic
 			auto cycles = m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory);
 
 			if (cycles == 0)
-				break;
+				m_RunMode = RunMode::Step;
 
 			m_DecoderHostExecutionTime = __rdtsc() - hostExecutionStartCycle;
 
@@ -124,6 +130,7 @@ namespace nvic
 				m_DecoderHostCycleTime = __rdtsc() - hostStartCycle;
 			} while (m_DecoderHostCycleTime < cycles * m_Clock.CPUClockDelay());
 
+			m_OpsRun++;
 		}
 	}
 

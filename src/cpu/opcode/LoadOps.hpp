@@ -13,6 +13,25 @@ namespace nvic
 	namespace opcode
 	{
 
+		constexpr auto OpA0_LDY = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				registers.Y = signals.DataBus;
+
+				if (registers.Y == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.Y & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 2;
+			};
+
 		constexpr auto OpA2_LDX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				signals.AddressBus = registers.PC++;
@@ -78,6 +97,44 @@ namespace nvic
 					registers.Flags &= ~Flag_Negative;
 
 				return 4;
+			};
+
+		constexpr auto OpB1_LDAindY = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint8_t overrun{};
+				std::uint16_t address{};
+				std::uint16_t zeropageAddress{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				zeropageAddress = signals.DataBus;
+
+				signals.AddressBus = zeropageAddress;
+				memory.Read();
+				address = signals.DataBus;
+
+				signals.AddressBus++;
+				memory.Read();
+				address += signals.DataBus << 8;
+
+				signals.AddressBus = address + registers.Y;
+				memory.Read();
+				registers.A = signals.DataBus;
+
+				if ((address >> 8) != ((address + registers.Y) >> 8))
+					overrun = 1;
+
+				if (registers.A == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.A & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 5 + overrun;
 			};
 
 		constexpr auto OpBD_LDAabsX = [](Registers& registers, Signals& signals, Memory& memory)
