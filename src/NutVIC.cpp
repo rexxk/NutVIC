@@ -117,6 +117,7 @@ auto main() -> std::uint32_t
 				ImGui::Text("Execution time: %llu", cpu.GetLastExecutionTime());
 
 				ImGui::Text("Host cycles for opcode: %d", cpu.GetLastExecutionCycles() * clock.CPUClockDelay());
+				ImGui::Text("Decoder time in cycles: %llu", cpu.GetDecoderCycleTime());
 			}
 
 			ImGui::End();

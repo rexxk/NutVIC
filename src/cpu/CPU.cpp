@@ -38,10 +38,14 @@ namespace nvic
 
 	auto CPU::ExecuteThread() -> void
 	{
+		std::uint64_t startCycle{};
 		std::uint64_t cycleCount{};
+		std::uint64_t elapsedCycles{};
 
 		while (m_Running)
 		{
+			startCycle = m_Clock.CPUClockCycles();
+
 			if (m_RunMode == RunMode::Step)
 			{
 				if (!m_SingleShot)
@@ -49,10 +53,8 @@ namespace nvic
 
 				m_SingleShot.store(false);
 
-				std::println("Single shot");
+//				std::println("Single shot");
 			}
-
-			auto startCycle = m_Clock.CPUClockCycles();
 
 			// Execute
 			FetchOperand(m_Registers.PC == ResetVector);
@@ -68,6 +70,12 @@ namespace nvic
 			}
 
 			// Delay, wait until cycleCount equals operation cycle time
+			do
+			{
+				elapsedCycles = m_Clock.CPUClockCycles() - startCycle;
+			} while (elapsedCycles < cycles * m_Clock.CPUClockDelay());
+
+			m_DecoderCycleTime = elapsedCycles;
 		}
 	}
 
