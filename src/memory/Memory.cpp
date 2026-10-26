@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <format>
 #include <string>
+#include <vector>
 
 
 namespace nvic
@@ -57,6 +58,14 @@ namespace nvic
 	auto Memory::SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void
 	{
 		m_Chunks.at(chunkID) = &chunk;
+	}
+
+	auto Memory::SetChunk(std::uint8_t chunkID, std::vector<MemoryChunk>& chunks) -> void
+	{
+		auto chunkCount = 0;
+
+		for (auto& chunk : chunks)
+			m_Chunks.at(chunkID + chunkCount++) = &chunk;
 	}
 
 	auto Memory::FindChunk(std::uint16_t address) -> std::uint8_t

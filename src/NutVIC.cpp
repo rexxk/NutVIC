@@ -72,8 +72,8 @@ auto main() -> std::uint32_t
 //	nvic::LoadROM(highROM, "rom/c64/chargen", 3, 0xD000);
 	nvic::LoadROM(highROM, "rom/c64/kernal", 0xE, 0xE000);
 
-	memory.SetChunk(2, lowROM);
-	memory.SetChunk(3, highROM);
+	memory.SetChunk(0xA, lowROM);
+	memory.SetChunk(0xE, highROM);
 
 
 	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), cpu.GetSignals());

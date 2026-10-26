@@ -38,8 +38,8 @@ namespace nvic
 		}
 
 		auto chunks = m_Memory.GetChunks();
-		auto chunk = m_PageNumber >> 6;
-		auto chunkStartAddress = chunk * 16 * 1024;
+		auto chunk = m_PageNumber >> 4;
+		auto chunkStartAddress = chunk * 4 * 1024;
 		auto chunkAddress = (m_PageNumber * 0x100) - chunkStartAddress;
 
 		std::uint16_t count{};

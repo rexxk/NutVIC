@@ -10,7 +10,7 @@
 namespace nvic
 {
 
-	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint8_t slot, std::uint16_t address, std::uint8_t slotCount) -> void
+	auto LoadROM(std::vector<MemoryChunk>& chunks, const std::string& file, std::uint8_t slot, std::uint16_t address) -> void
 	{
 		std::ifstream fs(file, std::ios::in | std::ios::binary);
 
@@ -27,9 +27,19 @@ namespace nvic
 		std::uint16_t chunkStartAddress = slot * 4 * 1024;
 		std::uint16_t chunkAddress = address - chunkStartAddress;
 
+		auto chunkCount = size / (4 * 1024);
+		auto chunkSize = 4 * 1024;
+
 		std::println("ROM ({}) size: {} bytes\nChunk start address: 0x{:02x}\nChunk address: 0x{:02x}", file, size, chunkStartAddress, chunkAddress);
 
-		fs.read((char*)(chunk.Data.data() + chunkAddress), size);
+		for (auto i = 0; i < chunkCount; i++)
+		{
+			MemoryChunk newChunk{ .ReadWrite{false} };
+			fs.read((char*)(newChunk.Data.data() + chunkAddress), chunkSize);
+
+			chunks.push_back(newChunk);
+		}
+
 
 		fs.close();
 	}
