@@ -12,6 +12,13 @@ namespace nvic
 	namespace opcode
 	{
 
+		constexpr auto Op18_CLC = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				registers.Flags &= ~Flag_Carry;
+
+				return 2;
+			};
+
 		constexpr auto Op78_SEI = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				registers.Flags |= Flag_Interrupt;

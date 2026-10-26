@@ -40,30 +40,44 @@ namespace nvic
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
 		m_OpCodes[0x09] = opcode::Op09_ORA;
+		m_OpCodes[0x0D] = opcode::Op0D_ORAabs;
+		m_OpCodes[0x10] = opcode::Op10_BPL;
+		m_OpCodes[0x18] = opcode::Op18_CLC;
 		m_OpCodes[0x20] = opcode::Op20_JSR;
 		m_OpCodes[0x29] = opcode::Op29_AND;
 		m_OpCodes[0x2A] = opcode::Op2A_ROL;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
+		m_OpCodes[0x69] = opcode::Op69_ADC;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
 		m_OpCodes[0x84] = opcode::Op84_STYzp;
 		m_OpCodes[0x85] = opcode::Op85_STAzp;
 		m_OpCodes[0x86] = opcode::Op86_STXzp;
+		m_OpCodes[0x88] = opcode::Op88_DEY;
 		m_OpCodes[0x8A] = opcode::Op8A_TXA;
-		m_OpCodes[0x8E] = opcode::Op8E_STXabs;
-		m_OpCodes[0x91] = opcode::Op91_STAindY;
-		m_OpCodes[0x99] = opcode::Op99_STAabsY;
+		m_OpCodes[0x8C] = opcode::Op8C_STYabs;
 		m_OpCodes[0x8D] = opcode::Op8D_STAabs;
+		m_OpCodes[0x8E] = opcode::Op8E_STXabs;
+		m_OpCodes[0x90] = opcode::Op90_BCC;
+		m_OpCodes[0x91] = opcode::Op91_STAindY;
+		m_OpCodes[0x94] = opcode::Op94_STYzpX;
+		m_OpCodes[0x95] = opcode::Op95_STAzpX;
 		m_OpCodes[0x98] = opcode::Op98_TYA;
+		m_OpCodes[0x99] = opcode::Op99_STAabsY;
 		m_OpCodes[0x9A] = opcode::Op9A_TXS;
+		m_OpCodes[0x9D] = opcode::Op9D_STAabsX;
 		m_OpCodes[0xA0] = opcode::OpA0_LDY;
 		m_OpCodes[0xA2] = opcode::OpA2_LDX;
+		m_OpCodes[0xA4] = opcode::OpA4_LDYzp;
 		m_OpCodes[0xA8] = opcode::OpA8_TAY;
 		m_OpCodes[0xA9] = opcode::OpA9_LDA;
 		m_OpCodes[0xAA] = opcode::OpAA_TAX;
 		m_OpCodes[0xAD] = opcode::OpAD_LDAabs;
+		m_OpCodes[0xB0] = opcode::OpB0_BCS;
 		m_OpCodes[0xB1] = opcode::OpB1_LDAindY;
+		m_OpCodes[0xB5] = opcode::OpB5_LDAzpX;
+		m_OpCodes[0xB9] = opcode::OpB9_LDAabsY;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
 		m_OpCodes[0xC1] = opcode::OpC1_CMPidxind;
 		m_OpCodes[0xC8] = opcode::OpC8_INY;
@@ -72,7 +86,9 @@ namespace nvic
 		m_OpCodes[0xD1] = opcode::OpD1_CMPindY;
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
+		m_OpCodes[0xE0] = opcode::OpE0_CPX;
 		m_OpCodes[0xE6] = opcode::OpE6_INCzp;
+		m_OpCodes[0xE8] = opcode::OpE8_INX;
 		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
 	}
 

@@ -132,6 +132,30 @@ namespace nvic
 				return 4 + overrun;
 			};
 
+		constexpr auto OpE0_CPX = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+
+				std::uint8_t result = registers.X - signals.DataBus;
+
+				if (result >= signals.DataBus)
+					registers.Flags |= Flag_Carry;
+				else
+					registers.Flags &= ~Flag_Carry;
+
+				if (result == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (result & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 2;
+			};
 	}
 
 }
