@@ -3,6 +3,7 @@
 #include "cpu/opcode/ExecutionControl.hpp"
 #include "memory/Memory.h"
 
+#include <chrono>
 #include <cstdint>
 #include <print>
 
@@ -14,7 +15,7 @@ namespace nvic
 
 	constexpr auto NotImplementedOpCode = [](Registers& registers, Signals& signals, Memory& memory)
 		{
-			std::println("OpCode is not implemented");
+			std::println("OpCode {:02x} is not implemented", signals.DataBus);
 
 			return 1;
 		};
@@ -42,8 +43,11 @@ namespace nvic
 		std::uint64_t cycleCount{};
 		std::uint64_t elapsedCycles{};
 
+		std::uint64_t hostStartCycle{};
+
 		while (m_Running)
 		{
+			hostStartCycle = __rdtsc();
 			startCycle = m_Clock.CPUClockCycles();
 
 			if (m_RunMode == RunMode::Step)
@@ -72,10 +76,10 @@ namespace nvic
 			// Delay, wait until cycleCount equals operation cycle time
 			do
 			{
-				elapsedCycles = m_Clock.CPUClockCycles() - startCycle;
-			} while (elapsedCycles < cycles * m_Clock.CPUClockDelay());
+				m_DecoderCycleTime = m_Clock.CPUClockCycles() - startCycle;
+				m_DecoderHostCycleTime = __rdtsc() - hostStartCycle;
+			} while (m_DecoderHostCycleTime < cycles * m_Clock.CPUClockDelay());
 
-			m_DecoderCycleTime = elapsedCycles;
 		}
 	}
 

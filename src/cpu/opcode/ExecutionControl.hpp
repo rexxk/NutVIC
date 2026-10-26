@@ -14,10 +14,8 @@ namespace nvic
 	{
 
 
-		auto Op4C_JMP = [](Registers& registers, Signals& signals, Memory& memory)
+		constexpr auto Op4C_JMP = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::println("JUMP!");
-
 				signals.AddressBus = registers.PC++;
 				memory.Read();
 				std::uint16_t address = signals.DataBus;
