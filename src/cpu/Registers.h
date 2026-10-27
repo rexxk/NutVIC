@@ -14,6 +14,10 @@ namespace nvic
 		std::uint8_t StackPointer{};
 		std::uint8_t Flags{};
 		std::uint16_t PC{};
+
+		std::uint16_t InternalRegister{};
+		std::uint8_t BaseAddressLow{};
+		std::uint8_t BaseAddressHigh{};
 	};
 
 }

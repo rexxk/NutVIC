@@ -48,9 +48,13 @@ namespace nvic
 
 		constexpr auto Op9A_TXS = [](Registers& registers, Signals& signals, Memory& memory)
 			{
+				signals.ExecutionCycle++;
+
 				registers.StackPointer = registers.X;
 
-				return 2;
+				signals.Executing = false;
+
+				return true;
 			};
 
 		constexpr auto OpA8_TAY = [](Registers& registers, Signals& signals, Memory& memory)

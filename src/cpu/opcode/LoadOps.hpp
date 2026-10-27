@@ -34,6 +34,8 @@ namespace nvic
 
 		constexpr auto OpA2_LDX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
+				signals.ExecutionCycle++;
+
 				signals.AddressBus = registers.PC++;
 				memory.Read();
 				registers.X = signals.DataBus;
@@ -48,7 +50,9 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
-				return 2;
+				signals.Executing = false;
+
+				return true;
 			};
 
 		constexpr auto OpA4_LDYzp = [](Registers& registers, Signals& signals, Memory& memory)
@@ -321,34 +325,72 @@ namespace nvic
 
 		constexpr auto OpBD_LDAabsX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint8_t overrun{};
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				if ((registers.PC & 0xFF) > 0xFE) overrun = 1;
+						return true;
+					}
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh += signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus;
+						return true;
+					}
+					case 2:
+					{
+						signals.AddressBus = (registers.BaseAddressHigh << 8) + registers.BaseAddressLow + registers.X;
+						memory.Read();
+						registers.A = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += static_cast<std::uint16_t>(signals.DataBus << 8);
+						if (static_cast<std::uint16_t>(registers.BaseAddressLow + registers.X) & 0x100)
+						{
+							return true;
+						}
 
-				signals.AddressBus = address + registers.X;
-				memory.Read();
-				registers.A = signals.DataBus;
+						if (registers.A == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
 
-				if (registers.A == 0)
-					registers.Flags |= Flag_Zero;
-				else
-					registers.Flags &= ~Flag_Zero;
+						if (registers.A & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
 
-				if (registers.A & 0x80)
-					registers.Flags |= Flag_Negative;
-				else
-					registers.Flags &= ~Flag_Negative;
+						signals.Executing = false;
 
-				return 4 + overrun;
+						return true;
+					}
+					case 3:
+					{
+						signals.AddressBus = ((registers.BaseAddressHigh + 1) << 8) + registers.BaseAddressLow + registers.X;
+						memory.Read();
+						registers.A = signals.DataBus;
+
+						if (registers.A == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (registers.A & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+
+						return true;
+					}
+				}
+
+				return true;
 			};
 	}
 

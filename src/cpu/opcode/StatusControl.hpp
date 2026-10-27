@@ -16,21 +16,27 @@ namespace nvic
 			{
 				registers.Flags &= ~Flag_Carry;
 
-				return 2;
+				signals.Executing = false;
+
+				return true;
 			};
 
 		constexpr auto Op78_SEI = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				registers.Flags |= Flag_Interrupt;
 
-				return 2;
+				signals.Executing = false;
+
+				return true;
 			};
 
 		constexpr auto OpD8_CLD = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				registers.Flags &= ~Flag_Decimal;
 
-				return 2;
+				signals.Executing = false;
+
+				return true;
 			};
 	}
 

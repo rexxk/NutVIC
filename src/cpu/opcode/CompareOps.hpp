@@ -97,39 +97,82 @@ namespace nvic
 
 		constexpr auto OpDD_CMPabsX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint8_t overrun{};
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				if ((registers.PC & 0xFF) > 0xFE) overrun = 1;
+						return true;
+					}
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus;
+						return true;
+					}
+					case 2:
+					{
+						signals.AddressBus = registers.BaseAddressHigh << 8 + registers.BaseAddressLow + registers.X;
+						memory.Read();
+						std::uint8_t result = registers.A - signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += static_cast<std::uint16_t>(signals.DataBus << 8);
+						if (static_cast<std::uint16_t>(registers.BaseAddressLow + registers.X) & 0x100)
+						{
+							return true;
+						}
 
-				signals.AddressBus = address + registers.X;
-				memory.Read();
-				std::uint8_t result = registers.A - signals.DataBus;
+						if (result >= signals.DataBus)
+							registers.Flags |= Flag_Carry;
+						else
+							registers.Flags &= ~Flag_Carry;
 
-				if (result >= signals.DataBus)
-					registers.Flags |= Flag_Carry;
-				else
-					registers.Flags &= ~Flag_Carry;
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
 
-				if (result == 0)
-					registers.Flags |= Flag_Zero;
-				else
-					registers.Flags &= ~Flag_Zero;
+						if (result & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
 
-				if (result & 0x80)
-					registers.Flags |= Flag_Negative;
-				else
-					registers.Flags &= ~Flag_Negative;
+						signals.Executing = false;
 
-				return 4 + overrun;
+						return true;
+					}
+					case 3:
+					{
+						signals.AddressBus = (registers.BaseAddressHigh + 1) << 8 + registers.BaseAddressLow + registers.X;
+						memory.Read();
+						std::uint8_t result = registers.A - signals.DataBus;
+
+						if (result >= signals.DataBus)
+							registers.Flags |= Flag_Carry;
+						else
+							registers.Flags &= ~Flag_Carry;
+
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (result & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto OpE0_CPX = [](Registers& registers, Signals& signals, Memory& memory)

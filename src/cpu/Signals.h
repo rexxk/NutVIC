@@ -24,6 +24,9 @@ namespace nvic
 	{
 		std::uint16_t Control{};
 
+		bool Executing{};
+		std::uint8_t ExecutionCycle{};
+
 		std::uint8_t DataBus{};
 		std::uint16_t AddressBus{};
 	};

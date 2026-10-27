@@ -15,7 +15,7 @@ namespace nvic
 
 	class Memory;
 
-	using OpCodeFn = std::function<std::uint8_t(Registers&, Signals&, Memory&)>;
+	using OpCodeFn = std::function<bool(Registers&, Signals&, Memory&)>;
 
 	class CPU
 	{

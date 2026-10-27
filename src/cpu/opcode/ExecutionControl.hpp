@@ -13,39 +13,73 @@ namespace nvic
 
 		constexpr auto Op20_JSR = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				std::uint8_t destinationLowAddress = signals.DataBus;
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.InternalRegister = signals.DataBus;
 
-				std::uint8_t highAddress = registers.PC >> 8;
-				memory.Push(0x100 + registers.StackPointer--, highAddress);
+						return true;
+					}
+					case 1:
+					{
+						std::uint8_t highAddress = registers.PC >> 8;
+						memory.Push(0x100 + registers.StackPointer--, highAddress);
 
-				std::uint8_t lowAddress = registers.PC & 0xFF;
-				memory.Push(0x100 + registers.StackPointer--, lowAddress);
+						return true;
+					}
+					case 2:
+					{
+						std::uint8_t lowAddress = registers.PC & 0xFF;
+						memory.Push(0x100 + registers.StackPointer--, lowAddress);
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				std::uint8_t destinationHighAddress = signals.DataBus;
+						return true;
+					}
+					case 3:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.InternalRegister += signals.DataBus << 8;
 
-				std::uint16_t newAddress = static_cast<std::uint16_t>(destinationHighAddress << 8) + destinationLowAddress;
-				registers.PC = newAddress;
+						return true;
+					}
+					case 4:
+					{
+						registers.PC = registers.InternalRegister;
+						signals.Executing = false;
+					}
+				}
 
-				return 6;
+				return true;
 			};
 
 		constexpr auto Op4C_JMP = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				std::uint16_t address = signals.DataBus;
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.InternalRegister = signals.DataBus;
+						return true;
+					}
+					case 1:
+					{
+						signals.AddressBus = registers.PC;
+						memory.Read();
+						registers.InternalRegister += (signals.DataBus << 8);
+						registers.PC = registers.InternalRegister;
 
-				signals.AddressBus = registers.PC;
-				memory.Read();
-				address += (signals.DataBus << 8);
+						signals.Executing = false;
 
-				registers.PC = address;
+						return true;
+					}
+				}
 
-				return 3;
+				return false;
 			};
 
 		constexpr auto Op60_RTS = [](Registers& registers, Signals& signals, Memory& memory)
