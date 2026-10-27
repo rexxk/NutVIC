@@ -76,6 +76,56 @@ namespace nvic
 				return 3;
 			};
 
+		constexpr auto OpA5_LDAzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t zeropageAddress{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				zeropageAddress = signals.DataBus;
+
+				signals.AddressBus = zeropageAddress;
+				memory.Read();
+				registers.A = signals.DataBus;
+
+				if (registers.A == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.A & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 3;
+			};
+
+		constexpr auto OpA6_LDXzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t zeropageAddress{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				zeropageAddress = signals.DataBus;
+
+				signals.AddressBus = zeropageAddress;
+				memory.Read();
+				registers.X = signals.DataBus;
+
+				if (registers.X == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.X & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 3;
+			};
+
 		constexpr auto OpA9_LDA = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				signals.AddressBus = registers.PC++;
@@ -162,6 +212,31 @@ namespace nvic
 				return 5 + overrun;
 			};
 
+		constexpr auto OpB4_LDYzpX = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t zeropageAddress{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				zeropageAddress = signals.DataBus;
+
+				signals.AddressBus = (zeropageAddress + registers.X) & 0xFF;
+				memory.Read();
+				registers.Y = signals.DataBus;
+
+				if (registers.Y == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.Y & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 4;
+			};
+
 		constexpr auto OpB5_LDAzpX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				std::uint16_t zeropageAddress{};
@@ -180,6 +255,31 @@ namespace nvic
 					registers.Flags &= ~Flag_Zero;
 
 				if (registers.A & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				return 4;
+			};
+
+		constexpr auto OpB6_LDXzpY = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				std::uint16_t zeropageAddress{};
+
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+				zeropageAddress = signals.DataBus;
+
+				signals.AddressBus = (zeropageAddress + registers.Y) & 0xFF;
+				memory.Read();
+				registers.X = signals.DataBus;
+
+				if (registers.X == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.X & 0x80)
 					registers.Flags |= Flag_Negative;
 				else
 					registers.Flags &= ~Flag_Negative;
