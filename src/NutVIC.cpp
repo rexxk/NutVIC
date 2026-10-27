@@ -1,5 +1,6 @@
 #include "chipset/Clock.h"
 #include "chipset/PIC.h"
+#include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "memory/Memory.h"
 #include "ui/CPUPanel.h"
@@ -83,8 +84,10 @@ auto main() -> std::uint32_t
 	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), cpu.GetSignals());
 	nvic::MemoryPanel memoryPanel(memory, cpu.GetRegisters());
 
-	nvic::PIC pic1{ 0 };
-	nvic::PIC pic2{ 1 };
+	nvic::PIC pic1{ 0, ioData, cpu.GetSignals() };
+	nvic::PIC pic2{ 1, ioData, cpu.GetSignals() };
+
+	nvic::VIC_II vic2{ ioData, cpu.GetSignals() };
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
