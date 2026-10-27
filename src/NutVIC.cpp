@@ -1,4 +1,5 @@
 #include "chipset/Clock.h"
+#include "chipset/PIC.h"
 #include "cpu/CPU.h"
 #include "memory/Memory.h"
 #include "ui/CPUPanel.h"
@@ -68,16 +69,22 @@ auto main() -> std::uint32_t
 	std::vector<nvic::MemoryChunk> basicROM{};
 	std::vector<nvic::MemoryChunk> kernalROM{};
 
+	nvic::MemoryChunk ioData{ .ReadWrite{true} };
+
 	nvic::LoadROM(basicROM, "rom/c64/basic", 0xA000);
 //	nvic::LoadROM(highROM, "rom/c64/chargen", 3, 0xD000);
 	nvic::LoadROM(kernalROM, "rom/c64/kernal", 0xE000);
 
 	memory.SetChunk(0xA, basicROM);
+	memory.SetChunk(0xD, ioData);
 	memory.SetChunk(0xE, kernalROM);
 
 
 	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), cpu.GetSignals());
 	nvic::MemoryPanel memoryPanel(memory, cpu.GetRegisters());
+
+	nvic::PIC pic1{ 0 };
+	nvic::PIC pic2{ 1 };
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
