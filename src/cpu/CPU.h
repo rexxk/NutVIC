@@ -27,7 +27,7 @@ namespace nvic
 		};
 
 	public:
-		CPU(Clock& clock);
+		CPU(Clock& clock, Signals& signals);
 
 		auto Reset() -> void;
 
@@ -36,7 +36,6 @@ namespace nvic
 		auto GetRunMode() const -> const RunMode { return m_RunMode; }
 
 		auto GetRegisters() -> Registers& { return m_Registers; }
-		auto GetSignals() -> Signals& { return m_Signals; }
 
 		auto Start() -> void;
 		auto Stop() -> void;
@@ -57,12 +56,12 @@ namespace nvic
 
 	private:
 		Clock& m_Clock;
+		Signals& m_Signals;
 		Memory* m_Memory{ nullptr };
 
 		std::atomic<RunMode> m_RunMode{ RunMode::Step };
 
 		Registers m_Registers{};
-		Signals m_Signals{};
 
 		std::jthread m_Thread;
 		std::atomic<bool> m_Running{ false };

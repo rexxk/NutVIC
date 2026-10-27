@@ -1,4 +1,5 @@
 #include "chipset/Clock.h"
+#include "cpu/Signals.h"
 
 #include <chrono>
 #include <print>
@@ -17,8 +18,8 @@ namespace nvic
 
 
 
-	Clock::Clock(FrequencyMode mode)
-		: m_FrequencyMode(mode)
+	Clock::Clock(FrequencyMode mode, Signals& signals)
+		: m_FrequencyMode(mode), m_Signals(signals)
 	{
 		std::uint64_t currentPerformanceCount{};
 
@@ -88,6 +89,9 @@ namespace nvic
 
 		cpuClockStart = dotClockStart = colorClockStart = __rdtsc();
 
+		std::uint32_t cpuClockHalfPhaseDelay = m_CPUClockDelay / 2;
+		std::uint64_t cpuHalfClockTicks{};
+
 		while (m_Running.load())
 		{
 			auto now = __rdtsc();
@@ -110,10 +114,21 @@ namespace nvic
 
 			cpuClockElapsed = now - cpuClockStart;
 
-			if (cpuClockElapsed > m_CPUClockDelay)
+//			if (cpuClockElapsed > m_CPUClockDelay)
+			if (cpuClockElapsed > cpuClockHalfPhaseDelay)
 			{
-				m_CPUClockTicks++;
-				cpuClockStart = now;
+				cpuHalfClockTicks++;
+
+				if (cpuHalfClockTicks % 2)
+				{
+					m_Signals.Control |= Signal_AddressEnableControl | Signal_ClockPhase1;
+					m_CPUClockTicks++;
+					cpuClockStart = now;
+				}
+				else
+				{
+					m_Signals.Control &= ~Signal_ClockPhase1;
+				}
 			}
 
 		}

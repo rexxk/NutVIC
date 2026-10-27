@@ -18,7 +18,7 @@ namespace nvic
 	constexpr std::uint16_t Signal_CassetteWrite = 0x0800;
 	constexpr std::uint16_t Signal_CassetteSense = 0x1000;
 	constexpr std::uint16_t Signal_CassetteMotor = 0x2000;
-
+	constexpr std::uint16_t Signal_ClockPhase1 = 0x8000;
 
 	struct Signals
 	{

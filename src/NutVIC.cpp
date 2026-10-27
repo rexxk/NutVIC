@@ -2,6 +2,7 @@
 #include "chipset/PIC.h"
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
+#include "cpu/Signals.h"
 #include "memory/Memory.h"
 #include "ui/CPUPanel.h"
 #include "ui/MemoryPanel.h"
@@ -57,9 +58,10 @@ auto main() -> std::uint32_t
 	ImGui_ImplOpenGL3_Init();
 
 	// Init system
-	nvic::Clock clock{nvic::Clock::FrequencyMode::PAL};
-	nvic::CPU cpu{clock};
-	nvic::Memory memory{ cpu.GetSignals() };
+	nvic::Signals signals{};
+	nvic::Clock clock{ nvic::Clock::FrequencyMode::PAL, signals };
+	nvic::CPU cpu{ clock, signals };
+	nvic::Memory memory{ signals };
 	cpu.SetMemory(&memory);
 
 	std::array<nvic::MemoryChunk, 16> ram{};
@@ -81,13 +83,13 @@ auto main() -> std::uint32_t
 	memory.SetChunk(0xE, kernalROM);
 
 
-	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), cpu.GetSignals());
+	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), signals);
 	nvic::MemoryPanel memoryPanel(memory, cpu.GetRegisters());
 
-	nvic::PIC pic1{ 0, ioData, cpu.GetSignals() };
-	nvic::PIC pic2{ 1, ioData, cpu.GetSignals() };
+	nvic::PIC pic1{ 0, ioData, signals };
+	nvic::PIC pic2{ 1, ioData, signals };
 
-	nvic::VIC_II vic2{ ioData, cpu.GetSignals() };
+	nvic::VIC_II vic2{ ioData, signals };
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);

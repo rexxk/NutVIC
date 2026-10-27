@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cpu/Signals.h"
+
 #include <atomic>
 #include <cstdint>
 #include <thread>
@@ -18,7 +20,7 @@ namespace nvic
 		};
 
 	public:
-		Clock(FrequencyMode mode);
+		Clock(FrequencyMode mode, Signals& signals);
 
 		auto Start() -> void;
 		auto Stop() -> void;
@@ -35,6 +37,7 @@ namespace nvic
 		auto ClockThread() -> void;
 
 	private:
+		Signals& m_Signals;
 		FrequencyMode m_FrequencyMode{ FrequencyMode::PAL };
 
 		std::atomic<bool> m_Running{ false };

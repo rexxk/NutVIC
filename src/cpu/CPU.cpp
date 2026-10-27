@@ -31,8 +31,8 @@ namespace nvic
 		};
 
 
-	CPU::CPU(Clock& clock)
-		: m_Clock(clock)
+	CPU::CPU(Clock& clock, Signals& signals)
+		: m_Clock(clock), m_Signals(signals)
 	{
 		m_Registers.PC = ResetVector;
 
