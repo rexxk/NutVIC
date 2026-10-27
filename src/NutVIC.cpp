@@ -94,7 +94,7 @@ auto main() -> std::uint32_t
 
 	clock.Start();
 	cpu.Start();
-
+	vic2.Start();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -156,6 +156,7 @@ auto main() -> std::uint32_t
 		glfwSwapBuffers(window);
 	}
 
+	vic2.Stop();
 	cpu.Stop();
 	clock.Stop();
 
