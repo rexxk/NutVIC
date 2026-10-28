@@ -3,4 +3,5 @@
 target_sources(NutVIC PRIVATE
 	CPUPanel.cpp
 	MemoryPanel.cpp
+	VICPanel.cpp
 )

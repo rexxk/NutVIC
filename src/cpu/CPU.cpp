@@ -153,8 +153,9 @@ namespace nvic
 //			if (m_OpsRun > 570895)
 //				m_RunMode = RunMode::Step;
 
-			if (m_Signals.Control & Signal_AddressEnableControl)
+			if (m_Signals.Control & Signal_AddressEnableControl && m_Signals.Control & Signal_ClockPhase1 && !m_Signals.BusLock)
 			{
+				m_Signals.BusLock = true;
 
 				hostExecutionStartCycle = __rdtsc();
 
@@ -193,6 +194,8 @@ namespace nvic
 				//			m_DecoderHostCycleTime = __rdtsc() - hostStartCycle;
 				//			} while (m_DecoderHostCycleTime < m_Clock.CPUClockDelay());
 				//			} while (m_DecoderHostCycleTime < cycles * m_Clock.CPUClockDelay());
+
+				m_Signals.BusLock = false;
 			}
 		}
 	}

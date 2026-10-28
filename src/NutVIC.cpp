@@ -6,6 +6,7 @@
 #include "memory/Memory.h"
 #include "ui/CPUPanel.h"
 #include "ui/MemoryPanel.h"
+#include "ui/VICPanel.h"
 #include "utils/FileTools.h"
 
 #include <glad/glad.h>
@@ -82,14 +83,14 @@ auto main() -> std::uint32_t
 	memory.SetChunk(0xD, ioData);
 	memory.SetChunk(0xE, kernalROM);
 
-
-	nvic::CPUPanel cpuPanel(cpu.GetRegisters(), signals);
-	nvic::MemoryPanel memoryPanel(memory, cpu.GetRegisters());
-
 	nvic::PIC pic1{ 0, ioData, signals };
 	nvic::PIC pic2{ 1, ioData, signals };
 
-	nvic::VIC_II vic2{ ioData, signals };
+	nvic::VIC_II vic2{ clock, ioData, ram, signals };
+
+	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
+	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
+	nvic::VICPanel vicPanel{ vic2 };
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
@@ -146,11 +147,12 @@ auto main() -> std::uint32_t
 			ImGui::End();
 		}
 
-
+		
 		cpuPanel.Draw();
 		memoryPanel.Draw();
-//		memory.ViewMemory();
+		vicPanel.Draw();
 
+		vic2.Update();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

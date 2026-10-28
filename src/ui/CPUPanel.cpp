@@ -59,6 +59,10 @@ namespace nvic
 		ImGui::Text("Last operand: %02x", m_Registers.LastOperand);
 		ImGui::Text("Active operand: %02x", m_Registers.ActiveOperand);
 
+		ImGui::Separator();
+
+		ImGui::Text("Signals: %04x", m_Signals.Control);
+
 		ImGui::End();
 	}
 
