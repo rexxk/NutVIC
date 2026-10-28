@@ -53,6 +53,11 @@ namespace nvic
 		ImGui::Text("Address bus: %04x", m_Signals.AddressBus);
 		ImGui::Text("Data bus: %02x", m_Signals.DataBus);
 
+		ImGui::Separator();
+
+		ImGui::Text("Second last operand: %02x", m_Registers.SecondLastOperand);
+		ImGui::Text("Last operand: %02x", m_Registers.LastOperand);
+		ImGui::Text("Active operand: %02x", m_Registers.ActiveOperand);
 
 		ImGui::End();
 	}

@@ -148,8 +148,9 @@ namespace nvic
 //				std::println("Single shot");
 			}
 
-			if (m_Registers.PC == 0xBA29)
-				m_RunMode = RunMode::Step;
+//			if (m_Registers.PC >= 0xBA20 && m_Registers.PC < 0xBA27)
+//			if (m_OpsRun > 570958)
+//				m_RunMode = RunMode::Step;
 
 			hostExecutionStartCycle = __rdtsc();
 
@@ -163,7 +164,7 @@ namespace nvic
 			}
 			else
 			{
-				if (!m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory))
+				if (!m_OpCodes[m_Registers.ActiveOperand](m_Registers, m_Signals, *m_Memory))
 					m_RunMode = RunMode::Step;
 			}
 //			auto cycles = m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory);
@@ -220,7 +221,7 @@ namespace nvic
 		{
 			m_Signals.AddressBus = ResetVector;
 			m_Signals.DataBus = 0x4C;
-			m_Operand = 0x4C;	// JMP
+			m_Registers.ActiveOperand = 0x4C;	// JMP
 			m_Signals.Executing = true;
 			m_Signals.ExecutionCycle = 0;
 			return;
@@ -228,6 +229,8 @@ namespace nvic
 
 		m_Signals.AddressBus = m_Registers.PC++;
 		m_Memory->Read();
-		m_Operand = m_Signals.DataBus;
+		m_Registers.SecondLastOperand = m_Registers.LastOperand;
+		m_Registers.LastOperand = m_Registers.ActiveOperand;
+		m_Registers.ActiveOperand = m_Signals.DataBus;
 	}
 }

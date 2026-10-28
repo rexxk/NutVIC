@@ -33,7 +33,7 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.PC & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = (registers.PC & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 
 						if (((registers.PC & 0xFF) + registers.RelativeOffset) & 0x100)
 						{
@@ -49,7 +49,7 @@ namespace nvic
 
 					case 2:
 					{
-						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 						memory.Read();
 
 						registers.PC = signals.AddressBus;
@@ -83,7 +83,7 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.PC & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = (registers.PC & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 
 						if (((registers.PC & 0xFF) + registers.RelativeOffset) & 0x100)
 						{
@@ -99,7 +99,7 @@ namespace nvic
 
 					case 2:
 					{
-						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 						memory.Read();
 
 						registers.PC = signals.AddressBus;
@@ -133,7 +133,7 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.PC & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = (registers.PC & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 
 						if (((registers.PC & 0xFF) + registers.RelativeOffset) & 0x100)
 						{
@@ -149,12 +149,12 @@ namespace nvic
 
 					case 2:
 					{
-						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 						memory.Read();
 
 						registers.PC = signals.AddressBus;
-						signals.Executing = false;
 
+						signals.Executing = false;
 						return true;
 					}
 				}
@@ -183,7 +183,7 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.PC & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = (registers.PC & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 
 						if (((registers.PC & 0xFF) + registers.RelativeOffset) & 0x100)
 						{
@@ -199,12 +199,12 @@ namespace nvic
 
 					case 2:
 					{
-						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 						memory.Read();
 
 						registers.PC = signals.AddressBus;
-						signals.Executing = false;
 
+						signals.Executing = false;
 						return true;
 					}
 				}
@@ -233,7 +233,7 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.PC & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = (registers.PC & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 
 						if (((registers.PC & 0xFF) + registers.RelativeOffset) & 0x100)
 						{
@@ -249,7 +249,7 @@ namespace nvic
 
 					case 2:
 					{
-						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 						memory.Read();
 
 						registers.PC = signals.AddressBus;
@@ -283,7 +283,7 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.PC & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = (registers.PC & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 
 						if (((registers.PC & 0xFF) + registers.RelativeOffset) & 0x100)
 						{
@@ -299,7 +299,7 @@ namespace nvic
 
 					case 2:
 					{
-						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) + ((registers.PC & 0xFF) + registers.RelativeOffset);
+						signals.AddressBus = ((registers.PC + 0x100) & 0xFF00) | static_cast<std::uint8_t>(((registers.PC & 0xFF) + registers.RelativeOffset));
 						memory.Read();
 
 						registers.PC = signals.AddressBus;

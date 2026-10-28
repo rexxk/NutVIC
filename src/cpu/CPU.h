@@ -75,7 +75,6 @@ namespace nvic
 		std::uint64_t m_OpsRun{};
 
 		std::array<OpCodeFn, 256> m_OpCodes;
-		std::uint8_t m_Operand{};
 	};
 
 }
