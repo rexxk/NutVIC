@@ -39,17 +39,24 @@ namespace nvic
 		for (auto i = 0; i < 256; i++)
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
+		m_OpCodes[0x08] = opcode::Op08_PHP;
 		m_OpCodes[0x09] = opcode::Op09_ORA;
 		m_OpCodes[0x0D] = opcode::Op0D_ORAabs;
 		m_OpCodes[0x10] = opcode::Op10_BPL;
 		m_OpCodes[0x18] = opcode::Op18_CLC;
 		m_OpCodes[0x20] = opcode::Op20_JSR;
+		m_OpCodes[0x28] = opcode::Op28_PLP;
 		m_OpCodes[0x29] = opcode::Op29_AND;
 		m_OpCodes[0x2A] = opcode::Op2A_ROL;
+		m_OpCodes[0x2C] = opcode::Op2C_BIT;
 		m_OpCodes[0x30] = opcode::Op30_BMI;
+		m_OpCodes[0x38] = opcode::Op38_SEC;
+		m_OpCodes[0x48] = opcode::Op48_PHA;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
 		m_OpCodes[0x58] = opcode::Op58_CLI;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
+		m_OpCodes[0x65] = opcode::Op65_ADCzp;
+		m_OpCodes[0x68] = opcode::Op68_PLA;
 		m_OpCodes[0x69] = opcode::Op69_ADC;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
@@ -77,7 +84,9 @@ namespace nvic
 		m_OpCodes[0xA8] = opcode::OpA8_TAY;
 		m_OpCodes[0xA9] = opcode::OpA9_LDA;
 		m_OpCodes[0xAA] = opcode::OpAA_TAX;
+		m_OpCodes[0xAC] = opcode::OpAC_LDYabs;
 		m_OpCodes[0xAD] = opcode::OpAD_LDAabs;
+		m_OpCodes[0xAE] = opcode::OpAE_LDXabs;
 		m_OpCodes[0xB0] = opcode::OpB0_BCS;
 		m_OpCodes[0xB1] = opcode::OpB1_LDAindY;
 		m_OpCodes[0xB4] = opcode::OpB4_LDYzpX;
@@ -86,15 +95,20 @@ namespace nvic
 		m_OpCodes[0xB9] = opcode::OpB9_LDAabsY;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
 //		m_OpCodes[0xC1] = opcode::OpC1_CMPidxind;
+		m_OpCodes[0xC4] = opcode::OpC4_CPYzp;
+		m_OpCodes[0xC5] = opcode::OpC5_CMPzp;
 		m_OpCodes[0xC8] = opcode::OpC8_INY;
+		m_OpCodes[0xC9] = opcode::OpC9_CMP;
 		m_OpCodes[0xCA] = opcode::OpCA_DEX;
 		m_OpCodes[0xD0] = opcode::OpD0_BNE;
 		m_OpCodes[0xD1] = opcode::OpD1_CMPindY;
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
 		m_OpCodes[0xE0] = opcode::OpE0_CPX;
+		m_OpCodes[0xE5] = opcode::OpE5_SBCzp;
 		m_OpCodes[0xE6] = opcode::OpE6_INCzp;
 		m_OpCodes[0xE8] = opcode::OpE8_INX;
+		m_OpCodes[0xE9] = opcode::OpE9_SBC;
 		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
 	}
 
@@ -134,8 +148,8 @@ namespace nvic
 //				std::println("Single shot");
 			}
 
-//			if (m_Registers.PC == 0xFD67)
-//				m_RunMode = RunMode::Step;
+			if (m_Registers.PC == 0xBA29)
+				m_RunMode = RunMode::Step;
 
 			hostExecutionStartCycle = __rdtsc();
 

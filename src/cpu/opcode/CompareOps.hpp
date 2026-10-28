@@ -51,6 +51,122 @@ namespace nvic
 				return 6;
 			};
 
+		constexpr auto OpC4_CPYzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+
+						std::uint8_t result = registers.Y - signals.DataBus;
+
+						if (result >= signals.DataBus)
+							registers.Flags |= Flag_Carry;
+						else
+							registers.Flags &= ~Flag_Carry;
+
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (result & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				signals.Executing = false;
+				return true;
+			};
+
+		constexpr auto OpC5_CMPzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+
+						std::uint8_t result = registers.A - signals.DataBus;
+
+						if (result >= signals.DataBus)
+							registers.Flags |= Flag_Carry;
+						else
+							registers.Flags &= ~Flag_Carry;
+
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (result & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				signals.Executing = false;
+				return true;
+			};
+
+		constexpr auto OpC9_CMP = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				signals.AddressBus = registers.PC++;
+				memory.Read();
+
+				std::uint8_t result = registers.A - signals.DataBus;
+
+				if (result >= signals.DataBus)
+					registers.Flags |= Flag_Carry;
+				else
+					registers.Flags &= ~Flag_Carry;
+
+				if (result == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (result & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				signals.Executing = false;
+				return true;
+			};
+
 		constexpr auto OpD1_CMPindY = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				switch (signals.ExecutionCycle++)
@@ -145,6 +261,8 @@ namespace nvic
 						return true;
 					}
 				}
+
+				return true;
 			};
 
 		constexpr auto OpDD_CMPabsX = [](Registers& registers, Signals& signals, Memory& memory)
@@ -256,6 +374,7 @@ namespace nvic
 				signals.Executing = false;
 				return true;
 			};
+
 	}
 
 }

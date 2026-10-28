@@ -31,7 +31,7 @@ namespace nvic
 					registers.Flags &= ~Flag_Negative;
 
 				signals.Executing = false;
-				return 2;
+				return true;
 			};
 
 		constexpr auto Op0D_ORAabs = [](Registers& registers, Signals& signals, Memory& memory)
@@ -101,9 +101,52 @@ namespace nvic
 					registers.Flags &= ~Flag_Negative;
 
 				signals.Executing = false;
-				return 2;
+				return true;
 			};
 
+		constexpr auto Op2C_BIT = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
+
+						return true;
+					}
+
+					case 2:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+
+						std::uint8_t result = registers.A & signals.DataBus;
+
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						registers.Flags = (registers.Flags & 0x3F) | (signals.DataBus & 0xC0);
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
+			};
 	}
 
 }
