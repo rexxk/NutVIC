@@ -153,44 +153,47 @@ namespace nvic
 //			if (m_OpsRun > 570895)
 //				m_RunMode = RunMode::Step;
 
-			hostExecutionStartCycle = __rdtsc();
+			if (m_Signals.Control & Signal_AddressEnableControl)
+			{
+
+				hostExecutionStartCycle = __rdtsc();
 
 			// Execute
-			if (!m_Signals.Executing)
-			{
-				FetchOperand(m_Registers.PC == ResetVector);
-				m_Signals.Executing = true;
-				m_Signals.ExecutionCycle = 0;
-				m_OpsRun++;
+				if (!m_Signals.Executing)
+				{
+					FetchOperand(m_Registers.PC == ResetVector);
+					m_Signals.Executing = true;
+					m_Signals.ExecutionCycle = 0;
+					m_OpsRun++;
+				}
+				else
+				{
+					if (!m_OpCodes[m_Registers.ActiveOperand](m_Registers, m_Signals, *m_Memory))
+						m_RunMode = RunMode::Step;
+				}
+				//			auto cycles = m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory);
+
+				//			if (cycles == 0)
+
+				m_DecoderHostExecutionTime = __rdtsc() - hostExecutionStartCycle;
+
+				//			cycleCount = m_Clock.CPUClockCycles() - startCycle;
+
+				if (m_RunMode == RunMode::Step)
+				{
+					m_OpCodeExecutionTime = cycleCount;
+					//				m_OpCodeCycles = cycles;
+				}
+
+				// Delay, wait until cycleCount equals operation cycle time
+				while ((m_DecoderHostCycleTime = __rdtsc() - hostStartCycle) < cpuClockDelay);
+				//			do
+				//			{
+				//				m_DecoderCycleTime = m_Clock.CPUClockCycles() - startCycle;
+				//			m_DecoderHostCycleTime = __rdtsc() - hostStartCycle;
+				//			} while (m_DecoderHostCycleTime < m_Clock.CPUClockDelay());
+				//			} while (m_DecoderHostCycleTime < cycles * m_Clock.CPUClockDelay());
 			}
-			else
-			{
-				if (!m_OpCodes[m_Registers.ActiveOperand](m_Registers, m_Signals, *m_Memory))
-					m_RunMode = RunMode::Step;
-			}
-//			auto cycles = m_OpCodes[m_Operand](m_Registers, m_Signals, *m_Memory);
-
-//			if (cycles == 0)
-
-			m_DecoderHostExecutionTime = __rdtsc() - hostExecutionStartCycle;
-			
-//			cycleCount = m_Clock.CPUClockCycles() - startCycle;
-
-			if (m_RunMode == RunMode::Step)
-			{
-				m_OpCodeExecutionTime = cycleCount;
-//				m_OpCodeCycles = cycles;
-			}
-
-			// Delay, wait until cycleCount equals operation cycle time
-			while ((m_DecoderHostCycleTime = __rdtsc() - hostStartCycle) < cpuClockDelay);
-//			do
-//			{
-//				m_DecoderCycleTime = m_Clock.CPUClockCycles() - startCycle;
-//			m_DecoderHostCycleTime = __rdtsc() - hostStartCycle;
-//			} while (m_DecoderHostCycleTime < m_Clock.CPUClockDelay());
-//			} while (m_DecoderHostCycleTime < cycles * m_Clock.CPUClockDelay());
-
 		}
 	}
 

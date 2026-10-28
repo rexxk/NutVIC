@@ -2,6 +2,10 @@
 
 #include "cpu/Signals.h"
 #include "memory/Memory.h"
+#include <chrono>
+#include <print>
+
+using namespace std::chrono_literals;
 
 
 namespace nvic
@@ -28,6 +32,12 @@ namespace nvic
 
 	auto VIC_II::ThreadFunc() -> void
 	{
+		std::this_thread::sleep_for(3s);
+
+		m_Signals.Control &= ~Signal_AddressEnableControl;
+
+		std::println("VIC-II is hijacking address enable control signal");
+
 		while (m_Running)
 		{
 
