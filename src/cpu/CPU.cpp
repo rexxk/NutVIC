@@ -105,6 +105,7 @@ namespace nvic
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
 		m_OpCodes[0xE0] = opcode::OpE0_CPX;
+		m_OpCodes[0xE4] = opcode::OpE4_CPXzp;
 		m_OpCodes[0xE5] = opcode::OpE5_SBCzp;
 		m_OpCodes[0xE6] = opcode::OpE6_INCzp;
 		m_OpCodes[0xE8] = opcode::OpE8_INX;
@@ -149,8 +150,8 @@ namespace nvic
 			}
 
 //			if (m_Registers.PC >= 0xBA20 && m_Registers.PC < 0xBA27)
-			if (m_OpsRun > 570895)
-				m_RunMode = RunMode::Step;
+//			if (m_OpsRun > 570895)
+//				m_RunMode = RunMode::Step;
 
 			hostExecutionStartCycle = __rdtsc();
 
