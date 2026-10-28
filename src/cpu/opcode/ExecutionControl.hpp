@@ -84,40 +84,103 @@ namespace nvic
 
 		constexpr auto Op60_RTS = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint8_t lowAddress = memory.Pop(0x100 + ++registers.StackPointer);
-				std::uint8_t highAddress = memory.Pop(0x100 + ++registers.StackPointer);
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						memory.Read();
 
-				std::uint16_t newAddress = static_cast<std::uint16_t>(highAddress << 8) + lowAddress;
+						return true;
+					}
 
-				registers.PC = newAddress + 1;
+					case 1:
+					{
+						signals.AddressBus = 0x100 + ++registers.StackPointer;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				return 6;
+						return true;
+					}
+
+					case 2:
+					{
+						signals.AddressBus = 0x100 + ++registers.StackPointer;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
+
+						registers.PC = (registers.PC & 0xFF00) + registers.BaseAddressLow;
+
+						return true;
+					}
+
+					case 3:
+					{
+						memory.Read();
+
+						registers.PC = (registers.BaseAddressHigh << 8) + (registers.PC & 0xFF);
+
+						return true;
+					}
+
+					case 4:
+					{
+						registers.PC++;
+						signals.Executing = false;
+						return true;
+					}
+
+				}
+
+				return true;
 			};
 
 		constexpr auto Op6C_JMPind = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
-				std::uint16_t jmpAddress{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus << 8;
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				signals.AddressBus = address++;
-				memory.Read();
-				jmpAddress = signals.DataBus;
+						registers.InternalRegister = registers.BaseAddress;
 
-				signals.AddressBus = address++;
-				memory.Read();
-				jmpAddress += signals.DataBus << 8;
+						return true;
+					}
 
-				registers.PC = jmpAddress;
+					case 2:
+					{
+						signals.AddressBus = registers.InternalRegister;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				return 5;
+						return true;
+					}
+
+					case 3:
+					{
+						signals.AddressBus = registers.InternalRegister + 1;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
+
+						registers.PC = registers.BaseAddress;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 	}

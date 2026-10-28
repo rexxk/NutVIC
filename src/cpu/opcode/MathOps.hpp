@@ -16,11 +16,9 @@ namespace nvic
 			{
 				signals.AddressBus = registers.PC++;
 				memory.Read();
-				std::uint8_t value = signals.DataBus;
 
 				std::uint8_t carry = static_cast<std::uint8_t>(registers.Flags & Flag_Carry);
-
-				std::uint16_t result = registers.A + value + carry;
+				std::uint16_t result = registers.A + signals.DataBus + carry;
 
 				registers.A = static_cast<std::uint8_t>(result);
 
@@ -40,12 +38,13 @@ namespace nvic
 					registers.Flags &= ~Flag_Negative;
 
 //	SUB			if ((registers.A ^ value) & (registers.A ^ static_cast<std::uint8_t>(result) & 0x80))
-				if (~(registers.A ^ value) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
+				if (~(registers.A ^ signals.DataBus) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
 					registers.Flags |= Flag_Overflow;
 				else
 					registers.Flags &= ~Flag_Overflow;
 
-				return 2;
+				signals.Executing = false;
+				return true;
 			};
 
 		constexpr auto Op88_DEY = [](Registers& registers, Signals& signals, Memory& memory)
@@ -62,6 +61,7 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
+				signals.Executing = false;
 				return 2;
 			};
 
@@ -79,6 +79,7 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
+				signals.Executing = false;
 				return 2;
 			};
 
@@ -96,35 +97,63 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
+				signals.Executing = false;
 				return 2;
 			};
 
 		constexpr auto OpE6_INCzp = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				std::uint16_t zeropageAddress = signals.DataBus;
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = zeropageAddress;
-				memory.Read();
-				std::uint8_t value = signals.DataBus;
+						return true;
+					}
 
-				value++;
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						registers.InternalRegister8 = signals.DataBus;
 
-				signals.DataBus = value;
-				memory.Write();
+						return true;
+					}
 
-				if (value == 0)
-					registers.Flags |= Flag_Zero;
-				else
-					registers.Flags &= ~Flag_Zero;
+					case 2:
+					{
+						memory.Read();
+						registers.InternalRegister8++;
 
-				if (value & 0x80)
-					registers.Flags |= Flag_Negative;
-				else
-					registers.Flags &= ~Flag_Negative;
+						return true;
+					}
 
-				return 5;
+					case 3:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.InternalRegister8;
+						memory.Write();
+
+						if (registers.InternalRegister8 == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (registers.InternalRegister8 & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto OpE8_INX = [](Registers& registers, Signals& signals, Memory& memory)
@@ -141,7 +170,8 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
-				return 2;
+				signals.Executing = false;
+				return true;
 			};
 
 	}

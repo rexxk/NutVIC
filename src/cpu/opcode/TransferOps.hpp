@@ -26,7 +26,8 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
-				return 2;
+				signals.Executing = false;
+				return true;
 			};
 
 		constexpr auto Op98_TYA = [](Registers& registers, Signals& signals, Memory& memory)
@@ -43,7 +44,8 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
-				return 2;
+				signals.Executing = false;
+				return true;
 			};
 
 		constexpr auto Op9A_TXS = [](Registers& registers, Signals& signals, Memory& memory)
@@ -53,7 +55,6 @@ namespace nvic
 				registers.StackPointer = registers.X;
 
 				signals.Executing = false;
-
 				return true;
 			};
 
@@ -71,6 +72,7 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
+				signals.Executing = false;
 				return 2;
 			};
 
@@ -88,6 +90,7 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
+				signals.Executing = false;
 				return 2;
 			};
 

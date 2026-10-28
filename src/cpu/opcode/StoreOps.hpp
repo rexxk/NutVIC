@@ -14,196 +14,414 @@ namespace nvic
 
 		constexpr auto Op84_STYzp = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = address;
-				signals.DataBus = registers.Y;
-				memory.Write();
+						return true;
+					}
 
-				return 3;
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.Y;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op85_STAzp = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = address;
-				signals.DataBus = registers.A;
-				memory.Write();
+						return true;
+					}
 
-				return 3;
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.A;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op86_STXzp = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = address;
-				signals.DataBus = registers.X;
-				memory.Write();
+						return true;
+					}
 
-				return 3;
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.X;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op8C_STYabs = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus << 8;
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				signals.AddressBus = address;
-				signals.DataBus = registers.Y;
-				memory.Write();
+						return true;
+					}
 
-				return 4;
+					case 2:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.Y;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op8D_STAabs = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus << 8;
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				signals.AddressBus = address;
-				signals.DataBus = registers.A;
-				memory.Write();
+						return true;
+					}
 
-				return 4;
+					case 2:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.A;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op8E_STXabs = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus << 8;
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				signals.AddressBus = address;
-				signals.DataBus = registers.X;
-				memory.Write();
+						return true;
+					}
 
-				return 4;
+					case 2:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.X;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op91_STAindY = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
-				std::uint16_t zeropageAddress{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				zeropageAddress = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = zeropageAddress;
-				memory.Read();
-				address = signals.DataBus;
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus++;
-				memory.Read();
-				address += signals.DataBus << 8;
+						return true;
+					}
 
-				signals.AddressBus = address + registers.Y;
-				signals.DataBus = registers.A;
-				memory.Write();
+					case 2:
+					{
+						signals.AddressBus++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				return 6;
+						return true;
+					}
+
+					case 3:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+
+						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
+							registers.BaseAddressHigh++;
+
+						return true;
+					}
+
+					case 4:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.A;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;			
 			};
 
 		constexpr auto Op94_STYzpX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = (address + registers.X) & 0xFF;
-				signals.DataBus = registers.Y;
-				memory.Write();
+					case 1:
+					{
+						signals.AddressBus = (registers.BaseAddressLow + registers.X) & 0xFF;
+						memory.Read();
 
-				return 4;
+						return true;
+					}
+
+					case 2:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.Y;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op95_STAzpX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = (address + registers.X) & 0xFF;
-				signals.DataBus = registers.A;
-				memory.Write();
+					case 1:
+					{
+						signals.AddressBus = (registers.BaseAddressLow + registers.X) & 0xFF;
+						memory.Read();
 
-				return 4;
+						return true;
+					}
+
+					case 2:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.A;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op99_STAabsY = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus << 8;
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				signals.AddressBus = address + registers.Y;
-				signals.DataBus = registers.A;
-				memory.Write();
+						return true;
+					}
 
-				return 5;
+					case 2:
+					{
+						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
+							registers.BaseAddressHigh++;
+
+						return true;
+					}
+
+					case 3:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.A;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 		constexpr auto Op9D_STAabsX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint16_t address{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				address += signals.DataBus << 8;
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				signals.AddressBus = address + registers.X;
-				signals.DataBus = registers.A;
-				memory.Write();
+						return true;
+					}
 
-				return 5;
+					case 2:
+					{
+						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.X) & 0x100)
+							registers.BaseAddressHigh++;
+
+						return true;
+					}
+
+					case 3:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.A;
+						memory.Write();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
 			};
 
 	}

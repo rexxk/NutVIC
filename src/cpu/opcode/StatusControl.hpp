@@ -17,7 +17,14 @@ namespace nvic
 				registers.Flags &= ~Flag_Carry;
 
 				signals.Executing = false;
+				return true;
+			};
 
+		constexpr auto Op58_CLI = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				registers.Flags &= ~Flag_Interrupt;
+
+				signals.Executing = false;
 				return true;
 			};
 
@@ -26,7 +33,6 @@ namespace nvic
 				registers.Flags |= Flag_Interrupt;
 
 				signals.Executing = false;
-
 				return true;
 			};
 
@@ -35,7 +41,6 @@ namespace nvic
 				registers.Flags &= ~Flag_Decimal;
 
 				signals.Executing = false;
-
 				return true;
 			};
 	}

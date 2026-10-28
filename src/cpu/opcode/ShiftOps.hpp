@@ -34,7 +34,8 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
-				return 2;
+				signals.Executing = false;
+				return true;
 			};
 
 	}

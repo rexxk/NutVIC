@@ -53,46 +53,98 @@ namespace nvic
 
 		constexpr auto OpD1_CMPindY = [](Registers& registers, Signals& signals, Memory& memory)
 			{
-				std::uint8_t overrun{};
-				std::uint16_t address{};
-				std::uint16_t zeropageAddress{};
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				zeropageAddress = signals.DataBus;
+						return true;
+					}
 
-				signals.AddressBus = zeropageAddress;
-				memory.Read();
-				address = signals.DataBus;
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-				signals.AddressBus++;
-				memory.Read();
-				address += signals.DataBus << 8;
+						return true;
+					}
 
-				signals.AddressBus = address + registers.Y;
-				memory.Read();
+					case 2:
+					{
+						signals.AddressBus++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
 
-				if ((address >> 8) != ((address + registers.Y) >> 8))
-					overrun = 1;
+						return true;
+					}
 
-				std::uint8_t result = registers.A - signals.DataBus;
+					case 3:
+					{
+						bool overrun{ false };
 
-				if (result >= signals.DataBus)
-					registers.Flags |= Flag_Carry;
-				else
-					registers.Flags &= ~Flag_Carry;
+						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
+							overrun = true;
 
-				if (result == 0)
-					registers.Flags |= Flag_Zero;
-				else
-					registers.Flags &= ~Flag_Zero;
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
 
-				if (result & 0x80)
-					registers.Flags |= Flag_Negative;
-				else
-					registers.Flags &= ~Flag_Negative;
+						if (overrun)
+							return true;
 
-				return 5 + overrun;
+						std::uint8_t result = registers.A - signals.DataBus;
+
+						if (result >= signals.DataBus)
+							registers.Flags |= Flag_Carry;
+						else
+							registers.Flags &= ~Flag_Carry;
+
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (result & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+
+					case 4:
+					{
+						registers.BaseAddressHigh++;
+
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+
+						std::uint8_t result = registers.A - signals.DataBus;
+
+						if (result >= signals.DataBus)
+							registers.Flags |= Flag_Carry;
+						else
+							registers.Flags &= ~Flag_Carry;
+
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (result & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
 			};
 
 		constexpr auto OpDD_CMPabsX = [](Registers& registers, Signals& signals, Memory& memory)
@@ -117,11 +169,14 @@ namespace nvic
 					}
 					case 2:
 					{
-						signals.AddressBus = registers.BaseAddressHigh << 8 + registers.BaseAddressLow + registers.X;
+						bool overrun{ false };
+						if ((static_cast<std::uint16_t>(registers.BaseAddressLow += registers.X) & 0x100)) overrun = true;
+
+						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 						std::uint8_t result = registers.A - signals.DataBus;
 
-						if (static_cast<std::uint16_t>(registers.BaseAddressLow + registers.X) & 0x100)
+						if (overrun)
 						{
 							return true;
 						}
@@ -147,7 +202,8 @@ namespace nvic
 					}
 					case 3:
 					{
-						signals.AddressBus = (registers.BaseAddressHigh + 1) << 8 + registers.BaseAddressLow + registers.X;
+						registers.BaseAddressHigh++;
+						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 						std::uint8_t result = registers.A - signals.DataBus;
 
@@ -197,7 +253,8 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
-				return 2;
+				signals.Executing = false;
+				return true;
 			};
 	}
 
