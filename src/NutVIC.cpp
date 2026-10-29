@@ -1,3 +1,4 @@
+#include "chipset/CIA.h"
 #include "chipset/Clock.h"
 #include "chipset/PIC.h"
 #include "chipset/VIC_II.h"
@@ -86,6 +87,9 @@ auto main() -> std::uint32_t
 	nvic::PIC pic1{ 0, ioData, signals };
 	nvic::PIC pic2{ 1, ioData, signals };
 
+	nvic::CIA cia1{ 0, ioData, signals };
+	nvic::CIA cia2{ 1, ioData, signals };
+
 	nvic::VIC_II vic2{ clock, ioData, ram, signals };
 
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
@@ -153,6 +157,8 @@ auto main() -> std::uint32_t
 		vicPanel.Draw();
 
 		vic2.Update();
+
+		cia2.Update();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

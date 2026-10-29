@@ -12,6 +12,46 @@ namespace nvic
 	namespace opcode
 	{
 
+		constexpr auto Op05_ORAzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+				case 0:
+				{
+					registers.BaseAddressHigh = 0;
+					signals.AddressBus = registers.PC++;
+					memory.Read();
+					registers.BaseAddressLow = signals.DataBus;
+
+					return true;
+				}
+
+				case 1:
+				{
+					signals.AddressBus = registers.BaseAddress;
+					memory.Read();
+					signals.DataBus;
+
+					registers.A = registers.A | signals.DataBus;
+
+					if (registers.A == 0)
+						registers.Flags |= Flag_Zero;
+					else
+						registers.Flags &= ~Flag_Zero;
+
+					if (registers.A & 0x80)
+						registers.Flags |= Flag_Negative;
+					else
+						registers.Flags &= ~Flag_Negative;
+
+					signals.Executing = false;
+					return true;
+				}
+				}
+
+				return true;
+			};
+
 		constexpr auto Op09_ORA = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				signals.AddressBus = registers.PC++;
@@ -73,6 +113,42 @@ namespace nvic
 							registers.Flags |= Flag_Negative;
 						else
 							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
+			};
+
+		constexpr auto Op24_BITzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+
+						std::uint8_t result = registers.A & signals.DataBus;
+
+						if (result == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						registers.Flags = (registers.Flags & 0x3F) | (signals.DataBus & 0xC0);
 
 						signals.Executing = false;
 						return true;

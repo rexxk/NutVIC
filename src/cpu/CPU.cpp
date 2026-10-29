@@ -39,12 +39,15 @@ namespace nvic
 		for (auto i = 0; i < 256; i++)
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
+		m_OpCodes[0x05] = opcode::Op05_ORAzp;
 		m_OpCodes[0x08] = opcode::Op08_PHP;
 		m_OpCodes[0x09] = opcode::Op09_ORA;
+		m_OpCodes[0x0A] = opcode::Op0A_ASL;
 		m_OpCodes[0x0D] = opcode::Op0D_ORAabs;
 		m_OpCodes[0x10] = opcode::Op10_BPL;
 		m_OpCodes[0x18] = opcode::Op18_CLC;
 		m_OpCodes[0x20] = opcode::Op20_JSR;
+		m_OpCodes[0x24] = opcode::Op24_BITzp;
 		m_OpCodes[0x28] = opcode::Op28_PLP;
 		m_OpCodes[0x29] = opcode::Op29_AND;
 		m_OpCodes[0x2A] = opcode::Op2A_ROL;
@@ -95,6 +98,7 @@ namespace nvic
 		m_OpCodes[0xB9] = opcode::OpB9_LDAabsY;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
 //		m_OpCodes[0xC1] = opcode::OpC1_CMPidxind;
+		m_OpCodes[0xCD] = opcode::OpCD_CMPabs;
 		m_OpCodes[0xC4] = opcode::OpC4_CPYzp;
 		m_OpCodes[0xC5] = opcode::OpC5_CMPzp;
 		m_OpCodes[0xC8] = opcode::OpC8_INY;
