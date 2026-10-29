@@ -303,7 +303,7 @@ namespace nvic
 							return true;
 						}
 
-						registers.PC = signals.AddressBus;
+						registers.PC = registers.InternalRegister;
 
 						signals.Executing = false;
 						return true;

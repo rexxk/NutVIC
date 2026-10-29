@@ -149,7 +149,7 @@ namespace nvic
 //				std::println("Single shot");
 			}
 
-//			if (m_Registers.PC >= 0xBA20 && m_Registers.PC < 0xBA27)
+//			if (m_Registers.PC >= 0xFDDD && m_Registers.PC < 0xFDE2)
 //			if (m_OpsRun > 570895)
 //				m_RunMode = RunMode::Step;
 

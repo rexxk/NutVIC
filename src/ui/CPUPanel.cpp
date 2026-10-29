@@ -29,7 +29,10 @@ namespace nvic
 		ImGui::Text("X: %02x", m_Registers.X);
 		ImGui::Text("Y: %02x", m_Registers.Y);
 		ImGui::Text("SP: %02x", m_Registers.StackPointer);
+
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0.2f, 1.0f, 0.2f, 1.0f });
 		ImGui::Text("PC: %04x", m_Registers.PC);
+		ImGui::PopStyleColor();
 
 		ImGui::Separator();
 
