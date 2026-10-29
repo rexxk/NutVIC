@@ -94,6 +94,24 @@ namespace nvic
 				return 2;
 			};
 
+		constexpr auto OpBA_TSX = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				registers.X = registers.StackPointer;
+
+				if (registers.X == 0)
+					registers.Flags |= Flag_Zero;
+				else
+					registers.Flags &= ~Flag_Zero;
+
+				if (registers.X & 0x80)
+					registers.Flags |= Flag_Negative;
+				else
+					registers.Flags &= ~Flag_Negative;
+
+				signals.Executing = false;
+				return 2;
+			};
+
 	}
 
 }

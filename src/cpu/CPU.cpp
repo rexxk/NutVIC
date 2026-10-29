@@ -96,6 +96,7 @@ namespace nvic
 		m_OpCodes[0xB5] = opcode::OpB5_LDAzpX;
 		m_OpCodes[0xB6] = opcode::OpB6_LDXzpY;
 		m_OpCodes[0xB9] = opcode::OpB9_LDAabsY;
+		m_OpCodes[0xBA] = opcode::OpBA_TSX;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
 //		m_OpCodes[0xC1] = opcode::OpC1_CMPidxind;
 		m_OpCodes[0xCD] = opcode::OpCD_CMPabs;
@@ -114,7 +115,9 @@ namespace nvic
 		m_OpCodes[0xE6] = opcode::OpE6_INCzp;
 		m_OpCodes[0xE8] = opcode::OpE8_INX;
 		m_OpCodes[0xE9] = opcode::OpE9_SBC;
+		m_OpCodes[0xEC] = opcode::OpEC_CPXabs;
 		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
+		m_OpCodes[0xFF] = opcode::OpFF_IRQ;
 	}
 
 	auto CPU::Reset() -> void
@@ -163,7 +166,7 @@ namespace nvic
 
 				hostExecutionStartCycle = __rdtsc();
 
-			// Execute
+				// Execute
 				if (!m_Signals.Executing)
 				{
 					FetchOperand(m_Registers.PC == ResetVector);
@@ -228,6 +231,16 @@ namespace nvic
 
 	auto CPU::FetchOperand(bool resetVector) -> void
 	{
+		if (m_Signals.InterruptRequest && !(m_Registers.Flags & Flag_Interrupt))
+		{
+			m_Signals.DataBus = 0xFF;
+			m_Registers.ActiveOperand = 0xFF;
+			m_Signals.Executing = true;
+			m_Signals.ExecutionCycle = 0;
+			m_Signals.InterruptRequest = false;
+			return;
+		}
+
 		if (resetVector)
 		{
 			m_Signals.AddressBus = ResetVector;

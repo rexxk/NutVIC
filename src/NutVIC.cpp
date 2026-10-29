@@ -134,6 +134,11 @@ auto main() -> std::uint32_t
 				cpu.Reset();
 			}
 
+			if (ImGui::Button("Interrupt request"))
+			{
+				signals.InterruptRequest = true;
+			}
+
 			if (cpu.GetRunMode() == nvic::CPU::RunMode::Step)
 			{
 				ImGui::Separator();

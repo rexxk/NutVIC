@@ -183,6 +183,74 @@ namespace nvic
 				return true;
 			};
 
+		constexpr auto OpFF_IRQ = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = --registers.PC;
+						memory.Read();
+						registers.StackPointer--;
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = 0x100 + registers.StackPointer--;
+						signals.DataBus = registers.PC >> 8;
+						memory.Write();
+
+						return true;
+					}
+
+					case 2:
+					{
+						signals.AddressBus = 0x100 + registers.StackPointer--;
+						signals.DataBus = registers.PC & 0xFF;
+						memory.Write();
+
+						return true;
+					}
+
+					case 3:
+					{
+						signals.AddressBus = 0x100 + registers.StackPointer--;
+						registers.InternalRegister8 = registers.Flags;
+						registers.InternalRegister8 |= Flag_Interrupt | Flag_Unused;
+						signals.DataBus = registers.InternalRegister8;
+						memory.Write();
+
+						return true;
+					}
+
+					case 4:
+					{
+						signals.AddressBus = 0xFFFE;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 5:
+					{
+						signals.AddressBus = 0xFFFF;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
+
+						registers.PC = registers.BaseAddress;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				signals.Executing = false;
+				return true;
+			};
+
 	}
 
 }
