@@ -1,6 +1,5 @@
 #include "chipset/CIA.h"
 #include "chipset/Clock.h"
-#include "chipset/PIC.h"
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
@@ -83,9 +82,6 @@ auto main() -> std::uint32_t
 	memory.SetChunk(0xA, basicROM);
 	memory.SetChunk(0xD, ioData);
 	memory.SetChunk(0xE, kernalROM);
-
-	nvic::PIC pic1{ 0, ioData, signals };
-	nvic::PIC pic2{ 1, ioData, signals };
 
 	nvic::CIA cia1{ 0, ioData, signals };
 	nvic::CIA cia2{ 1, ioData, signals };
