@@ -1,5 +1,6 @@
 #include "chipset/CIA.h"
 #include "chipset/Clock.h"
+#include "chipset/PLA.h"
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
@@ -60,7 +61,7 @@ auto main() -> std::uint32_t
 
 	// Init system
 	nvic::Signals signals{};
-	nvic::Clock clock{ nvic::Clock::FrequencyMode::PAL, signals };
+	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals };
 	nvic::CPU cpu{ clock, signals };
 	nvic::Memory memory{ signals };
 	cpu.SetMemory(&memory);
@@ -88,6 +89,8 @@ auto main() -> std::uint32_t
 
 	nvic::VIC_II vic2{ clock, ioData, ram, signals };
 
+	nvic::PLA pla{ signals };
+
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
 	nvic::VICPanel vicPanel{ vic2 };
@@ -98,6 +101,7 @@ auto main() -> std::uint32_t
 	clock.Start();
 	cpu.Start();
 	vic2.Start();
+	pla.Start();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -167,6 +171,7 @@ auto main() -> std::uint32_t
 		glfwSwapBuffers(window);
 	}
 
+	pla.Stop();
 	vic2.Stop();
 	cpu.Stop();
 	clock.Stop();

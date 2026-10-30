@@ -211,6 +211,7 @@ namespace nvic
 				//			} while (m_DecoderHostCycleTime < cycles * m_Clock.CPUClockDelay());
 
 //				m_Signals.BusAvailable = false;
+				m_Signals.CPU_IOPort = m_Memory->ReadAddress(0x0001);
 			}
 		}
 	}

@@ -26,14 +26,14 @@ namespace nvic
 		auto Read() -> void;
 		auto Write() -> void;
 
+		auto ReadAddress(std::uint16_t address) -> std::uint8_t;
+
 		auto Push(std::uint16_t address, std::uint8_t value) -> void;
 		auto Pop(std::uint16_t address) -> const std::uint8_t;
 
 		auto SetChunk(std::uint8_t chunkID, MemoryChunk& chunk) -> void;
 		auto SetChunk(std::uint8_t chunkID, std::vector<MemoryChunk>& chunks) -> void;
 		auto FindChunk(std::uint16_t address) -> std::uint8_t;
-
-		auto ViewMemory() -> void;
 
 		auto GetChunks() -> std::array<MemoryChunk*, 16>& { return m_Chunks; }
 

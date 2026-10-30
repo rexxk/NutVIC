@@ -32,6 +32,12 @@ namespace nvic
 
 		bool InterruptRequest{ false };
 		bool BusAvailable{ true };
+
+		std::uint8_t CPU_IOPort{};		
+
+		bool PLA_CHARROM{ false };
+		bool PLA_BASIC{ false };
+		bool PLA_KERNAL{ false };
 	};
 
 }
