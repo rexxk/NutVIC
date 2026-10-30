@@ -53,9 +53,9 @@ namespace nvic
 		{
 			cycles = m_Clock.CPUClockCycles();
 
-			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusLock)
+			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusAvailable)
 			{
-				m_Signals.BusLock = true;
+//				m_Signals.BusLock = true;
 
 
 
@@ -63,7 +63,9 @@ namespace nvic
 
 
 
-				m_Signals.BusLock = false;
+//				m_Signals.BusLock = false;
+
+				m_Signals.BusAvailable = true;
 			}
 
 			if ((cycles % 63) == 0)

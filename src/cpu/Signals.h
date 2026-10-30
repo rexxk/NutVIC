@@ -31,8 +31,7 @@ namespace nvic
 		std::uint16_t AddressBus{};
 
 		bool InterruptRequest{ false };
-
-		bool BusLock{ false };
+		bool BusAvailable{ true };
 	};
 
 }
