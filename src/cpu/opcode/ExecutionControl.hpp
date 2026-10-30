@@ -55,6 +55,60 @@ namespace nvic
 				return true;
 			};
 
+		constexpr auto Op40_RTI = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						memory.Read();
+						return true;
+					}
+
+					case 1:
+					{
+						memory.Read();
+						registers.StackPointer++;
+
+						return true;
+					}
+
+					case 2:
+					{
+						signals.AddressBus = 0x100 + registers.StackPointer++;
+						memory.Read();
+						registers.InternalRegister8 = signals.DataBus;
+
+						registers.Flags = registers.InternalRegister8 & 0xCF;
+
+						return true;
+					}
+
+					case 3:
+					{
+						signals.AddressBus = 0x100 + registers.StackPointer++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 4:
+					{
+						signals.AddressBus = 0x100 + registers.StackPointer++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
+
+						registers.PC = registers.BaseAddress;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
+			};
+
 		constexpr auto Op4C_JMP = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				switch (signals.ExecutionCycle++)
@@ -189,7 +243,7 @@ namespace nvic
 				{
 					case 0:
 					{
-						signals.AddressBus = --registers.PC;
+						signals.AddressBus = registers.PC;
 						memory.Read();
 						registers.StackPointer--;
 
@@ -218,9 +272,10 @@ namespace nvic
 					{
 						signals.AddressBus = 0x100 + registers.StackPointer--;
 						registers.InternalRegister8 = registers.Flags;
-						registers.InternalRegister8 |= Flag_Interrupt | Flag_Unused;
 						signals.DataBus = registers.InternalRegister8;
 						memory.Write();
+
+						registers.Flags |= Flag_Interrupt | Flag_Unused;
 
 						return true;
 					}

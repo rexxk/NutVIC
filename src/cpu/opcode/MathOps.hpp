@@ -119,6 +119,61 @@ namespace nvic
 				return 2;
 			};
 
+		constexpr auto OpC6_DECzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						registers.InternalRegister8 = signals.DataBus;
+
+						return true;
+					}
+
+					case 2:
+					{
+						memory.Read();
+						registers.InternalRegister8--;
+
+						return true;
+					}
+
+					case 3:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						signals.DataBus = registers.InternalRegister8;
+						memory.Write();
+
+						if (registers.InternalRegister8 == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (registers.InternalRegister8 & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
+			};
+
 		constexpr auto OpC8_INY = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				registers.Y++;
