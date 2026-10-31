@@ -17,8 +17,8 @@ namespace nvic
 	constexpr std::uint8_t CPUIO_CassetteMotorControl = 0x20;
 
 
-	PLA::PLA(Signals& signals)
-		: m_Signals(signals)
+	PLA::PLA(Signals& signals, Memory& memory)
+		: m_Signals(signals), m_Memory(memory)
 	{
 
 	}
@@ -39,22 +39,49 @@ namespace nvic
 	{
 		while (m_Running.load())
 		{
-			auto address = m_Signals.AddressBus;
+			if (m_Signals.CPU_IOPort != m_ActiveCPUPortSignals)
+			{
+				m_ActiveCPUPortSignals = m_Signals.CPU_IOPort;
 
-			if (m_Signals.CPU_IOPort & CPUIO_LORAM)
 				// true - BASIC ROM
 				// false - RAM
-				;
+				if (m_Signals.CPU_IOPort & CPUIO_LORAM)
+				{
+					m_Memory.SetBank(0xA, 1);
+					m_Memory.SetBank(0xB, 1);
+				}
+				else
+				{
+					m_Memory.SetBank(0xA, 0);
+					m_Memory.SetBank(0xB, 0);
+				}
 
-			if (m_Signals.CPU_IOPort & CPUIO_HIRAM)
 				// true = KERNAL ROM
 				// false = RAM
-				;
+				if (m_Signals.CPU_IOPort & CPUIO_HIRAM)
+				{
+					m_Memory.SetBank(0xE, 1);
+					m_Memory.SetBank(0xF, 1);
+				}
+				else
+				{
+					m_Memory.SetBank(0xE, 0);
+					m_Memory.SetBank(0xF, 0);
+				}
 
-			if (m_Signals.CPU_IOPort & CPUIO_CHAREN)
 				// true = IO
 				// false = CHARGEN ROM
-				;
+				if (m_Signals.CPU_IOPort & CPUIO_CHAREN)
+				{
+					m_Memory.SetBank(0xD, 1);
+				}
+				else
+				{
+					m_Memory.SetBank(0xD, 0);
+				}
+
+			}
+
 
 
 		}

@@ -69,27 +69,33 @@ auto main() -> std::uint32_t
 	std::array<nvic::MemoryChunk, 16> ram{};
 
 	for (auto i = 0; i < 16; i++)
-		memory.SetChunk(i, ram.at(i));
+		memory.SetChunk(i, 0, ram.at(i));
+
+	// Set IO #CS = active high
+	memory.SetChunk(0xD, 1, ram.at(0xD));
 
 	std::vector<nvic::MemoryChunk> basicROM{};
 	std::vector<nvic::MemoryChunk> kernalROM{};
+	std::vector<nvic::MemoryChunk> chargenROM{};
 
 	nvic::MemoryChunk ioData{ .ReadWrite{true} };
 
 	nvic::LoadROM(basicROM, "rom/c64/basic", 0xA000);
-//	nvic::LoadROM(highROM, "rom/c64/chargen", 3, 0xD000);
+	nvic::LoadROM(chargenROM, "rom/c64/chargen", 0xD000);
 	nvic::LoadROM(kernalROM, "rom/c64/kernal", 0xE000);
 
-	memory.SetChunk(0xA, basicROM);
-	memory.SetChunk(0xD, ioData);
-	memory.SetChunk(0xE, kernalROM);
+	memory.SetChunk(0xA, 1, basicROM);
+	memory.SetChunk(0xD, 0, ioData);
+	memory.SetChunk(0xE, 1, kernalROM);
+
+	memory.SetDefaultValues();
 
 	nvic::CIA cia1{ 0, ioData, signals };
 	nvic::CIA cia2{ 1, ioData, signals };
 
 	nvic::VIC_II vic2{ clock, ioData, ram, signals };
 
-	nvic::PLA pla{ signals };
+	nvic::PLA pla{ signals, memory };
 
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };

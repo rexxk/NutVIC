@@ -165,7 +165,7 @@ namespace nvic
 			}
 
 //			if (m_Registers.PC >= 0xFDDD && m_Registers.PC < 0xFDE2)
-//			if (m_OpsRun > 570895)
+//			if (m_OpsRun > 1330)
 //				m_RunMode = RunMode::Step;
 
 			if (m_Signals.Control & Signal_AddressEnableControl && m_Signals.Control & Signal_ClockPhase1 && m_Signals.BusAvailable)

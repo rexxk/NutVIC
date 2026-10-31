@@ -62,7 +62,7 @@ namespace nvic
 					ImGui::SameLine();
 
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ 0.1f, 0.9f, 0.1f, 1.0f });
-					str = std::format("{:02x}", chunks.at(chunk)->Data[row * 16 + chunkAddress + col]);
+					str = std::format("{:02x}", chunks.at(chunk)[m_Memory.m_BankSelector[chunk]]->Data[row * 16 + chunkAddress + col]);
 					ImGui::Text("%s", str.c_str());
 					ImGui::PopStyleColor();
 
@@ -72,7 +72,7 @@ namespace nvic
 						sameLine = true;
 				}
 				else
-					str += std::format("{:02x} ", chunks.at(chunk)->Data[row * 16 + chunkAddress + col]);
+					str += std::format("{:02x} ", chunks.at(chunk)[m_Memory.m_BankSelector[chunk]]->Data[row * 16 + chunkAddress + col]);
 			}
 
 			if (sameLine)

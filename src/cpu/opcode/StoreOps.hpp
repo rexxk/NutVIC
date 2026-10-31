@@ -244,8 +244,15 @@ namespace nvic
 						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 
-						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
+						std::uint16_t result = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.Y;
+
+						registers.BaseAddressLow = result & 0xFF;
+
+						if (result & 0x100)
 							registers.BaseAddressHigh++;
+
+//						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
+//							registers.BaseAddressHigh++;
 
 						return true;
 					}
@@ -360,8 +367,15 @@ namespace nvic
 
 					case 2:
 					{
-						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
+						std::uint16_t result = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.Y;
+
+						registers.BaseAddressLow = result & 0xFF;
+
+						if (result & 0x100)
 							registers.BaseAddressHigh++;
+
+//						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
+//							registers.BaseAddressHigh++;
 
 						return true;
 					}
@@ -404,8 +418,15 @@ namespace nvic
 
 					case 2:
 					{
-						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.X) & 0x100)
+						std::uint16_t result = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.X;
+
+						registers.BaseAddressLow = result & 0xFF;
+
+						if (result & 0x100)
 							registers.BaseAddressHigh++;
+
+//						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.X) & 0x100)
+//							registers.BaseAddressHigh++;
 
 						return true;
 					}

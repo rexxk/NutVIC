@@ -65,6 +65,7 @@ namespace nvic
 		ImGui::Separator();
 
 		ImGui::Text("Signals: %04x", m_Signals.Control);
+		ImGui::Text("IO port: %02x", m_Signals.CPU_IOPort);
 
 		ImGui::End();
 	}
