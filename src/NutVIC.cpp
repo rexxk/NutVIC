@@ -89,6 +89,7 @@ auto main() -> std::uint32_t
 	memory.SetChunk(0xE, 1, kernalROM);
 
 	memory.SetDefaultValues();
+	cpu.Reset();
 
 	nvic::CIA cia1{ 0, ioData, signals };
 	nvic::CIA cia2{ 1, ioData, signals };
@@ -107,7 +108,6 @@ auto main() -> std::uint32_t
 	clock.Start();
 	cpu.Start();
 	vic2.Start();
-	pla.Start();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -170,6 +170,7 @@ auto main() -> std::uint32_t
 		vic2.Update();
 
 		cia2.Update();
+		pla.Update();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -177,7 +178,6 @@ auto main() -> std::uint32_t
 		glfwSwapBuffers(window);
 	}
 
-	pla.Stop();
 	vic2.Stop();
 	cpu.Stop();
 	clock.Stop();
