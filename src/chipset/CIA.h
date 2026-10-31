@@ -40,6 +40,8 @@ namespace nvic
 
 		std::uint8_t m_ID{};
 
+		std::uint8_t m_TODClock{};
+
 	};
 
 }

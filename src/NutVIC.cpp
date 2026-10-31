@@ -171,6 +171,7 @@ auto main() -> std::uint32_t
 
 		vic2.Update();
 
+		cia1.Update();
 		cia2.Update();
 		pla.Update();
 
