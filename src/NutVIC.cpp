@@ -72,7 +72,7 @@ auto main() -> std::uint32_t
 		memory.SetChunk(i, 0, ram.at(i));
 
 	// Set IO #CS = active high
-	memory.SetChunk(0xD, 1, ram.at(0xD));
+//	memory.SetChunk(0xD, 1, ram.at(0xD));
 
 	std::vector<nvic::MemoryChunk> basicROM{};
 	std::vector<nvic::MemoryChunk> kernalROM{};
@@ -80,12 +80,14 @@ auto main() -> std::uint32_t
 
 	nvic::MemoryChunk ioData{ .ReadWrite{true} };
 
+	memory.SetChunk(0xD, 1, ioData);
+
 	nvic::LoadROM(basicROM, "rom/c64/basic", 0xA000);
 	nvic::LoadROM(chargenROM, "rom/c64/chargen", 0xD000);
 	nvic::LoadROM(kernalROM, "rom/c64/kernal", 0xE000);
 
 	memory.SetChunk(0xA, 1, basicROM);
-	memory.SetChunk(0xD, 0, ioData);
+	memory.SetChunk(0xD, 0, chargenROM);
 	memory.SetChunk(0xE, 1, kernalROM);
 
 	memory.SetDefaultValues();

@@ -46,12 +46,18 @@ namespace nvic
 
 //		std::println("VIC-II is hijacking address enable control signal");
 
-		std::uint64_t cycles{};
+		std::uint64_t currentCycle{};
+		std::uint64_t lastCycle{};
 		std::uint16_t rasterLine{};
 
 		while (m_Running)
 		{
-			cycles = m_Clock.CPUClockCycles();
+			do
+			{
+				currentCycle = m_Clock.CPUClockCycles();
+			} while (currentCycle == lastCycle);
+
+			lastCycle = currentCycle;
 
 
 			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusAvailable)
@@ -69,7 +75,7 @@ namespace nvic
 				m_Signals.BusAvailable = true;
 			}
 
-			if ((cycles % 63) == 0)
+			if ((currentCycle % 63) == 0)
 				rasterLine++;
 
 			if (rasterLine == 312)

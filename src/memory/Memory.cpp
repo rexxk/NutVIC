@@ -44,6 +44,9 @@ namespace nvic
 
 	auto Memory::Write() -> void
 	{
+//		if (m_Signals.AddressBus == 0x0001)
+//			m_Signals.Break = true;
+
 		std::uint8_t chunk = m_Signals.AddressBus >> 12;
 		std::uint16_t address = m_Signals.AddressBus & 0x0FFF;
 
