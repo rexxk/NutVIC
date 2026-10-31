@@ -13,6 +13,9 @@ namespace nvic
 
 	std::chrono::steady_clock::time_point CIA1_TimerA_StartTime{};
 
+	std::uint16_t TimerA_Value{};
+
+
 	CIA::CIA(std::uint8_t id, MemoryChunk& ioMemory, Signals& signals)
 		: m_ID(id), m_Memory(ioMemory), m_Signals(signals)
 	{
@@ -35,7 +38,9 @@ namespace nvic
 					m_Signals.InterruptRequest = true;
 					CIA1_TimerA_StartTime = TimerA_EndTime;
 
-					std::println("IRQ call");
+					TimerA_Value++;
+					m_Memory.Data[0xC00 + CIA_TimerALowByte] = TimerA_Value & 0xFF;
+					m_Memory.Data[0xC00 + CIA_TimerAHighByte] = TimerA_Value >> 8;
 				}
 			}
 		}
