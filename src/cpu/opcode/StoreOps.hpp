@@ -244,15 +244,11 @@ namespace nvic
 						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 
-						std::uint16_t result = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.Y;
+						registers.InternalRegister = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.Y;
+						registers.BaseAddressLow = registers.InternalRegister & 0xFF;
 
-						registers.BaseAddressLow = result & 0xFF;
-
-						if (result & 0x100)
+						if (registers.InternalRegister & 0x100)
 							registers.BaseAddressHigh++;
-
-//						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
-//							registers.BaseAddressHigh++;
 
 						return true;
 					}
@@ -367,15 +363,11 @@ namespace nvic
 
 					case 2:
 					{
-						std::uint16_t result = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.Y;
+						registers.InternalRegister = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.Y;
+						registers.BaseAddressLow = registers.InternalRegister & 0xFF;
 
-						registers.BaseAddressLow = result & 0xFF;
-
-						if (result & 0x100)
+						if (registers.InternalRegister & 0x100)
 							registers.BaseAddressHigh++;
-
-//						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
-//							registers.BaseAddressHigh++;
 
 						return true;
 					}
@@ -418,15 +410,11 @@ namespace nvic
 
 					case 2:
 					{
-						std::uint16_t result = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.X;
+						registers.InternalRegister = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.X;
+						registers.BaseAddressLow = registers.InternalRegister & 0xFF;
 
-						registers.BaseAddressLow = result & 0xFF;
-
-						if (result & 0x100)
+						if (registers.InternalRegister & 0x100)
 							registers.BaseAddressHigh++;
-
-//						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.X) & 0x100)
-//							registers.BaseAddressHigh++;
 
 						return true;
 					}

@@ -53,6 +53,7 @@ namespace nvic
 		{
 			cycles = m_Clock.CPUClockCycles();
 
+
 			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusAvailable)
 			{
 //				m_Signals.BusLock = true;
