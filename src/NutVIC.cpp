@@ -61,10 +61,9 @@ auto main() -> std::uint32_t
 
 	// Init system
 	nvic::Signals signals{};
-	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals };
-	nvic::CPU cpu{ clock, signals };
+	nvic::CPU cpu{ signals };
 	nvic::PLA pla{ signals };
-	nvic::Memory memory{ pla, signals };
+	nvic::Memory memory{ pla, signals, cpu.GetRegisters() };
 	cpu.SetMemory(&memory);
 
 	std::array<nvic::MemoryChunk, 16> ram{};
@@ -97,7 +96,9 @@ auto main() -> std::uint32_t
 	nvic::CIA cia1{ 0, ioData, signals };
 	nvic::CIA cia2{ 1, ioData, signals };
 
-	nvic::VIC_II vic2{ clock, ioData, ram, signals };
+	nvic::VIC_II vic2{ ioData, ram, signals };
+
+	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals, cpu, vic2, cia1, cia2 };
 
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
@@ -107,8 +108,8 @@ auto main() -> std::uint32_t
 //	memory.SetChunk(0, charrom);
 
 	clock.Start();
-	cpu.Start();
-	vic2.Start();
+//	cpu.Start();
+//	vic2.Start();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -180,8 +181,8 @@ auto main() -> std::uint32_t
 		glfwSwapBuffers(window);
 	}
 
-	vic2.Stop();
-	cpu.Stop();
+//	vic2.Stop();
+//	cpu.Stop();
 	clock.Stop();
 
 	ImGui_ImplOpenGL3_Shutdown();

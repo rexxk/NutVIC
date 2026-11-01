@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chipset/Clock.h"
+// #include "chipset/Clock.h"
 #include "cpu/Registers.h"
 #include "cpu/Signals.h"
 
@@ -27,9 +27,11 @@ namespace nvic
 		};
 
 	public:
-		CPU(Clock& clock, Signals& signals);
+		CPU(Signals& signals);
 
 		auto Reset() -> void;
+
+		auto Execute() -> void;
 
 		auto SetMemory(Memory* memory) -> void;
 		auto SetRunMode(RunMode mode) -> void;
@@ -55,7 +57,7 @@ namespace nvic
 		auto FetchOperand(bool resetVector) -> void;
 
 	private:
-		Clock& m_Clock;
+//		Clock& m_Clock;
 		Signals& m_Signals;
 		Memory* m_Memory{ nullptr };
 

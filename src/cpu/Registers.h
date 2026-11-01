@@ -31,6 +31,10 @@ namespace nvic
 			std::uint16_t BaseAddress;
 		};
 
+		// IO latches
+		std::uint8_t TimerA_LowByte_Latch{};
+		std::uint8_t TimerA_HighByte_Latch{};
+
 		std::int8_t RelativeOffset;
 
 		std::uint16_t LastPC{};

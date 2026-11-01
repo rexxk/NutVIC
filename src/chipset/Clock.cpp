@@ -18,8 +18,8 @@ namespace nvic
 
 
 
-	Clock::Clock(FrequencyMode mode, Signals& signals)
-		: m_FrequencyMode(mode), m_Signals(signals)
+	Clock::Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2)
+		: m_FrequencyMode(mode), m_Signals(signals), m_CPU(cpu), m_VIC2(vic2), m_CIA1(cia1), m_CIA2(cia2)
 	{
 		std::uint64_t currentPerformanceCount{};
 
@@ -124,10 +124,16 @@ namespace nvic
 					m_Signals.Control |= Signal_AddressEnableControl | Signal_ClockPhase1;
 					m_CPUClockTicks++;
 					cpuClockStart = now;
+
+					m_CPU.Execute();
+					m_CIA1.Update();
+					m_CIA2.Update();
 				}
 				else
 				{
 					m_Signals.Control &= ~Signal_ClockPhase1;
+
+					m_VIC2.Execute();
 				}
 			}
 

@@ -39,9 +39,22 @@ namespace nvic
 		Signals& m_Signals;
 
 		std::uint8_t m_ID{};
-
 		std::uint8_t m_TODClock{};
 
+		union
+		{
+			struct
+			{
+				std::uint8_t m_TimerA_Low;
+				std::uint8_t m_TimerA_High;
+			};
+
+			std::uint16_t m_TimerA_Latch;
+		};
+
+		std::uint16_t m_TimerA_Value{};
+
+		bool m_Running{ false };
 	};
 
 }

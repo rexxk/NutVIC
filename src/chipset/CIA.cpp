@@ -11,9 +11,7 @@ namespace nvic
 	constexpr std::uint8_t TODClockNTSC = 60;
 	constexpr std::uint8_t TODClockPAL = 50;
 
-	std::chrono::steady_clock::time_point CIA1_TimerA_StartTime{};
-
-	std::uint16_t TimerA_Value{};
+//	std::chrono::steady_clock::time_point CIA1_TimerA_StartTime{};
 
 
 	CIA::CIA(std::uint8_t id, MemoryChunk& ioMemory, Signals& signals)
@@ -21,7 +19,7 @@ namespace nvic
 	{
 		m_TODClock = TODClockNTSC;
 
-		CIA1_TimerA_StartTime = std::chrono::steady_clock::now();
+//		CIA1_TimerA_StartTime = std::chrono::steady_clock::now();
 	}
 
 
@@ -31,18 +29,27 @@ namespace nvic
 		{
 			if (m_Memory.Data[0xC00 + CIA_InterruptControl] & 0x1)
 			{
-				auto TimerA_EndTime = std::chrono::steady_clock::now();
-
-				if ((std::chrono::duration_cast<std::chrono::milliseconds>(TimerA_EndTime - CIA1_TimerA_StartTime).count() / 1000.0) > (1 / 60.0f))
+				if (!m_Running)
 				{
-					m_Signals.InterruptRequest = true;
-					CIA1_TimerA_StartTime = TimerA_EndTime;
+					m_TimerA_Low = m_Memory.Data[0xC04];
+					m_TimerA_High = m_Memory.Data[0xC05];
 
-					TimerA_Value++;
-					m_Memory.Data[0xC00 + CIA_TimerALowByte] = TimerA_Value & 0xFF;
-					m_Memory.Data[0xC00 + CIA_TimerAHighByte] = TimerA_Value >> 8;
+					m_TimerA_Value = m_TimerA_Latch;
+
+					m_Running = true;
 				}
+
+				if ((m_TimerA_Value--) == 0xFFFF)
+				{
+					m_TimerA_Value = m_TimerA_Latch;
+					m_Signals.InterruptRequest = true;
+				}
+
+				m_Memory.Data[0xC00 + CIA_TimerALowByte] = m_TimerA_Value & 0xFF;
+				m_Memory.Data[0xC00 + CIA_TimerAHighByte] = m_TimerA_Value >> 8;
 			}
+			else
+				m_Running = false;
 		}
 
 		if (m_ID == 1)

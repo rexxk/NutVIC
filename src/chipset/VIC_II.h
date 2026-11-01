@@ -1,6 +1,5 @@
 #pragma once
 
-#include "chipset/Clock.h"
 #include "cpu/Signals.h"
 #include "memory/Memory.h"
 
@@ -65,7 +64,9 @@ namespace nvic
 	class VIC_II
 	{
 	public:
-		VIC_II(Clock& clock, MemoryChunk& ioMemory, std::array<MemoryChunk, 16>& ram, Signals& signals);
+		VIC_II(MemoryChunk& ioMemory, std::array<MemoryChunk, 16>& ram, Signals& signals);
+
+		auto Execute() -> void;
 
 		auto Start() -> void;
 		auto Stop() -> void;
@@ -79,7 +80,6 @@ namespace nvic
 		void ThreadFunc();
 
 	private:
-		Clock& m_Clock;
 		MemoryChunk& m_IOMemory;
 		Signals& m_Signals;
 		std::array<MemoryChunk, 16>& m_RAM;

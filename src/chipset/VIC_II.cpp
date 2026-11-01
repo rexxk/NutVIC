@@ -17,8 +17,8 @@ constexpr std::uint8_t VIC_MemoryBanks = 0x03;
 namespace nvic
 {
 
-	VIC_II::VIC_II(Clock& clock, MemoryChunk& ioMemory, std::array<MemoryChunk, 16>& ram, Signals& signals)
-		: m_Clock(clock), m_IOMemory(ioMemory), m_RAM(ram), m_Signals(signals)
+	VIC_II::VIC_II(MemoryChunk& ioMemory, std::array<MemoryChunk, 16>& ram, Signals& signals)
+		: m_IOMemory(ioMemory), m_RAM(ram), m_Signals(signals)
 	{
 		// Set default values
 		m_IOMemory.Data[VIC_ControlRegister1] = 0x9B;
@@ -42,6 +42,11 @@ namespace nvic
 
 	auto VIC_II::ThreadFunc() -> void
 	{
+
+	}
+
+	auto VIC_II::Execute() -> void
+	{
 //		std::this_thread::sleep_for(3s);
 
 //		std::println("VIC-II is hijacking address enable control signal");
@@ -50,12 +55,12 @@ namespace nvic
 		std::uint64_t lastCycle{};
 		std::uint16_t rasterLine{};
 
-		while (m_Running)
+//		while (m_Running)
 		{
-			do
-			{
-				currentCycle = m_Clock.CPUClockCycles();
-			} while (currentCycle == lastCycle);
+//			do
+//			{
+//				currentCycle = m_Clock.CPUClockCycles();
+//			} while (currentCycle == lastCycle);
 
 			lastCycle = currentCycle;
 

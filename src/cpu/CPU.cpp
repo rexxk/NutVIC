@@ -31,8 +31,10 @@ namespace nvic
 		};
 
 
-	CPU::CPU(Clock& clock, Signals& signals)
-		: m_Clock(clock), m_Signals(signals)
+//	CPU::CPU(Clock& clock, Signals& signals)
+//		: m_Clock(clock), m_Signals(signals)
+	CPU::CPU(Signals& signals)
+		: m_Signals(signals)
 	{
 		m_Registers.PC = ResetVector;
 
@@ -140,6 +142,14 @@ namespace nvic
 
 	auto CPU::ExecuteThread() -> void
 	{
+		while (m_Running.load())
+		{
+
+		}
+	}
+
+	auto CPU::Execute() -> void
+	{
 		std::uint64_t startCycle{};
 		std::uint64_t cycleCount{};
 		std::uint64_t elapsedCycles{};
@@ -147,9 +157,9 @@ namespace nvic
 		std::uint64_t hostStartCycle{};
 		std::uint64_t hostExecutionStartCycle{};
 
-		auto cpuClockDelay = m_Clock.CPUClockDelay();
+//		auto cpuClockDelay = m_Clock.CPUClockDelay();
 
-		while (m_Running)
+//		while (m_Running)
 		{
 			hostStartCycle = __rdtsc();
 //			startCycle = m_Clock.CPUClockCycles();
@@ -157,7 +167,8 @@ namespace nvic
 			if (m_RunMode == RunMode::Step)
 			{
 				if (!m_SingleShot)
-					continue;
+					return;
+//					continue;
 
 				m_SingleShot.store(false);
 
@@ -206,7 +217,7 @@ namespace nvic
 				}
 
 				// Delay, wait until cycleCount equals operation cycle time
-				while ((m_DecoderHostCycleTime = __rdtsc() - hostStartCycle) < cpuClockDelay);
+//				while ((m_DecoderHostCycleTime = __rdtsc() - hostStartCycle) < cpuClockDelay);
 				//			do
 				//			{
 				//				m_DecoderCycleTime = m_Clock.CPUClockCycles() - startCycle;

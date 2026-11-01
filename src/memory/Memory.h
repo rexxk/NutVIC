@@ -1,6 +1,7 @@
 #pragma once
 
 #include "chipset/PLA.h"
+#include "cpu/Registers.h"
 #include "cpu/Signals.h"
 
 #include <array>
@@ -24,7 +25,7 @@ namespace nvic
 	class Memory
 	{
 	public:
-		Memory(PLA& pla, Signals& signals);
+		Memory(PLA& pla, Signals& signals, Registers& registers);
 
 		auto SetDefaultValues() -> void;
 
@@ -44,6 +45,7 @@ namespace nvic
 
 	private:
 		PLA& m_PLA;
+		Registers& m_Registers;
 		Signals& m_Signals;
 
 		std::array<MemoryChunk*[3], 16> m_Chunks;

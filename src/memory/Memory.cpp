@@ -1,6 +1,7 @@
 #include "memory/Memory.h"
 
 #include "cpu/Signals.h"
+#include "cpu/Registers.h"
 
 #include <imgui.h>
 
@@ -14,8 +15,8 @@ namespace nvic
 {
 
 
-	Memory::Memory(PLA& pla, Signals& signals)
-		: m_PLA(pla), m_Signals(signals)
+	Memory::Memory(PLA& pla, Signals& signals, Registers& registers)
+		: m_PLA(pla), m_Signals(signals), m_Registers(registers)
 	{
 		for (auto chunk = 0; chunk < 16; chunk++)
 			for (auto bank = 0; bank < 3; bank++)
@@ -69,6 +70,9 @@ namespace nvic
 		// Is there a need to set latches in IO?
 		if (m_Signals.WriteToIO)
 		{
+			if (address == 0xC04) m_Registers.TimerA_LowByte_Latch = m_Signals.DataBus;
+			if (address == 0xC05) m_Registers.TimerA_HighByte_Latch = m_Signals.DataBus;
+
 			m_Signals.WriteToIO = false;
 		}
 	}

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "chipset/CIA.h"
+#include "chipset/VIC_II.h"
+#include "cpu/CPU.h"
 #include "cpu/Signals.h"
 
 #include <atomic>
@@ -20,7 +23,7 @@ namespace nvic
 		};
 
 	public:
-		Clock(FrequencyMode mode, Signals& signals);
+		Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2);
 
 		auto Start() -> void;
 		auto Stop() -> void;
@@ -37,6 +40,11 @@ namespace nvic
 		auto ClockThread() -> void;
 
 	private:
+		CPU& m_CPU;
+		VIC_II& m_VIC2;
+		CIA& m_CIA1;
+		CIA& m_CIA2;
+
 		Signals& m_Signals;
 		FrequencyMode m_FrequencyMode{ FrequencyMode::PAL };
 
