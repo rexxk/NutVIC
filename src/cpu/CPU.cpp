@@ -172,8 +172,8 @@ namespace nvic
 //				m_Signals.Break = false;
 //			}
 
-			if (m_Signals.Control & Signal_AddressEnableControl && m_Signals.Control & Signal_ClockPhase1 && m_Signals.BusAvailable)
-			{
+//			if (m_Signals.Control & Signal_AddressEnableControl && m_Signals.Control & Signal_ClockPhase1 && m_Signals.BusAvailable)
+//			{
 //				m_Signals.BusAvailable = true;
 
 				hostExecutionStartCycle = __rdtsc();
@@ -215,8 +215,8 @@ namespace nvic
 				//			} while (m_DecoderHostCycleTime < cycles * m_Clock.CPUClockDelay());
 
 //				m_Signals.BusAvailable = false;
-				m_Signals.CPU_IOPort = m_Memory->ReadAddress(0x0001);
-			}
+//				m_Signals.CPU_IOPort = m_Memory->ReadAddress(0x0001);
+//			}
 		}
 	}
 
@@ -261,13 +261,19 @@ namespace nvic
 			m_Registers.ActiveOperand = 0x4C;	// JMP
 			m_Signals.Executing = true;
 			m_Signals.ExecutionCycle = 0;
+			m_Signals.BusAvailable = true;
+
 			return;
 		}
+
+		m_Registers.SecondLastPC = m_Registers.LastPC;
+		m_Registers.LastPC = m_Registers.PC;
 
 		m_Signals.AddressBus = m_Registers.PC++;
 		m_Memory->Read();
 		m_Registers.SecondLastOperand = m_Registers.LastOperand;
 		m_Registers.LastOperand = m_Registers.ActiveOperand;
 		m_Registers.ActiveOperand = m_Signals.DataBus;
+
 	}
 }

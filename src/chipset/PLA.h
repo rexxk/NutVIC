@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cpu/Signals.h"
-#include "memory/Memory.h"
 
 #include <atomic>
 #include <cstdint>
@@ -14,13 +13,14 @@ namespace nvic
 	class PLA
 	{
 	public:
-		PLA(Signals& signals, Memory& memory);
+		PLA(Signals& signals);
 
-		auto Update() -> void;
+//		auto Update() -> void;
+
+		auto GetBankSelector(bool read) const -> const std::uint8_t;
 
 	private:
 		Signals& m_Signals;
-		Memory& m_Memory;
 
 		std::uint8_t m_ActiveCPUPortSignals{ 0 };
 	};

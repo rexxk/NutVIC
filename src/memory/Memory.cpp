@@ -14,10 +14,17 @@ namespace nvic
 {
 
 
-	Memory::Memory(Signals& signals)
-		: m_Signals(signals)
+	Memory::Memory(PLA& pla, Signals& signals)
+		: m_PLA(pla), m_Signals(signals)
 	{
+		for (auto chunk = 0; chunk < 16; chunk++)
+			for (auto bank = 0; bank < 3; bank++)
+				m_Chunks[chunk][bank] = nullptr;
 
+		m_ActiveBanks[0xA] = 1;
+		m_ActiveBanks[0xB] = 1;
+		m_ActiveBanks[0xE] = 1;
+		m_ActiveBanks[0xF] = 1;
 	}
 
 	auto Memory::SetDefaultValues() -> void
@@ -39,7 +46,10 @@ namespace nvic
 		std::uint8_t chunk = m_Signals.AddressBus >> 12;
 		std::uint16_t address = m_Signals.AddressBus & 0x0FFF;
 
-		m_Signals.DataBus = m_Chunks[chunk][m_BankSelector[chunk]]->Data.at(address);
+		m_BankSelector = m_PLA.GetBankSelector(true);
+		m_ActiveBanks[chunk] = m_BankSelector;
+
+		m_Signals.DataBus = m_Chunks[chunk][m_BankSelector]->Data.at(address);
 	}
 
 	auto Memory::Write() -> void
@@ -50,8 +60,17 @@ namespace nvic
 		std::uint8_t chunk = m_Signals.AddressBus >> 12;
 		std::uint16_t address = m_Signals.AddressBus & 0x0FFF;
 
-		if (m_Chunks[chunk][m_BankSelector[chunk]]->ReadWrite)
-			m_Chunks[chunk][m_BankSelector[chunk]]->Data.at(address) = m_Signals.DataBus;
+		m_BankSelector = m_PLA.GetBankSelector(false);
+		m_ActiveBanks[chunk] = m_BankSelector;
+//		if (m_Chunks[chunk][m_BankSelector[chunk]]->ReadWrite)
+//			m_Chunks[chunk][m_BankSelector[chunk]]->Data.at(address) = m_Signals.DataBus;
+		m_Chunks[chunk][m_BankSelector]->Data.at(address) = m_Signals.DataBus;
+
+		// Is there a need to set latches in IO?
+		if (m_Signals.WriteToIO)
+		{
+			m_Signals.WriteToIO = false;
+		}
 	}
 
 	auto Memory::ReadAddress(std::uint16_t address) -> std::uint8_t
@@ -59,7 +78,10 @@ namespace nvic
 		std::uint8_t chunk = address >> 12;
 		address &= 0x0FFF;
 
-		return m_Chunks[chunk][m_BankSelector[chunk]]->Data.at(address);
+		m_Signals.AddressBus = address;
+		m_BankSelector = m_PLA.GetBankSelector(true);
+
+		return m_Chunks[chunk][m_BankSelector]->Data.at(address);
 	}
 
 	auto Memory::Push(std::uint16_t address, std::uint8_t value) -> void
@@ -67,8 +89,11 @@ namespace nvic
 		std::uint8_t chunk = address >> 12;
 		std::uint16_t addr = address & 0x0FFF;
 
-		if (m_Chunks[chunk][m_BankSelector[chunk]]->ReadWrite)
-			m_Chunks[chunk][m_BankSelector[chunk]]->Data.at(addr) = value;
+		m_BankSelector = m_PLA.GetBankSelector(false);
+		m_ActiveBanks[chunk] = m_BankSelector;
+
+//		if (m_Chunks[chunk][m_BankSelector[chunk]]->ReadWrite)
+		m_Chunks[chunk][m_BankSelector]->Data.at(addr) = value;
 
 	}
 
@@ -77,7 +102,10 @@ namespace nvic
 		std::uint8_t chunk = address >> 12;
 		std::uint16_t addr = address & 0x0FFF;
 
-		return m_Chunks[chunk][m_BankSelector[chunk]]->Data.at(addr);
+		m_BankSelector = m_PLA.GetBankSelector(true);
+		m_ActiveBanks[chunk] = m_BankSelector;
+
+		return m_Chunks[chunk][m_BankSelector]->Data.at(addr);
 	}
 
 	auto Memory::SetChunk(std::uint8_t chunkID, std::uint8_t select, MemoryChunk& chunk) -> void
@@ -96,11 +124,6 @@ namespace nvic
 	auto Memory::FindChunk(std::uint16_t address) -> std::uint8_t
 	{
 		return address >> 12;
-	}
-
-	auto Memory::SetBank(std::uint8_t bank, std::uint8_t select) -> void
-	{
-		m_BankSelector[bank] = select;
 	}
 
 

@@ -60,8 +60,8 @@ namespace nvic
 			lastCycle = currentCycle;
 
 
-			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusAvailable)
-			{
+//			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusAvailable)
+//			{
 //				m_Signals.BusLock = true;
 
 
@@ -72,8 +72,8 @@ namespace nvic
 
 //				m_Signals.BusLock = false;
 
-				m_Signals.BusAvailable = true;
-			}
+//				m_Signals.BusAvailable = true;
+//			}
 
 			if ((currentCycle % 63) == 0)
 				rasterLine++;

@@ -22,6 +22,7 @@ namespace nvic
 
 		bool m_TraceProgramCounter{ true };
 		int m_PageNumber{ 0xFF };
+		int m_BankNumber{};
 
 		std::uint8_t m_PageAddress{};
 	};

@@ -63,7 +63,8 @@ auto main() -> std::uint32_t
 	nvic::Signals signals{};
 	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals };
 	nvic::CPU cpu{ clock, signals };
-	nvic::Memory memory{ signals };
+	nvic::PLA pla{ signals };
+	nvic::Memory memory{ pla, signals };
 	cpu.SetMemory(&memory);
 
 	std::array<nvic::MemoryChunk, 16> ram{};
@@ -80,14 +81,14 @@ auto main() -> std::uint32_t
 
 	nvic::MemoryChunk ioData{ .ReadWrite{true} };
 
-	memory.SetChunk(0xD, 1, ioData);
+	memory.SetChunk(0xD, 2, ioData);
 
 	nvic::LoadROM(basicROM, "rom/c64/basic", 0xA000);
 	nvic::LoadROM(chargenROM, "rom/c64/chargen", 0xD000);
 	nvic::LoadROM(kernalROM, "rom/c64/kernal", 0xE000);
 
 	memory.SetChunk(0xA, 1, basicROM);
-	memory.SetChunk(0xD, 0, chargenROM);
+	memory.SetChunk(0xD, 1, chargenROM);
 	memory.SetChunk(0xE, 1, kernalROM);
 
 	memory.SetDefaultValues();
@@ -97,8 +98,6 @@ auto main() -> std::uint32_t
 	nvic::CIA cia2{ 1, ioData, signals };
 
 	nvic::VIC_II vic2{ clock, ioData, ram, signals };
-
-	nvic::PLA pla{ signals, memory };
 
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
@@ -173,7 +172,7 @@ auto main() -> std::uint32_t
 
 		cia1.Update();
 		cia2.Update();
-		pla.Update();
+//		pla.Update();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

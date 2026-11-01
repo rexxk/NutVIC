@@ -58,8 +58,8 @@ namespace nvic
 
 		ImGui::Separator();
 
-		ImGui::Text("Second last operand: %02x", m_Registers.SecondLastOperand);
-		ImGui::Text("Last operand: %02x", m_Registers.LastOperand);
+		ImGui::Text("Second last operand: %02x (%04x)", m_Registers.SecondLastOperand, m_Registers.SecondLastPC);
+		ImGui::Text("Last operand: %02x (%04x)", m_Registers.LastOperand, m_Registers.LastPC);
 		ImGui::Text("Active operand: %02x", m_Registers.ActiveOperand);
 
 		ImGui::Separator();

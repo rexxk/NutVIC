@@ -37,6 +37,8 @@ namespace nvic
 
 		std::uint8_t CPU_IOPort{ 0x37 };		
 
+		bool WriteToIO{ false };
+
 		bool PLA_CHARROM{ false };
 		bool PLA_BASIC{ false };
 		bool PLA_KERNAL{ false };

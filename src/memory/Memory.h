@@ -1,5 +1,6 @@
 #pragma once
 
+#include "chipset/PLA.h"
 #include "cpu/Signals.h"
 
 #include <array>
@@ -23,7 +24,7 @@ namespace nvic
 	class Memory
 	{
 	public:
-		Memory(Signals& signals);
+		Memory(PLA& pla, Signals& signals);
 
 		auto SetDefaultValues() -> void;
 
@@ -39,16 +40,16 @@ namespace nvic
 		auto SetChunk(std::uint8_t chunkID, std::uint8_t select, std::vector<MemoryChunk>& chunks) -> void;
 		auto FindChunk(std::uint16_t address) -> std::uint8_t;
 
-		auto GetChunks() -> std::array<MemoryChunk*[2], 16>& { return m_Chunks; }
-
-		auto SetBank(std::uint8_t bank, std::uint8_t select) -> void;
+		auto GetChunks() -> std::array<MemoryChunk*[3], 16>& { return m_Chunks; }
 
 	private:
+		PLA& m_PLA;
 		Signals& m_Signals;
 
-		std::array<MemoryChunk*[2], 16> m_Chunks;
+		std::array<MemoryChunk*[3], 16> m_Chunks;
 
-		std::array<std::uint8_t, 16> m_BankSelector{};
+		std::uint8_t m_BankSelector{};
+		std::array<std::uint8_t, 16> m_ActiveBanks{};
 
 		int m_PageNumber{ 0xFF };
 

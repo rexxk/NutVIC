@@ -33,9 +33,11 @@ namespace nvic
 
 		std::int8_t RelativeOffset;
 
-		std::uint8_t SecondLastOperand;
-		std::uint8_t LastOperand;
-		std::uint8_t ActiveOperand;
+		std::uint16_t LastPC{};
+		std::uint16_t SecondLastPC{};
+		std::uint8_t SecondLastOperand{};
+		std::uint8_t LastOperand{};
+		std::uint8_t ActiveOperand{};
 	};
 
 }
