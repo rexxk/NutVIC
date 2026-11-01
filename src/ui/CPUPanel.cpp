@@ -53,8 +53,10 @@ namespace nvic
 
 		ImGui::Separator();
 
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.3f, 1.0f, 0.3f, 1.0f));
 		ImGui::Text("Address bus: %04x", m_Signals.AddressBus);
 		ImGui::Text("Data bus: %02x", m_Signals.DataBus);
+		ImGui::PopStyleColor();
 
 		ImGui::Separator();
 

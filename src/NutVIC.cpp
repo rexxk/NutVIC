@@ -104,6 +104,7 @@ auto main() -> std::uint32_t
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
 	nvic::VICPanel vicPanel{ vic2 };
 
+
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
 
@@ -136,6 +137,16 @@ auto main() -> std::uint32_t
 			{
 				cpu.SetRunMode(nvic::CPU::RunMode::Continuous);
 			}
+
+			if (ImGui::Button("Jump to"))
+			{
+				signals.JumpTo = true;
+			}
+
+			ImGui::SameLine();
+
+			ImGui::InputInt("Address", &signals.JumpToAddress, 1, 0x100, ImGuiInputTextFlags_CharsHexadecimal);
+
 
 			if (ImGui::Button("Reset"))
 			{

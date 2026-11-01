@@ -28,6 +28,9 @@ namespace nvic
 		auto chunkStartAddress = chunk * 4 * 1024;
 		auto chunkAddress = (m_PageNumber * 0x100) - chunkStartAddress;
 
+		while (m_Memory.m_Chunks[chunk][m_BankNumber] == nullptr)
+			m_BankNumber--;
+
 		ImGui::Begin("Memory page");
 
 		if (ImGui::InputInt("Page", &m_PageNumber, 1, 100, ImGuiInputTextFlags_CharsHexadecimal))

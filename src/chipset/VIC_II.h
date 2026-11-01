@@ -91,6 +91,9 @@ namespace nvic
 		std::uint8_t m_RAMSelect{};
 
 		std::uint8_t m_BaseAddress{};
+
+		std::uint64_t m_CycleCounter{};
+		std::uint16_t m_RasterLine{};
 	};
 
 }

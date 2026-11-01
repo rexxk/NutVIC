@@ -24,6 +24,9 @@ namespace nvic
 	{
 		std::uint16_t Control{};
 
+		int JumpToAddress{};
+		bool JumpTo{ false };
+
 		bool Executing{};
 		std::uint8_t ExecutionCycle{};
 

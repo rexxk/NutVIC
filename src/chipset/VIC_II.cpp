@@ -51,18 +51,18 @@ namespace nvic
 
 //		std::println("VIC-II is hijacking address enable control signal");
 
-		std::uint64_t currentCycle{};
-		std::uint64_t lastCycle{};
-		std::uint16_t rasterLine{};
+//		std::uint64_t currentCycle{};
+//		std::uint64_t lastCycle{};
+//		std::uint16_t rasterLine{};
 
 //		while (m_Running)
-		{
+//		{
 //			do
 //			{
 //				currentCycle = m_Clock.CPUClockCycles();
 //			} while (currentCycle == lastCycle);
 
-			lastCycle = currentCycle;
+//			lastCycle = currentCycle;
 
 
 //			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusAvailable)
@@ -80,22 +80,22 @@ namespace nvic
 //				m_Signals.BusAvailable = true;
 //			}
 
-			if ((currentCycle % 63) == 0)
-				rasterLine++;
+		if ((m_CycleCounter++ % 63) == 0)
+			m_RasterLine++;
 
-			if (rasterLine == 312)
-				rasterLine = 0;
+		if (m_RasterLine == 312)
+			m_RasterLine = 0;
 
-			m_IOMemory.Data[VIC_RasterCounter] = static_cast<std::uint8_t>(rasterLine & 0xFF);
+		m_IOMemory.Data[VIC_RasterCounter] = static_cast<std::uint8_t>(m_RasterLine & 0xFF);
 
-			if (rasterLine & 0x100)
-				m_IOMemory.Data[VIC_ControlRegister1] |= (1 << 7);
-			else
-				m_IOMemory.Data[VIC_ControlRegister1] &= ~(1 << 7);
+		if (m_RasterLine & 0x100)
+			m_IOMemory.Data[VIC_ControlRegister1] |= (1 << 7);
+		else
+			m_IOMemory.Data[VIC_ControlRegister1] &= ~(1 << 7);
 
 //			m_Signals.Control &= ~Signal_AddressEnableControl;
 
-		}
+//		}
 
 	}
 

@@ -164,6 +164,17 @@ namespace nvic
 			hostStartCycle = __rdtsc();
 //			startCycle = m_Clock.CPUClockCycles();
 
+			if (m_Signals.JumpTo)
+			{
+				m_RunMode = RunMode::Continuous;
+
+				if (m_Registers.PC == (m_Signals.JumpToAddress + 1))
+				{
+					m_RunMode = RunMode::Step;
+					m_Signals.JumpTo = false;
+				}
+			}
+
 			if (m_RunMode == RunMode::Step)
 			{
 				if (!m_SingleShot)
