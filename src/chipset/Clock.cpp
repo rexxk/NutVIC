@@ -92,9 +92,43 @@ namespace nvic
 		std::uint32_t cpuClockHalfPhaseDelay = m_CPUClockDelay / 2;
 		std::uint64_t cpuHalfClockTicks{};
 
+		long long performanceCounterStart{};
+		long long currentPerformanceCount{};
+		long long wait{};
+		long long startCount = __rdtsc();
+
+		performanceCounterStart = _Query_perf_counter();
+
 		while (m_Running.load())
 		{
 			auto now = __rdtsc();
+
+			// Adjust CPU frequency due to variable frequencies
+			wait = _Query_perf_frequency();
+
+			currentPerformanceCount = _Query_perf_counter();
+
+			if ((currentPerformanceCount - performanceCounterStart) > wait)
+			{
+				m_HostProcessorFrequency = __rdtsc() - startCount;
+				startCount = __rdtsc();
+				performanceCounterStart = _Query_perf_counter();
+
+				if (m_FrequencyMode == FrequencyMode::PAL)
+				{
+					m_ColorClockDelay = m_HostProcessorFrequency / CrystalFrequencyPAL;
+					m_DotClockDelay = m_HostProcessorFrequency / DualVoltageFrequencyPAL;
+					m_CPUClockDelay = m_DotClockDelay * 8;
+				}
+				else
+				{
+					m_ColorClockDelay = m_HostProcessorFrequency / CrystalFrequencyNTSC;
+					m_DotClockDelay = m_HostProcessorFrequency / DualVoltageFrequencyNTSC;
+					m_CPUClockDelay = m_DotClockDelay * 8;
+				}
+
+			}
+
 
 			colorClockElapsed = now - colorClockStart;
 
@@ -119,13 +153,14 @@ namespace nvic
 			{
 				cpuHalfClockTicks++;
 
-				if (cpuHalfClockTicks % 2)
+				if ((cpuHalfClockTicks & 0x1) == 0)
 				{
 					m_Signals.Control |= Signal_AddressEnableControl | Signal_ClockPhase1;
 					m_CPUClockTicks++;
 					cpuClockStart = now;
 
 					m_CPU.Execute();
+
 					m_CIA1.Update();
 					m_CIA2.Update();
 				}

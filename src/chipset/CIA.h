@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cpu/Signals.h"
+#include "cpu/Registers.h"
 #include "memory/Memory.h"
 
 #include <cstdint>
@@ -30,13 +31,14 @@ namespace nvic
 	class CIA
 	{
 	public:
-		CIA(std::uint8_t id, MemoryChunk& ioMemory, Signals& signals);
+		CIA(std::uint8_t id, MemoryChunk& ioMemory, Signals& signals, Registers& registers);
 
 		auto Update() -> void;
 
 	private:
 		MemoryChunk& m_Memory;
 		Signals& m_Signals;
+		Registers& m_Registers;
 
 		std::uint8_t m_ID{};
 		std::uint8_t m_TODClock{};

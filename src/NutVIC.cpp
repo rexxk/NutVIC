@@ -93,8 +93,8 @@ auto main() -> std::uint32_t
 	memory.SetDefaultValues();
 	cpu.Reset();
 
-	nvic::CIA cia1{ 0, ioData, signals };
-	nvic::CIA cia2{ 1, ioData, signals };
+	nvic::CIA cia1{ 0, ioData, signals, cpu.GetRegisters() };
+	nvic::CIA cia2{ 1, ioData, signals, cpu.GetRegisters() };
 
 	nvic::VIC_II vic2{ ioData, ram, signals };
 
@@ -126,6 +126,10 @@ auto main() -> std::uint32_t
 
 		{
 			ImGui::Begin("Control");
+
+			ImGui::Text("Host CPU Frequency: %llu", clock.GetHostFrequency());
+
+			ImGui::Separator();
 
 			if (ImGui::Button("Step"))
 			{

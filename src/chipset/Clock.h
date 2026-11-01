@@ -36,6 +36,8 @@ namespace nvic
 		auto DotClockDelay() const -> const std::uint32_t { return m_DotClockDelay; }
 		auto CPUClockDelay() const -> const std::uint32_t { return m_CPUClockDelay; }
 
+		auto GetHostFrequency() const -> const std::uint64_t { return m_HostProcessorFrequency; }
+
 	private:
 		auto ClockThread() -> void;
 
