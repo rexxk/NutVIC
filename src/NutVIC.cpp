@@ -175,6 +175,12 @@ auto main() -> std::uint32_t
 
 				ImGui::Text("Ops run: %llu", cpu.GetOpsRun());
 			}
+			else
+			{
+				ImGui::Separator();
+				ImGui::Text("Ticks per second: %llu", clock.GetTicksPerSecond());
+				ImGui::Text("Utilization: %f %%", clock.GetUtilization());
+			}
 
 			ImGui::End();
 		}

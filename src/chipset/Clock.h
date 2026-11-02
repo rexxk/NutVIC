@@ -37,6 +37,8 @@ namespace nvic
 		auto CPUClockDelay() const -> const std::uint32_t { return m_CPUClockDelay; }
 
 		auto GetHostFrequency() const -> const std::uint64_t { return m_HostProcessorFrequency; }
+		auto GetTicksPerSecond() const -> const std::uint64_t { return m_TicksPerSecond; }
+		auto GetUtilization() const -> const double { return m_Utilization; }
 
 	private:
 		auto ClockThread() -> void;
@@ -63,6 +65,8 @@ namespace nvic
 		std::atomic<std::uint64_t> m_CPUClockTicks{};
 
 		std::uint64_t m_HostProcessorFrequency{};
+		std::uint64_t m_TicksPerSecond{};
+		double m_Utilization{};
 	};
 
 }

@@ -54,6 +54,17 @@ namespace nvic
 			std::uint16_t m_TimerA_Latch;
 		};
 
+		union
+		{
+			struct
+			{
+				std::uint8_t m_TimerB_Low;
+				std::uint8_t m_TimerB_High;
+			};
+
+			std::uint16_t m_TimerB_Latch;
+		};
+
 		std::uint16_t m_TimerA_Value{};
 
 		bool m_Running{ false };

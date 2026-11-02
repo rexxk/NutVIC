@@ -16,6 +16,8 @@ namespace nvic
 	constexpr std::uint64_t DualVoltageFrequencyNTSC = 8'180'000;
 	constexpr std::uint64_t DualVoltageFrequencyPAL = 7'880'000;
 
+	std::chrono::steady_clock::time_point CPU_Clock_StartTime{};
+	std::uint64_t TicksPerSecond{};
 
 
 	Clock::Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2)
@@ -119,12 +121,14 @@ namespace nvic
 					m_ColorClockDelay = m_HostProcessorFrequency / CrystalFrequencyPAL;
 					m_DotClockDelay = m_HostProcessorFrequency / DualVoltageFrequencyPAL;
 					m_CPUClockDelay = m_DotClockDelay * 8;
+					cpuClockHalfPhaseDelay = m_CPUClockDelay / 2;
 				}
 				else
 				{
 					m_ColorClockDelay = m_HostProcessorFrequency / CrystalFrequencyNTSC;
 					m_DotClockDelay = m_HostProcessorFrequency / DualVoltageFrequencyNTSC;
 					m_CPUClockDelay = m_DotClockDelay * 8;
+					cpuClockHalfPhaseDelay = m_CPUClockDelay / 2;
 				}
 
 			}
@@ -157,12 +161,14 @@ namespace nvic
 				{
 					m_Signals.Control |= Signal_AddressEnableControl | Signal_ClockPhase1;
 					m_CPUClockTicks++;
-					cpuClockStart = now;
+//					cpuClockStart = now;
 
 					m_CPU.Execute();
 
 					m_CIA1.Update();
 					m_CIA2.Update();
+
+					TicksPerSecond++;
 				}
 				else
 				{
@@ -170,8 +176,26 @@ namespace nvic
 
 					m_VIC2.Execute();
 				}
+
+				while (cpuClockElapsed < cpuClockHalfPhaseDelay)
+				{
+					cpuClockElapsed = __rdtsc() - cpuClockStart;
+				}
+
+				cpuClockStart = now;
 			}
 
+			auto endTime = std::chrono::steady_clock::now();
+
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - CPU_Clock_StartTime).count() / 1000.0 > 1.0)
+			{
+				CPU_Clock_StartTime = endTime;
+				m_TicksPerSecond = TicksPerSecond;
+
+				TicksPerSecond = 0;
+
+				m_Utilization = (static_cast<double>(m_TicksPerSecond) / (static_cast<double>(DualVoltageFrequencyNTSC) / 8.0)) * 100.0;
+			}
 		}
 
 		std::println("Stopping clock thread");

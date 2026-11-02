@@ -30,8 +30,11 @@ namespace nvic
 	{
 		if (m_ID == 0)
 		{
-			m_TimerA_Low = m_Registers.TimerA_LowByte_Latch;
-			m_TimerA_High = m_Registers.TimerA_HighByte_Latch;
+			m_TimerA_Low = m_Registers.CIA1_TimerA_LowByte_Latch;
+			m_TimerA_High = m_Registers.CIA1_TimerA_HighByte_Latch;
+
+			m_TimerB_Low = m_Registers.CIA1_TimerB_LowByte_Latch;
+			m_TimerB_High = m_Registers.CIA1_TimerB_HighByte_Latch;
 
 			if (m_Memory.Data[0xC00 + CIA_InterruptControl] & 0x1)
 			{
@@ -73,6 +76,12 @@ namespace nvic
 		if (m_ID == 1)
 		{
 			m_Memory.Data[0xD00] |= 0x80;
+
+			m_TimerA_Low = m_Registers.CIA2_TimerA_LowByte_Latch;
+			m_TimerA_High = m_Registers.CIA2_TimerA_HighByte_Latch;
+
+			m_TimerB_Low = m_Registers.CIA2_TimerB_LowByte_Latch;
+			m_TimerB_High = m_Registers.CIA2_TimerB_HighByte_Latch;
 		}
 	}
 

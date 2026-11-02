@@ -32,8 +32,16 @@ namespace nvic
 		};
 
 		// IO latches
-		std::uint8_t TimerA_LowByte_Latch{};
-		std::uint8_t TimerA_HighByte_Latch{};
+		std::uint8_t CIA1_TimerA_LowByte_Latch{};
+		std::uint8_t CIA1_TimerA_HighByte_Latch{};
+		std::uint8_t CIA1_TimerB_LowByte_Latch{};
+		std::uint8_t CIA1_TimerB_HighByte_Latch{};
+
+		std::uint8_t CIA2_TimerA_LowByte_Latch{};
+		std::uint8_t CIA2_TimerA_HighByte_Latch{};
+		std::uint8_t CIA2_TimerB_LowByte_Latch{};
+		std::uint8_t CIA2_TimerB_HighByte_Latch{};
+
 
 		std::int8_t RelativeOffset;
 
