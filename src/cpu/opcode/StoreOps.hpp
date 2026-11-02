@@ -283,7 +283,8 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.BaseAddressLow + registers.X) & 0xFF;
+						registers.BaseAddressLow += registers.X;
+						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 
 						return true;
@@ -319,7 +320,8 @@ namespace nvic
 
 					case 1:
 					{
-						signals.AddressBus = (registers.BaseAddressLow + registers.X) & 0xFF;
+						registers.BaseAddressLow += registers.X;
+						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 
 						return true;
