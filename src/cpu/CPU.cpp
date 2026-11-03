@@ -47,6 +47,7 @@ namespace nvic
 		m_OpCodes[0x0A] = opcode::Op0A_ASL;
 		m_OpCodes[0x0D] = opcode::Op0D_ORAabs;
 		m_OpCodes[0x10] = opcode::Op10_BPL;
+		m_OpCodes[0x16] = opcode::Op16_ASLzpX;
 		m_OpCodes[0x18] = opcode::Op18_CLC;
 		m_OpCodes[0x20] = opcode::Op20_JSR;
 		m_OpCodes[0x24] = opcode::Op24_BITzp;
@@ -62,6 +63,7 @@ namespace nvic
 		m_OpCodes[0x49] = opcode::Op49_EOR;
 		m_OpCodes[0x4A] = opcode::Op4A_LSR;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
+		m_OpCodes[0x56] = opcode::Op56_LSRzpX;
 		m_OpCodes[0x58] = opcode::Op58_CLI;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x65] = opcode::Op65_ADCzp;
