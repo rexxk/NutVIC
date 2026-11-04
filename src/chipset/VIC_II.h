@@ -6,7 +6,7 @@
 #include <atomic>
 #include <cstdint>
 #include <thread>
-
+#include <vector>
 
 namespace nvic
 {
@@ -76,6 +76,8 @@ namespace nvic
 		auto GetRAMSelect() const -> const std::uint8_t { return m_RAMSelect; }
 		auto GetBaseAddress() const -> const std::uint8_t { return m_BaseAddress; }
 
+		auto GetImageData() -> std::vector<std::uint8_t>& { return m_Pixels; }
+
 	private:
 		void ThreadFunc();
 
@@ -83,6 +85,8 @@ namespace nvic
 		MemoryChunk& m_IOMemory;
 		Signals& m_Signals;
 		std::array<MemoryChunk, 16>& m_RAM;
+
+		std::vector<std::uint8_t> m_Pixels{};
 
 		std::atomic<bool> m_Running{ false };
 

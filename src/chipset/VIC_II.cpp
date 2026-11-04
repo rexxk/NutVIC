@@ -25,6 +25,11 @@ namespace nvic
 		m_IOMemory.Data[VIC_ControlRegister2] = 0x08;
 		m_IOMemory.Data[VIC_MemoryPointers] = 0x14;
 		m_IOMemory.Data[VIC_InterruptRegister] = 0x0F;
+	
+	
+		m_Pixels.resize(320 * 200 * 4);
+
+		std::memset(m_Pixels.data(), 0, 320 * 200 * 4);
 	}
 
 

@@ -4,6 +4,7 @@
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
+#include "display/Texture.h"
 #include "memory/Memory.h"
 #include "ui/CPUPanel.h"
 #include "ui/MemoryPanel.h"
@@ -104,6 +105,7 @@ auto main() -> std::uint32_t
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
 	nvic::VICPanel vicPanel{ vic2 };
 
+	nvic::Texture displayTexture{ 320, 200 };
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
@@ -185,6 +187,14 @@ auto main() -> std::uint32_t
 			ImGui::End();
 		}
 
+		{
+			ImGui::Begin("Screen");
+
+			displayTexture.SetData(vic2.GetImageData());
+			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 640, 400 });
+
+			ImGui::End();
+		}
 		
 		cpuPanel.Draw();
 		memoryPanel.Draw();
