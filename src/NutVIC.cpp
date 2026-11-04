@@ -191,7 +191,8 @@ auto main() -> std::uint32_t
 			ImGui::Begin("Screen");
 
 			displayTexture.SetData(vic2.GetImageData());
-			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 640, 400 });
+//			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 640, 400 });
+			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 418, 235 });
 
 			ImGui::End();
 		}
