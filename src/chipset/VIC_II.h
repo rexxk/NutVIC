@@ -99,6 +99,9 @@ namespace nvic
 		std::uint16_t m_CycleCounter{};
 		std::uint16_t m_RasterLine{};
 		bool m_VisibleRasterLine{ false };
+
+		bool m_BadLine{ false };
+		std::uint16_t m_BadLineCounter{};
 	};
 
 }

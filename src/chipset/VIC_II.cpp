@@ -112,6 +112,24 @@ namespace nvic
 //				m_Signals.BusAvailable = true;
 //			}
 
+		if (m_BadLine)
+		{
+
+			m_BadLineCounter++;
+
+			if (m_BadLineCounter == 40)
+			{
+				m_BadLine = false;
+				m_BadLineCounter = 0;
+
+				m_Signals.BusAvailable = true;
+			}
+			else
+			{
+				return;
+			}
+		}
+
 		std::uint8_t borderColorIndex = m_IOMemory.Data[VIC_BorderColor];
 		std::uint8_t backgroundColorIndex1 = m_IOMemory.Data[VIC_BackgroundColor0];
 
@@ -126,6 +144,19 @@ namespace nvic
 			// Sprite fetch and line wrap
 			m_CycleCounter = 0;
 			m_RasterLine++;
+
+			if (m_RasterLine == 262)
+				m_RasterLine = 0;
+
+			if ((m_RasterLine == 0) || ((m_RasterLine % 8) == 0))
+			{
+				m_BadLine = true;
+				m_BadLineCounter = 0;
+
+				m_Signals.BusAvailable = false;
+//				std::println("Raster start: {}", m_RasterLine);
+			}
+
 		}
 		else if (m_CycleCounter >= 56)
 		{
@@ -168,8 +199,6 @@ namespace nvic
 			}
 		}
 //		if (m_RasterLine == 312)
-		if (m_RasterLine == 262)
-			m_RasterLine = 0;
 
 		m_CycleCounter++;
 
