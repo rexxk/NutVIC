@@ -20,7 +20,7 @@ namespace nvic
 			glDeleteTextures(1, &m_TextureID);
 	}
 
-	auto Texture::SetData(std::span<std::uint8_t> colorData) -> void
+	auto Texture::SetData(std::span<std::uint32_t> colorData) -> void
 	{
 		glTextureSubImage2D(m_TextureID, 0, 0, 0, m_Width, m_Height, GL_RGBA, GL_UNSIGNED_BYTE, colorData.data());
 	}

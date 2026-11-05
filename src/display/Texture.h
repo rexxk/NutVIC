@@ -15,7 +15,7 @@ namespace nvic
 		Texture(std::uint16_t width, std::uint16_t height);
 		~Texture();
 
-		auto SetData(std::span<std::uint8_t> colorData) -> void;
+		auto SetData(std::span<std::uint32_t> colorData) -> void;
 		auto GetTexture() -> GLuint { return m_TextureID; }
 
 	private:

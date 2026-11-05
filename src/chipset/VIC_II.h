@@ -76,7 +76,7 @@ namespace nvic
 		auto GetRAMSelect() const -> const std::uint8_t { return m_RAMSelect; }
 		auto GetBaseAddress() const -> const std::uint8_t { return m_BaseAddress; }
 
-		auto GetImageData() -> std::vector<std::uint8_t>& { return m_Pixels; }
+		auto GetImageData() -> std::vector<std::uint32_t>& { return m_Pixels; }
 
 	private:
 		void ThreadFunc();
@@ -86,7 +86,7 @@ namespace nvic
 		Signals& m_Signals;
 		std::array<MemoryChunk, 16>& m_RAM;
 
-		std::vector<std::uint8_t> m_Pixels{};
+		std::vector<std::uint32_t> m_Pixels{};
 
 		std::atomic<bool> m_Running{ false };
 
@@ -96,8 +96,9 @@ namespace nvic
 
 		std::uint8_t m_BaseAddress{};
 
-		std::uint64_t m_CycleCounter{};
+		std::uint16_t m_CycleCounter{};
 		std::uint16_t m_RasterLine{};
+		bool m_VisibleRasterLine{ false };
 	};
 
 }

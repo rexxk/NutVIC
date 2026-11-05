@@ -105,7 +105,8 @@ auto main() -> std::uint32_t
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
 	nvic::VICPanel vicPanel{ vic2 };
 
-	nvic::Texture displayTexture{ 320, 200 };
+//	nvic::Texture displayTexture{ 320, 200 };
+	nvic::Texture displayTexture{ 418, 251 };
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);

@@ -13,9 +13,34 @@ constexpr std::uint16_t VIC_MemoryBankRegister = 0xD00;
 
 constexpr std::uint8_t VIC_MemoryBanks = 0x03;
 
+constexpr std::uint16_t UpperVisibleRasterLineNTSC = 12;
+constexpr std::uint16_t LowerVisibleRasterLineNTSC = 263;
+constexpr std::uint16_t UpperDisplayRasterLineNTSC = 51;
+constexpr std::uint16_t LowerDisplayRasterLineNTSC = 250;
+
 
 namespace nvic
 {
+
+	constexpr std::array<std::uint32_t, 16> ColorPalette
+	{
+		0xff000000,			// Black
+		0xffffffff,			// White
+		0xff444e9f,			// Red
+		0xffc6bf6a,			// Cyan
+		0xffa357a0,			// Magenta
+		0xff5eab5c,			// Green
+		0xff9b4550,			// Blue
+		0xff87d4c9,			// Yellow
+		0xff3c68a1,			// Orange
+		0xff12546d,			// Brown
+		0xff757ecb,			// Bright red
+		0xff626262,			// Dark blue
+		0xff898989,			// Grey
+		0xff9be29a,			// Bright green
+		0xffcb7e88,			// Bright blue
+		0xffadadad,			// Bright grey
+	};
 
 	VIC_II::VIC_II(MemoryChunk& ioMemory, std::array<MemoryChunk, 16>& ram, Signals& signals)
 		: m_IOMemory(ioMemory), m_RAM(ram), m_Signals(signals)
@@ -28,10 +53,10 @@ namespace nvic
 	
 	
 //		m_Pixels.resize(320 * 200 * 4);
-		m_Pixels.resize(418 * 235 * 4);
+		m_Pixels.resize(418 * 251);
 
 //		std::memset(m_Pixels.data(), 0, 320 * 200 * 4);
-		std::memset(m_Pixels.data(), 0, 418 * 235 * 4);
+		std::memset(m_Pixels.data(), 0, 418 * 251);
 	}
 
 
@@ -87,6 +112,14 @@ namespace nvic
 //				m_Signals.BusAvailable = true;
 //			}
 
+		std::uint8_t borderColorIndex = m_IOMemory.Data[VIC_BorderColor];
+		std::uint8_t backgroundColorIndex1 = m_IOMemory.Data[VIC_BackgroundColor0];
+
+		if (m_RasterLine >= UpperVisibleRasterLineNTSC && m_RasterLine <= LowerVisibleRasterLineNTSC)//250)
+			m_VisibleRasterLine = true;
+		else
+			m_VisibleRasterLine = false;
+
 //		if (m_CycleCounter >= 63)
 		if (m_CycleCounter >= 60)
 		{
@@ -97,18 +130,48 @@ namespace nvic
 		else if (m_CycleCounter >= 56)
 		{
 			// Right border
+			if (m_VisibleRasterLine)
+			{
+				for (auto i = 0; i < 8; i++)
+					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
+			}
+
 		}
 		else if (m_CycleCounter >= 16)
 		{
 			// Main screen area
+
+			if (m_VisibleRasterLine)
+			{
+				if (m_RasterLine >= UpperDisplayRasterLineNTSC && m_RasterLine <= LowerDisplayRasterLineNTSC)
+				{
+					// Main display area
+
+					for (auto i = 0; i < 8; i++)
+						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[backgroundColorIndex1];
+				}
+				else
+				{
+					for (auto i = 0; i < 8; i++)
+						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
+				}
+
+			}
 		}
 		else if (m_CycleCounter >= 12)
 		{
 			// Left border
+			if (m_VisibleRasterLine)
+			{
+				for (auto i = 0; i < 8; i++)
+					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
+			}
 		}
 //		if (m_RasterLine == 312)
 		if (m_RasterLine == 262)
 			m_RasterLine = 0;
+
+		m_CycleCounter++;
 
 		m_IOMemory.Data[VIC_RasterCounter] = static_cast<std::uint8_t>(m_RasterLine & 0xFF);
 
