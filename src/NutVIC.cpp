@@ -97,7 +97,7 @@ auto main() -> std::uint32_t
 	nvic::CIA cia1{ 0, ioData, signals, cpu.GetRegisters() };
 	nvic::CIA cia2{ 1, ioData, signals, cpu.GetRegisters() };
 
-	nvic::VIC_II vic2{ ioData, ram, signals };
+	nvic::VIC_II vic2{ ioData, chargenROM[0], ram, signals};
 
 	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals, cpu, vic2, cia1, cia2 };
 

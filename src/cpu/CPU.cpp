@@ -190,7 +190,7 @@ namespace nvic
 //				std::println("Single shot");
 			}
 
-			if (m_Signals.BusAvailable == false)
+			if (m_Signals.BusAvailable == false && !m_Signals.Executing)
 				return;
 
 //			if (m_Registers.PC >= 0xFDDD && m_Registers.PC < 0xFDE2)

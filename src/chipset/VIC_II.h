@@ -64,7 +64,7 @@ namespace nvic
 	class VIC_II
 	{
 	public:
-		VIC_II(MemoryChunk& ioMemory, std::array<MemoryChunk, 16>& ram, Signals& signals);
+		VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals);
 
 		auto Execute() -> void;
 
@@ -83,8 +83,10 @@ namespace nvic
 
 	private:
 		MemoryChunk& m_IOMemory;
+		MemoryChunk& m_CharROM;
+		std::array<nvic::MemoryChunk, 16>& m_RAM;
+
 		Signals& m_Signals;
-		std::array<MemoryChunk, 16>& m_RAM;
 
 		std::vector<std::uint32_t> m_Pixels{};
 
@@ -102,6 +104,8 @@ namespace nvic
 
 		bool m_BadLine{ false };
 		std::uint16_t m_BadLineCounter{};
+
+		std::vector<std::array<std::uint8_t, 8>> m_CharCache;
 	};
 
 }

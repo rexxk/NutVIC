@@ -42,8 +42,8 @@ namespace nvic
 		0xffadadad,			// Bright grey
 	};
 
-	VIC_II::VIC_II(MemoryChunk& ioMemory, std::array<MemoryChunk, 16>& ram, Signals& signals)
-		: m_IOMemory(ioMemory), m_RAM(ram), m_Signals(signals)
+	VIC_II::VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals)
+		: m_IOMemory(ioMemory), m_CharROM(charrom), m_RAM(ram), m_Signals(signals)
 	{
 		// Set default values
 		m_IOMemory.Data[VIC_ControlRegister1] = 0x9B;
@@ -51,6 +51,7 @@ namespace nvic
 		m_IOMemory.Data[VIC_MemoryPointers] = 0x14;
 		m_IOMemory.Data[VIC_InterruptRegister] = 0x0F;
 	
+		m_CharCache.resize(40);
 	
 //		m_Pixels.resize(320 * 200 * 4);
 		m_Pixels.resize(418 * 251);
@@ -112,31 +113,64 @@ namespace nvic
 //				m_Signals.BusAvailable = true;
 //			}
 
-		if (m_BadLine)
-		{
+		std::uint16_t screenRAMPointer = (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
+		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800) - 0x1000;
 
-			m_BadLineCounter++;
-
-			if (m_BadLineCounter == 40)
-			{
-				m_BadLine = false;
-				m_BadLineCounter = 0;
-
-				m_Signals.BusAvailable = true;
-			}
-			else
-			{
-				return;
-			}
-		}
-
-		std::uint8_t borderColorIndex = m_IOMemory.Data[VIC_BorderColor];
-		std::uint8_t backgroundColorIndex1 = m_IOMemory.Data[VIC_BackgroundColor0];
+		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLineNTSC);
 
 		if (m_RasterLine >= UpperVisibleRasterLineNTSC && m_RasterLine <= LowerVisibleRasterLineNTSC)//250)
 			m_VisibleRasterLine = true;
 		else
 			m_VisibleRasterLine = false;
+
+
+		if (m_BadLine)
+		{
+			if (!m_Signals.Executing)
+			{
+				m_BadLineCounter++;
+
+				if (m_BadLineCounter == 40)
+				{
+					m_BadLine = false;
+					m_BadLineCounter = 0;
+
+					m_Signals.BusAvailable = true;
+				}
+				else
+				{
+					// Perform bad line operations (i.e read text line data)
+					// TODO(da): Bad line start is also dependent of YScroll variable, that is not
+					// implemented at the moment.
+
+//					if (currentRasterLine == 8)
+//					{
+//						currentRasterLine &= 0xFFFF;
+//					}
+
+					std::uint16_t ramAddress = screenRAMPointer + (currentRasterLine * 5) + m_BadLineCounter - 1;
+
+					std::uint8_t chunk = ramAddress >> 12;
+					std::uint16_t address = ramAddress & 0x0FFF;
+
+//					std::println("Current rasterline: {}", currentRasterLine);
+
+					std::uint8_t ramEntry = m_RAM.at(chunk).Data[address];
+
+					std::uint16_t charAddress = charsetDataPointer + 0x800 + ramEntry * 8;
+
+
+					for (auto i = 0; i < 8; i++)
+						m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[charAddress + i];
+
+					return;
+				}
+
+			}
+		}
+
+		std::uint8_t borderColorIndex = m_IOMemory.Data[VIC_BorderColor];
+		std::uint8_t backgroundColorIndex1 = m_IOMemory.Data[VIC_BackgroundColor0];
 
 //		if (m_CycleCounter >= 63)
 		if (m_CycleCounter >= 60)
@@ -148,7 +182,8 @@ namespace nvic
 			if (m_RasterLine == 262)
 				m_RasterLine = 0;
 
-			if ((m_RasterLine == 0) || ((m_RasterLine % 8) == 0))
+			if (((m_RasterLine == UpperDisplayRasterLineNTSC) || (((m_RasterLine - UpperDisplayRasterLineNTSC) % 8) == 0) 
+				&& (m_RasterLine >= UpperDisplayRasterLineNTSC)) && (m_RasterLine < LowerDisplayRasterLineNTSC))
 			{
 				m_BadLine = true;
 				m_BadLineCounter = 0;
@@ -179,7 +214,11 @@ namespace nvic
 					// Main display area
 
 					for (auto i = 0; i < 8; i++)
-						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[backgroundColorIndex1];
+					{
+						auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (8 - i));
+						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
+					}
+//						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[backgroundColorIndex1];
 				}
 				else
 				{
