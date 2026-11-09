@@ -587,7 +587,12 @@ namespace nvic
 					case 2:
 					{
 						bool overrun{ false };
-						if ((static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)) overrun = true;
+
+						registers.InternalRegister = registers.BaseAddressLow + registers.Y;
+						registers.BaseAddressLow += registers.Y;
+
+						if (registers.InternalRegister & 0x100) overrun = true;
+
 
 						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
@@ -659,7 +664,11 @@ namespace nvic
 					case 2:
 					{
 						bool overrun{ false };
-						if ((static_cast<std::uint16_t>(registers.BaseAddressLow += registers.X) & 0x100)) overrun = true;
+
+						registers.InternalRegister = registers.BaseAddressLow + registers.X;
+						registers.BaseAddressLow += registers.X;
+
+						if (registers.InternalRegister & 0x100) overrun = true;
 
 						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
