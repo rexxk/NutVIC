@@ -65,7 +65,7 @@ namespace nvic
 				if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - CIA1_TimerA_StartTime).count() / 1000.0 > 1.0)
 				{
 					CIA1_TimerA_StartTime = endTime;
-					std::println("Latch: {}, FPS: {}", m_TimerA_Latch, fps);
+//					std::println("Latch: {}, FPS: {}", m_TimerA_Latch, fps);
 					fps = 0;
 				}
 			}

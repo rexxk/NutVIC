@@ -273,7 +273,7 @@ namespace nvic
 
 	auto CPU::FetchOperand(bool resetVector) -> void
 	{
-		if (m_Signals.InterruptRequest && !(m_Registers.Flags & Flag_Interrupt))
+		if (!m_Signals.DisableInterrupts && m_Signals.InterruptRequest && !(m_Registers.Flags & Flag_Interrupt))
 		{
 			m_Signals.DataBus = 0xFF;
 			m_Registers.ActiveOperand = 0xFF;

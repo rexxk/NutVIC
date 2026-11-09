@@ -115,6 +115,8 @@ auto main() -> std::uint32_t
 //	cpu.Start();
 //	vic2.Start();
 
+	float scale = 1.5;
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
@@ -165,6 +167,11 @@ auto main() -> std::uint32_t
 				signals.InterruptRequest = true;
 			}
 
+			ImGui::SameLine();
+
+			ImGui::Checkbox("Disable interrupts", &signals.DisableInterrupts);
+
+
 			if (cpu.GetRunMode() == nvic::CPU::RunMode::Step)
 			{
 				ImGui::Separator();
@@ -193,7 +200,7 @@ auto main() -> std::uint32_t
 
 			displayTexture.SetData(vic2.GetImageData());
 //			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 640, 400 });
-			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 418, 235 });
+			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 418 * scale, 235 * scale});
 
 			ImGui::End();
 		}

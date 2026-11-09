@@ -33,6 +33,7 @@ namespace nvic
 		std::uint8_t DataBus{};
 		std::uint16_t AddressBus{};
 
+		bool DisableInterrupts{ true };
 		bool InterruptRequest{ false };
 		bool BusAvailable{ true };
 
