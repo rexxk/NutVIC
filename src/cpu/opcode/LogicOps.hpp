@@ -16,37 +16,37 @@ namespace nvic
 			{
 				switch (signals.ExecutionCycle++)
 				{
-				case 0:
-				{
-					registers.BaseAddressHigh = 0;
-					signals.AddressBus = registers.PC++;
-					memory.Read();
-					registers.BaseAddressLow = signals.DataBus;
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
 
-					return true;
-				}
+						return true;
+					}
 
-				case 1:
-				{
-					signals.AddressBus = registers.BaseAddress;
-					memory.Read();
-					signals.DataBus;
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						signals.DataBus;
 
-					registers.A = registers.A | signals.DataBus;
+						registers.A = registers.A | signals.DataBus;
 
-					if (registers.A == 0)
-						registers.Flags |= Flag_Zero;
-					else
-						registers.Flags &= ~Flag_Zero;
+						if (registers.A == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
 
-					if (registers.A & 0x80)
-						registers.Flags |= Flag_Negative;
-					else
-						registers.Flags &= ~Flag_Negative;
+						if (registers.A & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
 
-					signals.Executing = false;
-					return true;
-				}
+						signals.Executing = false;
+						return true;
+					}
 				}
 
 				return true;
@@ -215,6 +215,46 @@ namespace nvic
 							registers.Flags &= ~Flag_Zero;
 
 						registers.Flags = (registers.Flags & 0x3F) | (signals.DataBus & 0xC0);
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
+			};
+
+		constexpr auto Op45_EORzp = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						registers.BaseAddressHigh = 0;
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						signals.DataBus;
+
+						registers.A = registers.A ^ signals.DataBus;
+
+						if (registers.A == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (registers.A & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
 
 						signals.Executing = false;
 						return true;

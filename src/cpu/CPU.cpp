@@ -42,6 +42,7 @@ namespace nvic
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
 		m_OpCodes[0x05] = opcode::Op05_ORAzp;
+		m_OpCodes[0x06] = opcode::Op06_ASLzp;
 		m_OpCodes[0x08] = opcode::Op08_PHP;
 		m_OpCodes[0x09] = opcode::Op09_ORA;
 		m_OpCodes[0x0A] = opcode::Op0A_ASL;
@@ -58,6 +59,7 @@ namespace nvic
 		m_OpCodes[0x30] = opcode::Op30_BMI;
 		m_OpCodes[0x38] = opcode::Op38_SEC;
 		m_OpCodes[0x40] = opcode::Op40_RTI;
+		m_OpCodes[0x45] = opcode::Op45_EORzp;
 		m_OpCodes[0x46] = opcode::Op46_LSRzp;
 		m_OpCodes[0x48] = opcode::Op48_PHA;
 		m_OpCodes[0x49] = opcode::Op49_EOR;
@@ -67,11 +69,15 @@ namespace nvic
 		m_OpCodes[0x58] = opcode::Op58_CLI;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x65] = opcode::Op65_ADCzp;
+		m_OpCodes[0x66] = opcode::Op66_RORzp;
 		m_OpCodes[0x68] = opcode::Op68_PLA;
 		m_OpCodes[0x69] = opcode::Op69_ADC;
+		m_OpCodes[0x6A] = opcode::Op6A_ROR;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
 		m_OpCodes[0x70] = opcode::Op70_BVS;
+		m_OpCodes[0x76] = opcode::Op76_RORzpX;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
+		m_OpCodes[0x79] = opcode::Op79_ADCabsY;
 		m_OpCodes[0x84] = opcode::Op84_STYzp;
 		m_OpCodes[0x85] = opcode::Op85_STAzp;
 		m_OpCodes[0x86] = opcode::Op86_STXzp;
