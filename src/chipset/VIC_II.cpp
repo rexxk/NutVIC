@@ -157,7 +157,7 @@ namespace nvic
 
 					std::uint8_t ramEntry = m_RAM.at(chunk).Data[address];
 
-					std::uint16_t charAddress = charsetDataPointer + 0x800 + ramEntry * 8;
+					std::uint16_t charAddress = charsetDataPointer + /*0x800 +*/ ramEntry * 8;
 
 
 					for (auto i = 0; i < 8; i++)
