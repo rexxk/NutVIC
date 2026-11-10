@@ -19,7 +19,7 @@ namespace nvic
 
 				std::uint8_t result = registers.Y - signals.DataBus;
 
-				if (result >= signals.DataBus)
+				if (registers.Y >= signals.DataBus)
 					registers.Flags |= Flag_Carry;
 				else
 					registers.Flags &= ~Flag_Carry;
@@ -59,7 +59,7 @@ namespace nvic
 				memory.Read();
 				std::uint8_t result = registers.A - signals.DataBus;
 
-				if (result >= signals.DataBus)
+				if (registers.A >= signals.DataBus)
 					registers.Flags |= Flag_Carry;
 				else
 					registers.Flags &= ~Flag_Carry;
@@ -98,7 +98,7 @@ namespace nvic
 
 						std::uint8_t result = registers.Y - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.Y >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -143,7 +143,7 @@ namespace nvic
 
 						std::uint8_t result = registers.A - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.A >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -174,7 +174,7 @@ namespace nvic
 
 				std::uint8_t result = registers.A - signals.DataBus;
 
-				if (result >= signals.DataBus)
+				if (registers.A >= signals.DataBus)
 					registers.Flags |= Flag_Carry;
 				else
 					registers.Flags &= ~Flag_Carry;
@@ -219,7 +219,7 @@ namespace nvic
 						memory.Read();
 						std::uint8_t result = registers.Y - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.Y >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -268,7 +268,7 @@ namespace nvic
 						memory.Read();
 						std::uint8_t result = registers.A - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.A >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -333,9 +333,6 @@ namespace nvic
 						if (registers.InternalRegister & 0x100)
 							overrun = true;
 
-//						if (static_cast<std::uint16_t>(registers.BaseAddressLow += registers.Y) & 0x100)
-//							overrun = true;
-
 						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 
@@ -344,7 +341,7 @@ namespace nvic
 
 						std::uint8_t result = registers.A - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.A >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -372,7 +369,7 @@ namespace nvic
 
 						std::uint8_t result = registers.A - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.A >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -436,7 +433,7 @@ namespace nvic
 							return true;
 						}
 
-						if (result >= signals.DataBus)
+						if (registers.A >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -462,7 +459,7 @@ namespace nvic
 						memory.Read();
 						std::uint8_t result = registers.A - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.A >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -492,7 +489,7 @@ namespace nvic
 
 				std::uint8_t result = registers.X - signals.DataBus;
 
-				if (result >= signals.DataBus)
+				if (registers.X >= signals.DataBus)
 					registers.Flags |= Flag_Carry;
 				else
 					registers.Flags &= ~Flag_Carry;
@@ -532,7 +529,7 @@ namespace nvic
 
 						std::uint8_t result = registers.X - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.X >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;
@@ -582,7 +579,7 @@ namespace nvic
 						memory.Read();
 						std::uint8_t result = registers.X - signals.DataBus;
 
-						if (result >= signals.DataBus)
+						if (registers.X >= signals.DataBus)
 							registers.Flags |= Flag_Carry;
 						else
 							registers.Flags &= ~Flag_Carry;

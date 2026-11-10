@@ -90,8 +90,12 @@ namespace nvic
 		std::uint8_t chunk = address >> 12;
 		address &= 0x0FFF;
 
+		auto oldAddress = m_Signals.AddressBus;
+
 		m_Signals.AddressBus = address;
 		m_BankSelector = m_PLA.GetBankSelector(true);
+
+		m_Signals.AddressBus = oldAddress;
 
 		return m_Chunks[chunk][m_BankSelector]->Data.at(address);
 	}
