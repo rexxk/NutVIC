@@ -29,7 +29,7 @@ namespace nvic
 	public:
 		CPU(Signals& signals);
 
-		auto Reset() -> void;
+		auto Reset(bool test) -> void;
 
 		auto Execute() -> void;
 

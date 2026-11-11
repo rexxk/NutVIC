@@ -11,6 +11,77 @@ namespace nvic
 	namespace opcode
 	{
 
+		constexpr auto Op00_BRK = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+				case 0:
+				{
+					signals.AddressBus = registers.PC++;
+					memory.Read();
+//					registers.StackPointer--;
+
+					registers.Flags |= Flag_Break;
+
+					return true;
+				}
+
+				case 1:
+				{
+					signals.AddressBus = 0x100 + registers.StackPointer--;
+					signals.DataBus = registers.PC >> 8;
+					memory.Write();
+
+					return true;
+				}
+
+				case 2:
+				{
+					signals.AddressBus = 0x100 + registers.StackPointer--;
+					signals.DataBus = registers.PC & 0xFF;
+					memory.Write();
+
+					return true;
+				}
+
+				case 3:
+				{
+					signals.AddressBus = 0x100 + registers.StackPointer--;
+					registers.InternalRegister8 = registers.Flags;
+					signals.DataBus = registers.InternalRegister8;
+					memory.Write();
+
+					registers.Flags |= Flag_Interrupt | Flag_Unused;
+
+					return true;
+				}
+
+				case 4:
+				{
+					signals.AddressBus = 0xFFFE;
+					memory.Read();
+					registers.BaseAddressLow = signals.DataBus;
+
+					return true;
+				}
+
+				case 5:
+				{
+					signals.AddressBus = 0xFFFF;
+					memory.Read();
+					registers.BaseAddressHigh = signals.DataBus;
+
+					registers.PC = registers.BaseAddress;
+
+					signals.Executing = false;
+					return true;
+				}
+				}
+
+				signals.Executing = false;
+				return true;
+			};
+
 		constexpr auto Op20_JSR = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				switch (signals.ExecutionCycle++)
@@ -95,7 +166,7 @@ namespace nvic
 
 					case 4:
 					{
-						signals.AddressBus = 0x100 + registers.StackPointer++;
+						signals.AddressBus = 0x100 + registers.StackPointer;
 						memory.Read();
 						registers.BaseAddressHigh = signals.DataBus;
 
@@ -237,6 +308,15 @@ namespace nvic
 				return true;
 			};
 
+		constexpr auto OpEA_NOP = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				signals.AddressBus = registers.PC;
+				memory.Read();
+
+				signals.Executing = false;
+				return true;
+			};
+
 		constexpr auto OpFF_IRQ = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				switch (signals.ExecutionCycle++)
@@ -245,7 +325,7 @@ namespace nvic
 					{
 						signals.AddressBus = registers.PC;
 						memory.Read();
-						registers.StackPointer--;
+//						registers.StackPointer--;
 
 						return true;
 					}

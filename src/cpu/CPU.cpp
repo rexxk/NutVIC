@@ -41,6 +41,7 @@ namespace nvic
 		for (auto i = 0; i < 256; i++)
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
+		m_OpCodes[0x00] = opcode::Op00_BRK;
 		m_OpCodes[0x05] = opcode::Op05_ORAzp;
 		m_OpCodes[0x06] = opcode::Op06_ASLzp;
 		m_OpCodes[0x08] = opcode::Op08_PHP;
@@ -65,6 +66,7 @@ namespace nvic
 		m_OpCodes[0x49] = opcode::Op49_EOR;
 		m_OpCodes[0x4A] = opcode::Op4A_LSR;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
+		m_OpCodes[0x50] = opcode::Op50_BVC;
 		m_OpCodes[0x56] = opcode::Op56_LSRzpX;
 		m_OpCodes[0x58] = opcode::Op58_CLI;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
@@ -134,15 +136,19 @@ namespace nvic
 		m_OpCodes[0xE6] = opcode::OpE6_INCzp;
 		m_OpCodes[0xE8] = opcode::OpE8_INX;
 		m_OpCodes[0xE9] = opcode::OpE9_SBC;
+		m_OpCodes[0xEA] = opcode::OpEA_NOP;
 		m_OpCodes[0xEC] = opcode::OpEC_CPXabs;
 		m_OpCodes[0xEE] = opcode::OpEE_INCabs;
 		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
 		m_OpCodes[0xFF] = opcode::OpFF_IRQ;
 	}
 
-	auto CPU::Reset() -> void
+	auto CPU::Reset(bool test) -> void
 	{
-		m_Registers.PC = ResetVector;
+		if (test)
+			m_Registers.PC = 0x0400;
+		else
+			m_Registers.PC = ResetVector;
 	}
 
 	auto CPU::SetMemory(Memory* memory) -> void

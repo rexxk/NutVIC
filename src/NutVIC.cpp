@@ -87,12 +87,18 @@ auto main() -> std::uint32_t
 	nvic::LoadROM(chargenROM, "rom/c64/chargen", 0xD000);
 	nvic::LoadROM(kernalROM, "rom/c64/kernal", 0xE000);
 
+	std::vector<nvic::MemoryChunk> testROM{};
+
+	nvic::LoadROM(testROM, "rom/c64/6502_functional_test.bin", 0x0000);
+
 	memory.SetChunk(0xA, 1, basicROM);
 	memory.SetChunk(0xD, 1, chargenROM);
 	memory.SetChunk(0xE, 1, kernalROM);
 
+//	memory.SetChunk(0x0, 1, testROM);
+
 	memory.SetDefaultValues();
-	cpu.Reset();
+	cpu.Reset(false);
 
 	nvic::CIA cia1{ 0, ioData, signals, cpu.GetRegisters() };
 	nvic::CIA cia2{ 1, ioData, signals, cpu.GetRegisters() };
@@ -116,6 +122,9 @@ auto main() -> std::uint32_t
 //	vic2.Start();
 
 	float scale = 1.5;
+	signals.JumpToAddress = 0xBF04;
+//	signals.JumpToAddress = 0xE430;
+//	signals.JumpToAddress = 0xB877;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -159,7 +168,7 @@ auto main() -> std::uint32_t
 
 			if (ImGui::Button("Reset"))
 			{
-				cpu.Reset();
+				cpu.Reset(true);
 			}
 
 			if (ImGui::Button("Interrupt request"))

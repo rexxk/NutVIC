@@ -32,16 +32,20 @@ namespace nvic
 		{
 			if (m_Signals.BusAvailable)
 			{
-				if (bank == 0xA || bank == 0xB || bank == 0xE || bank == 0xF)
+				if ((bank == 0xA || bank == 0xB) && (m_Signals.CPU_IOPort & CPUIO_LORAM))
 					return 1;
-				else if (bank == 0xD)
+				else if ((bank == 0xE || bank == 0xF) && (m_Signals.CPU_IOPort & CPUIO_HIRAM))
+					return 1;
+				else if ((bank == 0xD) && !(m_Signals.CPU_IOPort & CPUIO_CHAREN))
 					return 2;
 				else
 					return 0;
 			}
 			else
 			{
-				if (bank == 0xA || bank == 0xB || bank == 0xE || bank == 0xF)
+				if ((bank == 0xA || bank == 0xB) && (m_Signals.CPU_IOPort & CPUIO_LORAM))
+					return 1;
+				else if ((bank == 0xE || bank == 0xF) && (m_Signals.CPU_IOPort & CPUIO_HIRAM))
 					return 1;
 				else
 					return 0;

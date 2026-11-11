@@ -395,8 +395,8 @@ namespace nvic
 						signals.AddressBus = registers.BaseAddress;
 						memory.Read();
 
-						std::uint8_t carry = static_cast<std::uint8_t>(!(registers.Flags & Flag_Carry));
-						std::uint8_t result = registers.A - signals.DataBus - carry;
+						std::uint8_t carry = static_cast<std::uint8_t>(registers.Flags & Flag_Carry);
+						std::uint16_t result = registers.A + ~signals.DataBus + carry;
 
 						registers.A = static_cast<std::uint8_t>(result);
 
@@ -415,8 +415,9 @@ namespace nvic
 						else
 							registers.Flags &= ~Flag_Negative;
 
+//						if (~(registers.A ^ ~signals.DataBus) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
 						if ((registers.A ^ signals.DataBus) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
-							registers.Flags |= Flag_Overflow;
+								registers.Flags |= Flag_Overflow;
 						else
 							registers.Flags &= ~Flag_Overflow;
 
@@ -506,8 +507,8 @@ namespace nvic
 				signals.AddressBus = registers.PC++;
 				memory.Read();
 
-				std::uint8_t carry = static_cast<std::uint8_t>(!(registers.Flags & Flag_Carry));
-				std::uint16_t result = registers.A - signals.DataBus - ~carry;
+				std::uint8_t carry = static_cast<std::uint8_t>(registers.Flags & Flag_Carry);
+				std::uint16_t result = registers.A + ~signals.DataBus + carry;
 
 				registers.A = static_cast<std::uint8_t>(result);
 
@@ -526,6 +527,7 @@ namespace nvic
 				else
 					registers.Flags &= ~Flag_Negative;
 
+//				if (~(registers.A ^ ~signals.DataBus) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
 				if ((registers.A ^ signals.DataBus) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
 					registers.Flags |= Flag_Overflow;
 				else
