@@ -38,45 +38,6 @@ namespace nvic
 				return true;
 			};
 
-		constexpr auto OpC1_CMPidxind = [](Registers& registers, Signals& signals, Memory& memory)
-			{
-				std::uint16_t address{};
-				std::uint8_t zeropageValue{};
-
-				signals.AddressBus = registers.PC++;
-				memory.Read();
-				zeropageValue = signals.DataBus + registers.X;
-
-				signals.AddressBus = static_cast<std::uint16_t>(zeropageValue);
-				memory.Read();
-				address = signals.DataBus;
-
-				signals.AddressBus = static_cast<std::uint16_t>(zeropageValue) + 1;
-				memory.Read();
-				address += signals.DataBus << 8;
-
-				signals.AddressBus = address;
-				memory.Read();
-				std::uint8_t result = registers.A - signals.DataBus;
-
-				if (registers.A >= signals.DataBus)
-					registers.Flags |= Flag_Carry;
-				else
-					registers.Flags &= ~Flag_Carry;
-
-				if (result == 0)
-					registers.Flags |= Flag_Zero;
-				else
-					registers.Flags &= ~Flag_Zero;
-
-				if (result & 0x80)
-					registers.Flags |= Flag_Negative;
-				else
-					registers.Flags &= ~Flag_Negative;
-
-				return 6;
-			};
-
 		constexpr auto OpC4_CPYzp = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				switch (signals.ExecutionCycle++)
