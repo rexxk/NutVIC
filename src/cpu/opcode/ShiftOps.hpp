@@ -56,12 +56,12 @@ namespace nvic
 						signals.DataBus = registers.InternalRegister8;
 						memory.Write();
 
-						if (registers.A == 0)
+						if (registers.InternalRegister8 == 0)
 							registers.Flags |= Flag_Zero;
 						else
 							registers.Flags &= ~Flag_Zero;
 
-						if (registers.A & 0x80)
+						if (registers.InternalRegister8 & 0x80)
 							registers.Flags |= Flag_Negative;
 						else
 							registers.Flags &= ~Flag_Negative;
@@ -238,7 +238,7 @@ namespace nvic
 						signals.DataBus = registers.InternalRegister8;
 						memory.Write();
 
-						if (registers.A == 0)
+						if (registers.InternalRegister8 == 0)
 							registers.Flags |= Flag_Zero;
 						else
 							registers.Flags &= ~Flag_Zero;
