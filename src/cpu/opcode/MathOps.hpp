@@ -159,6 +159,7 @@ namespace nvic
 						else
 							registers.Flags &= ~Flag_Overflow;
 
+						signals.Executing = false;
 						return true;
 					}
 
