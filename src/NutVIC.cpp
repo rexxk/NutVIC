@@ -4,6 +4,7 @@
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
+#include "devices/Keyboard.h"
 #include "display/Texture.h"
 #include "memory/Memory.h"
 #include "ui/CPUPanel.h"
@@ -107,6 +108,17 @@ auto main() -> std::uint32_t
 
 	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals, cpu, vic2, cia1, cia2 };
 
+	nvic::Keyboard keyboard{ ioData };
+
+	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			if (action == GLFW_PRESS)
+				nvic::Keyboard::SetKey(key);
+			else
+				nvic::Keyboard::ReleaseKey(key);
+		});
+
+
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
 	nvic::VICPanel vicPanel{ vic2 };
@@ -125,6 +137,7 @@ auto main() -> std::uint32_t
 //	signals.JumpToAddress = 0xBF04;
 	signals.JumpToAddress = 0xE430;
 //	signals.JumpToAddress = 0xB877;
+//	signals.DisableInterrupts = true;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -180,6 +193,10 @@ auto main() -> std::uint32_t
 
 			ImGui::Checkbox("Disable interrupts", &signals.DisableInterrupts);
 
+			if (ImGui::Button("Send A"))
+			{
+				keyboard.UpdateMatrix('A');
+			}
 
 			if (cpu.GetRunMode() == nvic::CPU::RunMode::Step)
 			{
