@@ -338,7 +338,7 @@ namespace nvic
 						memory.Read();
 						registers.BaseAddressLow = signals.DataBus;
 
-						return true;
+						return true;	
 					}
 
 					case 1:

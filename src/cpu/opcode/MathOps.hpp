@@ -396,7 +396,7 @@ namespace nvic
 						memory.Read();
 
 						std::uint8_t carry = static_cast<std::uint8_t>(registers.Flags & Flag_Carry);
-						std::uint16_t result = registers.A + ~signals.DataBus + carry;
+						std::uint16_t result = static_cast<std::uint8_t>(registers.A) + static_cast<std::uint8_t>(~signals.DataBus) + static_cast<std::uint8_t>(carry);
 
 						registers.A = static_cast<std::uint8_t>(result);
 
@@ -508,7 +508,7 @@ namespace nvic
 				memory.Read();
 
 				std::uint8_t carry = static_cast<std::uint8_t>(registers.Flags & Flag_Carry);
-				std::uint16_t result = registers.A + ~signals.DataBus + carry;
+				std::uint16_t result = static_cast<std::uint8_t>(registers.A) + static_cast<std::uint8_t>(~signals.DataBus) + static_cast<std::uint8_t>(carry);
 
 				registers.A = static_cast<std::uint8_t>(result);
 

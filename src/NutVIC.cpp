@@ -122,8 +122,8 @@ auto main() -> std::uint32_t
 //	vic2.Start();
 
 	float scale = 1.5;
-	signals.JumpToAddress = 0xBF04;
-//	signals.JumpToAddress = 0xE430;
+//	signals.JumpToAddress = 0xBF04;
+	signals.JumpToAddress = 0xE430;
 //	signals.JumpToAddress = 0xB877;
 
 	while (!glfwWindowShouldClose(window))
