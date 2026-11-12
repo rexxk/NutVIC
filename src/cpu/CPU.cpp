@@ -292,6 +292,7 @@ namespace nvic
 			m_Signals.Executing = true;
 			m_Signals.ExecutionCycle = 0;
 			m_Signals.InterruptRequest = false;
+			m_Signals.BusAvailable = true;
 			return;
 		}
 

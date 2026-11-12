@@ -13,6 +13,10 @@ namespace nvic
 	{
 		for (auto i = 0; i < 256; i++)
 			m_Keys[i] = false;
+
+		m_Memory.Data[0xC00] = 0xFF;
+		m_Memory.Data[0xC01] = 0xFF;
+
 	}
 
 
@@ -30,8 +34,8 @@ namespace nvic
 	{
 		if (key == 'A')
 		{
-			m_Memory.Data[0] |= 0x02;
-			m_Memory.Data[1] |= 0x04;
+			m_Memory.Data[0xC00] &= ~0x02;
+			m_Memory.Data[0xC01] &= ~0x04;
 		}
 	}
 

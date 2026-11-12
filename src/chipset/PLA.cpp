@@ -47,6 +47,10 @@ namespace nvic
 					return 1;
 				else if ((bank == 0xE || bank == 0xF) && (m_Signals.CPU_IOPort & CPUIO_HIRAM))
 					return 1;
+
+				// TODO: Fix this - hack to get key matrix to be read by interrupt handler
+				else if (bank == 0xD)
+					return 2;
 				else
 					return 0;
 			}
