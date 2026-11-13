@@ -4,6 +4,7 @@
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
+#include "devices/Input.h"
 #include "devices/Keyboard.h"
 #include "display/Texture.h"
 #include "memory/Memory.h"
@@ -55,11 +56,8 @@ auto main() -> std::uint32_t
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
+	
 	ImGui::StyleColorsDark();
-
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init();
 
 	// Init system
 	nvic::Signals signals{};
@@ -98,6 +96,8 @@ auto main() -> std::uint32_t
 
 //	memory.SetChunk(0x0, 1, testROM);
 
+	nvic::Input::Initialize();
+
 	memory.SetDefaultValues();
 	cpu.Reset(false);
 
@@ -105,18 +105,21 @@ auto main() -> std::uint32_t
 	nvic::CIA cia2{ 1, ioData, signals, cpu.GetRegisters() };
 
 	nvic::VIC_II vic2{ ioData, chargenROM[0], ram, signals};
-
-	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals, cpu, vic2, cia1, cia2 };
-
 	nvic::Keyboard keyboard{ ioData };
+
+	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals, cpu, vic2, cia1, cia2, keyboard };
+
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			if (action == GLFW_PRESS)
-				nvic::Keyboard::SetKey(key);
+				nvic::Input::SetKey(key);
 			else
-				nvic::Keyboard::ReleaseKey(key);
+				nvic::Input::ReleaseKey(key);
 		});
+
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
 
 
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
@@ -134,8 +137,8 @@ auto main() -> std::uint32_t
 //	vic2.Start();
 
 	float scale = 1.5;
-//	signals.JumpToAddress = 0xBF04;
-	signals.JumpToAddress = 0xE430;
+	signals.JumpToAddress = 0xEA87;
+//	signals.JumpToAddress = 0xE430;
 //	signals.JumpToAddress = 0xB877;
 //	signals.DisableInterrupts = true;
 
@@ -193,11 +196,6 @@ auto main() -> std::uint32_t
 
 			ImGui::Checkbox("Disable interrupts", &signals.DisableInterrupts);
 
-			if (ImGui::Button("Send A"))
-			{
-				keyboard.UpdateMatrix('A');
-			}
-
 			if (cpu.GetRunMode() == nvic::CPU::RunMode::Step)
 			{
 				ImGui::Separator();
@@ -235,11 +233,7 @@ auto main() -> std::uint32_t
 		memoryPanel.Draw();
 		vicPanel.Draw();
 
-		vic2.Update();
-
-		cia1.Update();
-		cia2.Update();
-//		pla.Update();
+//		vic2.Update();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

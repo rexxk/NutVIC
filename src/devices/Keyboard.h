@@ -9,20 +9,19 @@
 namespace nvic
 {
 
+
 	class Keyboard
 	{
 	public:
 		Keyboard(MemoryChunk& ioMemory);
 
-		static auto SetKey(std::uint8_t key) -> void;
-		static auto ReleaseKey(std::uint8_t key) -> void;
-
-		auto UpdateMatrix(const std::uint8_t key) -> void;
+		auto Update() -> void;
 
 	private:
 		MemoryChunk& m_Memory;
 
-		inline static std::array<bool, 256> m_Keys;
+		std::array<std::uint8_t, 8> m_KeyMatrix{};
 	};
+
 
 }

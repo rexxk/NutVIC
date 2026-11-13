@@ -4,6 +4,7 @@
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
+#include "devices/Keyboard.h"
 
 #include <atomic>
 #include <cstdint>
@@ -23,7 +24,7 @@ namespace nvic
 		};
 
 	public:
-		Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2);
+		Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2, Keyboard& keyboard);
 
 		auto Start() -> void;
 		auto Stop() -> void;
@@ -48,6 +49,7 @@ namespace nvic
 		VIC_II& m_VIC2;
 		CIA& m_CIA1;
 		CIA& m_CIA2;
+		Keyboard& m_Keyboard;
 
 		Signals& m_Signals;
 		FrequencyMode m_FrequencyMode{ FrequencyMode::PAL };

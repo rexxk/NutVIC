@@ -1,5 +1,6 @@
 #include "chipset/Clock.h"
 #include "cpu/Signals.h"
+#include "devices/Keyboard.h"
 
 #include <chrono>
 #include <print>
@@ -20,8 +21,8 @@ namespace nvic
 	std::uint64_t TicksPerSecond{};
 
 
-	Clock::Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2)
-		: m_FrequencyMode(mode), m_Signals(signals), m_CPU(cpu), m_VIC2(vic2), m_CIA1(cia1), m_CIA2(cia2)
+	Clock::Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2, Keyboard& keyboard)
+		: m_FrequencyMode(mode), m_Signals(signals), m_CPU(cpu), m_VIC2(vic2), m_CIA1(cia1), m_CIA2(cia2), m_Keyboard(keyboard)
 	{
 		std::uint64_t currentPerformanceCount{};
 
@@ -168,12 +169,15 @@ namespace nvic
 					m_CIA1.Update();
 					m_CIA2.Update();
 
+					m_Keyboard.Update();
+
 					TicksPerSecond++;
 				}
 				else
 				{
 					m_Signals.Control &= ~Signal_ClockPhase1;
 
+					m_VIC2.Update();
 					m_VIC2.Execute();
 				}
 
