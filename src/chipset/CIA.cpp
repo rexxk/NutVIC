@@ -23,6 +23,12 @@ namespace nvic
 		m_TODClock = TODClockNTSC;
 
 //		CIA1_TimerA_StartTime = std::chrono::steady_clock::now();
+
+		if (id == 0)
+		{
+			m_Memory.Data[0xC02] = 0x3F;
+			m_Memory.Data[0xC03] = 0x7F;
+		}
 	}
 
 

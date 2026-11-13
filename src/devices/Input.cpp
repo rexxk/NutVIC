@@ -11,21 +11,19 @@ namespace nvic
 	{
 		for (auto i = 0; i < 512; i++)
 			m_Keys[i] = true;
-
-		m_Keys[296] = false;
 	}
 
 
-	auto Input::SetKey(std::uint8_t key) -> void
+	auto Input::SetKey(std::uint16_t key) -> void
 	{
-		m_Keys[key] = false;
+		m_Keys.at(key) = false;
 
 		std::println("Key {} pressed", key);
 	}
 
-	auto Input::ReleaseKey(std::uint8_t key) -> void
+	auto Input::ReleaseKey(std::uint16_t key) -> void
 	{
-		m_Keys[key] = true;
+		m_Keys.at(key) = true;
 	}
 
 }
