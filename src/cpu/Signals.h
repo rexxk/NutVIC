@@ -46,6 +46,8 @@ namespace nvic
 		bool PLA_CHARROM{ false };
 		bool PLA_BASIC{ false };
 		bool PLA_KERNAL{ false };
+
+		bool CIA_ReadDC0D{ false };
 	};
 
 }

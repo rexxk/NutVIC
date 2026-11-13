@@ -36,7 +36,7 @@ namespace nvic
 					return 1;
 				else if ((bank == 0xE || bank == 0xF) && (m_Signals.CPU_IOPort & CPUIO_HIRAM))
 					return 1;
-				else if ((bank == 0xD) && !(m_Signals.CPU_IOPort & CPUIO_CHAREN))
+				else if ((bank == 0xD) && (m_Signals.CPU_IOPort & CPUIO_CHAREN))
 					return 2;
 				else
 					return 0;

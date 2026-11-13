@@ -42,6 +42,12 @@ namespace nvic
 			m_TimerB_Low = m_Registers.CIA1_TimerB_LowByte_Latch;
 			m_TimerB_High = m_Registers.CIA1_TimerB_HighByte_Latch;
 
+			if (m_Signals.CIA_ReadDC0D)
+			{
+//				m_Memory.Data[0xC00 + CIA_InterruptControl] &= 0xF0;
+				m_Signals.CIA_ReadDC0D = false;
+			}
+
 			if (m_Memory.Data[0xC00 + CIA_InterruptControl] & 0x1)
 			{
 				if (!m_Running)
@@ -60,6 +66,7 @@ namespace nvic
 				{
 					m_TimerA_Value = m_TimerA_Latch;
 					m_Signals.InterruptRequest = true;
+					m_Memory.Data[0xC0D] |= 0x01;
 					fps++;
 				}
 

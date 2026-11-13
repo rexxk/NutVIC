@@ -44,6 +44,9 @@ namespace nvic
 
 	auto Memory::Read() -> void
 	{
+//		if (m_Signals.AddressBus == 0xDC0D)
+//			m_Signals.CIA_ReadDC0D = m_Signals.CIA_ReadDC0D;
+
 		std::uint8_t chunk = m_Signals.AddressBus >> 12;
 		std::uint16_t address = m_Signals.AddressBus & 0x0FFF;
 
@@ -51,6 +54,9 @@ namespace nvic
 		m_ActiveBanks[chunk] = m_BankSelector;
 
 		m_Signals.DataBus = m_Chunks[chunk][m_BankSelector]->Data.at(address);
+
+		if (m_Signals.AddressBus == 0xDC0D)
+			m_Signals.CIA_ReadDC0D = true;
 	}
 
 	auto Memory::Write() -> void
