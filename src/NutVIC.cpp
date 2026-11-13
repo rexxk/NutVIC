@@ -216,11 +216,6 @@ auto main() -> std::uint32_t
 				ImGui::Text("Utilization: %f %%", clock.GetUtilization());
 			}
 
-			if (ImGui::Button("Send X char"))
-			{
-				keyboard.SetXButton();
-			}
-
 			ImGui::End();
 		}
 

@@ -9,8 +9,6 @@
 namespace nvic
 {
 
-	bool xkey{ true };
-
 	Keyboard::Keyboard(MemoryChunk& ioMemory)
 		: m_Memory(ioMemory)
 	{
@@ -37,7 +35,7 @@ namespace nvic
 		std::uint8_t col7 = 0xFF;
 		std::uint8_t col8 = 0xFF;
 
-		if (!keys[GLFW_KEY_DELETE]) col1 &= ~0x01;
+		if (!keys[GLFW_KEY_BACKSPACE]) col1 &= ~0x01;
 		if (!keys[GLFW_KEY_ENTER]) col1 &= ~0x02;
 		if (!keys[GLFW_KEY_RIGHT]) col1 &= ~0x04;
 		if (!keys[GLFW_KEY_F7]) col1 &= ~0x08;
@@ -63,16 +61,7 @@ namespace nvic
 		if (!keys[GLFW_KEY_C]) col3 &= ~0x10;
 		if (!keys[GLFW_KEY_F]) col3 &= ~0x20;
 		if (!keys[GLFW_KEY_T]) col3 &= ~0x40;
-		if (xkey)
-		{
-			if (!keys[GLFW_KEY_X]) col3 &= ~0x80;
-		}
-		else
-		{
-			col3 &= ~0x80;
-		}
-
-
+		if (!keys[GLFW_KEY_X]) col3 &= ~0x80;
 
 		if (!keys[GLFW_KEY_7]) col4 &= ~0x01;
 		if (!keys[GLFW_KEY_Y]) col4 &= ~0x02;
@@ -189,11 +178,6 @@ namespace nvic
 		}
 
 		m_Memory.Data[0xC01] = col;
-	}
-
-	auto Keyboard::SetXButton() -> void
-	{
-		xkey = !xkey;
 	}
 
 }

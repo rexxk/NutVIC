@@ -17,8 +17,6 @@ namespace nvic
 
 		auto Update() -> void;
 
-		auto SetXButton() -> void;
-
 	private:
 		MemoryChunk& m_Memory;
 
