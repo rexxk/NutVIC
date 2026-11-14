@@ -10,6 +10,7 @@
 #include "display/Texture.h"
 #include "memory/Memory.h"
 #include "ui/CPUPanel.h"
+#include "ui/DatassettePanel.h"
 #include "ui/MemoryPanel.h"
 #include "ui/VICPanel.h"
 #include "utils/FileTools.h"
@@ -126,6 +127,7 @@ auto main() -> std::uint32_t
 
 
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
+	nvic::DatassettePanel tapePanel{};
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
 	nvic::VICPanel vicPanel{ vic2 };
 
@@ -234,6 +236,7 @@ auto main() -> std::uint32_t
 		
 		cpuPanel.Draw();
 		memoryPanel.Draw();
+		tapePanel.Draw();
 		vicPanel.Draw();
 
 //		vic2.Update();
