@@ -4,6 +4,7 @@
 #include "chipset/VIC_II.h"
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
+#include "devices/Datassette.h"
 #include "devices/Input.h"
 #include "devices/Keyboard.h"
 #include "display/Texture.h"
@@ -106,6 +107,8 @@ auto main() -> std::uint32_t
 
 	nvic::VIC_II vic2{ ioData, chargenROM[0], ram, signals};
 	nvic::Keyboard keyboard{ ioData };
+
+	nvic::Datassette tape{ signals };
 
 	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals, cpu, vic2, cia1, cia2, keyboard };
 

@@ -53,6 +53,7 @@ namespace nvic
 		m_OpCodes[0x18] = opcode::Op18_CLC;
 		m_OpCodes[0x20] = opcode::Op20_JSR;
 		m_OpCodes[0x24] = opcode::Op24_BITzp;
+		m_OpCodes[0x25] = opcode::Op25_ANDzp;
 		m_OpCodes[0x26] = opcode::Op26_ROLzp;
 		m_OpCodes[0x28] = opcode::Op28_PLP;
 		m_OpCodes[0x29] = opcode::Op29_AND;
@@ -116,6 +117,7 @@ namespace nvic
 		m_OpCodes[0xB9] = opcode::OpB9_LDAabsY;
 		m_OpCodes[0xBA] = opcode::OpBA_TSX;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
+		m_OpCodes[0xBE] = opcode::OpBE_LDXabsY;
 		m_OpCodes[0xC0] = opcode::OpC0_CPY;
 		m_OpCodes[0xC4] = opcode::OpC4_CPYzp;
 		m_OpCodes[0xC5] = opcode::OpC5_CMPzp;
@@ -129,6 +131,7 @@ namespace nvic
 		m_OpCodes[0xD0] = opcode::OpD0_BNE;
 		m_OpCodes[0xD1] = opcode::OpD1_CMPindY;
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
+		m_OpCodes[0xD9] = opcode::OpD9_CMPabsY;
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
 		m_OpCodes[0xE0] = opcode::OpE0_CPX;
 		m_OpCodes[0xE4] = opcode::OpE4_CPXzp;
@@ -141,7 +144,9 @@ namespace nvic
 		m_OpCodes[0xEE] = opcode::OpEE_INCabs;
 		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
 		m_OpCodes[0xF1] = opcode::OpF1_SBCindY;
+		m_OpCodes[0xF5] = opcode::OpF5_SBCzpX;
 		m_OpCodes[0xF9] = opcode::OpF9_SBCabsY;
+		m_OpCodes[0xFD] = opcode::OpFD_SBCabsX;
 		m_OpCodes[0xFF] = opcode::OpFF_IRQ;
 	}
 

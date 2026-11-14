@@ -81,7 +81,7 @@ namespace nvic
 		if (!keys[GLFW_KEY_O]) col5 &= ~0x40;
 		if (!keys[GLFW_KEY_N]) col5 &= ~0x80;
 
-		if (!keys[GLFW_KEY_KP_ADD]) col6 &= ~0x01;
+		if (!keys[GLFW_KEY_MINUS]) col6 &= ~0x01;
 		if (!keys[GLFW_KEY_P]) col6 &= ~0x02;
 		if (!keys[GLFW_KEY_L]) col6 &= ~0x04;
 		if (!keys[GLFW_KEY_EQUAL]) col6 &= ~0x08;
