@@ -51,6 +51,10 @@ namespace nvic
 
 		bool Datassette_SENSE{ true };
 		bool Datassette_MOTOR{ true };
+		bool Datassette_READ{ false };
+		bool Datassette_WRITE{ false };
+
+		bool Datassette_PLAY{ false };
 	};
 
 }

@@ -66,6 +66,7 @@ namespace nvic
 		};
 
 		std::uint16_t m_TimerA_Value{};
+		std::uint16_t m_TimerB_Value{};
 
 		bool m_Running{ false };
 	};

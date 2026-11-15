@@ -42,6 +42,7 @@ namespace nvic
 		std::uint8_t CIA2_TimerB_LowByte_Latch{};
 		std::uint8_t CIA2_TimerB_HighByte_Latch{};
 
+		std::uint8_t CIA1_InterruptMask{};
 
 		std::int8_t RelativeOffset;
 

@@ -22,9 +22,18 @@ namespace nvic
 		if (ImGui::Button("Load image"))
 		{
 			m_Datassette.OpenTapeImage("data/tapes/Last_Ninja_2.tap");
+			m_Datassette.m_CassetteInserted = true;
 		}
 
-		ImGui::Checkbox("Sense", &m_Datassette.m_Signals.Datassette_SENSE);
+		if (m_Datassette.m_CassetteInserted)
+		{
+			ImGui::Checkbox("Play", &m_Datassette.m_Signals.Datassette_PLAY);
+
+			m_Datassette.m_Signals.Datassette_SENSE = !m_Datassette.m_Signals.Datassette_PLAY;
+
+			ImGui::SameLine();
+			ImGui::Text("Pointer: %lu", m_Datassette.GetFilePointer());
+		}
 
 		ImGui::End();
 	}

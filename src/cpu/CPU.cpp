@@ -78,6 +78,7 @@ namespace nvic
 		m_OpCodes[0x69] = opcode::Op69_ADC;
 		m_OpCodes[0x6A] = opcode::Op6A_ROR;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
+		m_OpCodes[0x6D] = opcode::Op6D_ADCabs;
 		m_OpCodes[0x70] = opcode::Op70_BVS;
 		m_OpCodes[0x76] = opcode::Op76_RORzpX;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
@@ -141,6 +142,7 @@ namespace nvic
 		m_OpCodes[0xE9] = opcode::OpE9_SBC;
 		m_OpCodes[0xEA] = opcode::OpEA_NOP;
 		m_OpCodes[0xEC] = opcode::OpEC_CPXabs;
+		m_OpCodes[0xED] = opcode::OpED_SBCabs;
 		m_OpCodes[0xEE] = opcode::OpEE_INCabs;
 		m_OpCodes[0xF0] = opcode::OpF0_BEQ;
 		m_OpCodes[0xF1] = opcode::OpF1_SBCindY;
@@ -173,13 +175,14 @@ namespace nvic
 
 	auto CPU::Update() -> void
 	{
-		m_Signals.CPU_IOPort &= 0x07;
-		m_Signals.CPU_IOPort |= m_Signals.Datassette_SENSE << 3;
+		m_Signals.CPU_IOPort &= 0xEF;
+		m_Signals.CPU_IOPort |= m_Signals.Datassette_SENSE << 4;
+		m_Signals.Datassette_MOTOR = m_Signals.CPU_IOPort & 0x20;
 
 		m_Memory->WriteZeropageAddress(0x0001, m_Signals.CPU_IOPort);
 	}
 
-	auto CPU::Execute() -> void
+	auto CPU::Execute() -> bool
 	{
 		std::uint64_t startCycle{};
 		std::uint64_t cycleCount{};
@@ -209,7 +212,7 @@ namespace nvic
 			if (m_RunMode == RunMode::Step)
 			{
 				if (!m_SingleShot)
-					return;
+					return false;
 //					continue;
 
 				m_SingleShot.store(false);
@@ -218,7 +221,7 @@ namespace nvic
 			}
 
 			if (m_Signals.BusAvailable == false && !m_Signals.Executing)
-				return;
+				return true;
 
 //			if (m_Registers.PC >= 0xFDDD && m_Registers.PC < 0xFDE2)
 //			if (m_OpsRun > 1330)
@@ -274,6 +277,8 @@ namespace nvic
 //				m_Signals.CPU_IOPort = m_Memory->ReadAddress(0x0001);
 //			}
 		}
+
+		return true;
 	}
 
 	auto CPU::Start() -> void
@@ -308,6 +313,7 @@ namespace nvic
 			m_Signals.ExecutionCycle = 0;
 			m_Signals.InterruptRequest = false;
 			m_Signals.BusAvailable = true;
+
 			return;
 		}
 

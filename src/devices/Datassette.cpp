@@ -51,4 +51,22 @@ namespace nvic
 
 	}
 
+	auto Datassette::Read(std::uint64_t cpuClockTicks) -> void
+	{
+		auto elapsedTicks = cpuClockTicks - m_StartCycleTick;
+
+		std::uint32_t waitTime = m_Image.Data[m_FilePointer] * 8;
+
+		if (elapsedTicks >= waitTime)
+		{
+			m_Signals.Datassette_READ = true;
+			m_StartCycleTick = cpuClockTicks;
+
+			m_FilePointer++;
+			if (m_FilePointer >= m_Image.DataSize) m_FilePointer = m_Image.DataSize;
+		}
+
+	}
+
+
 }

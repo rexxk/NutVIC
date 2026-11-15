@@ -1,5 +1,6 @@
 #include "chipset/Clock.h"
 #include "cpu/Signals.h"
+#include "devices/Datassette.h"
 #include "devices/Keyboard.h"
 
 #include <chrono>
@@ -21,8 +22,8 @@ namespace nvic
 	std::uint64_t TicksPerSecond{};
 
 
-	Clock::Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2, Keyboard& keyboard)
-		: m_FrequencyMode(mode), m_Signals(signals), m_CPU(cpu), m_VIC2(vic2), m_CIA1(cia1), m_CIA2(cia2), m_Keyboard(keyboard)
+	Clock::Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2, Keyboard& keyboard, Datassette& datassette)
+		: m_FrequencyMode(mode), m_Signals(signals), m_CPU(cpu), m_VIC2(vic2), m_CIA1(cia1), m_CIA2(cia2), m_Keyboard(keyboard), m_Datassette(datassette)
 	{
 		std::uint64_t currentPerformanceCount{};
 
@@ -164,15 +165,22 @@ namespace nvic
 					m_CPUClockTicks++;
 //					cpuClockStart = now;
 
-					m_CPU.Update();
-					m_CPU.Execute();
+					if (m_CPU.Execute())
+					{
+						m_CPU.Update();
 
-					m_CIA1.Update();
-					m_CIA2.Update();
+						m_CIA1.Update();
+						m_CIA2.Update();
 
-					m_Keyboard.Update();
+						m_Keyboard.Update();
 
-					TicksPerSecond++;
+						if (!m_Signals.Datassette_SENSE && m_Signals.Datassette_PLAY && !m_Signals.Datassette_MOTOR)
+						{
+							m_Datassette.Read(m_CPUClockTicks);
+						}
+
+						TicksPerSecond++;
+					}
 				}
 				else
 				{

@@ -32,7 +32,7 @@ namespace nvic
 		auto Reset(bool test) -> void;
 
 		auto Update() -> void;
-		auto Execute() -> void;
+		auto Execute() -> bool;
 
 		auto SetMemory(Memory* memory) -> void;
 		auto SetRunMode(RunMode mode) -> void;
