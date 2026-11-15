@@ -48,6 +48,9 @@ namespace nvic
 		bool PLA_KERNAL{ false };
 
 		bool CIA_ReadDC0D{ false };
+
+		bool Datassette_SENSE{ true };
+		bool Datassette_MOTOR{ true };
 	};
 
 }

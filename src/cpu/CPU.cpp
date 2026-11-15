@@ -171,6 +171,14 @@ namespace nvic
 		}
 	}
 
+	auto CPU::Update() -> void
+	{
+		m_Signals.CPU_IOPort &= 0x07;
+		m_Signals.CPU_IOPort |= m_Signals.Datassette_SENSE << 3;
+
+		m_Memory->WriteZeropageAddress(0x0001, m_Signals.CPU_IOPort);
+	}
+
 	auto CPU::Execute() -> void
 	{
 		std::uint64_t startCycle{};

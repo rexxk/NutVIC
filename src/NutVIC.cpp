@@ -127,7 +127,7 @@ auto main() -> std::uint32_t
 
 
 	nvic::CPUPanel cpuPanel{ cpu.GetRegisters(), signals };
-	nvic::DatassettePanel tapePanel{};
+	nvic::DatassettePanel tapePanel{ tape };
 	nvic::MemoryPanel memoryPanel{ memory, cpu.GetRegisters() };
 	nvic::VICPanel vicPanel{ vic2 };
 

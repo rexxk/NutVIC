@@ -33,6 +33,7 @@ namespace nvic
 		auto Write() -> void;
 
 		auto ReadAddress(std::uint16_t address) -> std::uint8_t;
+		auto WriteZeropageAddress(std::uint16_t address, std::uint8_t value) -> void;
 
 		auto Push(std::uint16_t address, std::uint8_t value) -> void;
 		auto Pop(std::uint16_t address) -> const std::uint8_t;

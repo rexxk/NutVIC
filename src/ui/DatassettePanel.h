@@ -1,5 +1,6 @@
 #pragma once
 
+#include "devices/Datassette.h"
 
 
 namespace nvic
@@ -8,9 +9,12 @@ namespace nvic
 	class DatassettePanel
 	{
 	public:
-		DatassettePanel();
+		DatassettePanel(Datassette& datassette);
 
 		auto Draw() -> void;
+
+	private:
+		Datassette& m_Datassette;
 
 	};
 

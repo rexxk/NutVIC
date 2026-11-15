@@ -106,6 +106,11 @@ namespace nvic
 		return m_Chunks[chunk][m_BankSelector]->Data.at(address);
 	}
 
+	auto Memory::WriteZeropageAddress(std::uint16_t address, std::uint8_t value) -> void
+	{
+		m_Chunks[0][0]->Data[address] = value;
+	}
+
 	auto Memory::Push(std::uint16_t address, std::uint8_t value) -> void
 	{
 		std::uint8_t chunk = address >> 12;

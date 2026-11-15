@@ -31,6 +31,7 @@ namespace nvic
 
 		auto Reset(bool test) -> void;
 
+		auto Update() -> void;
 		auto Execute() -> void;
 
 		auto SetMemory(Memory* memory) -> void;

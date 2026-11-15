@@ -164,6 +164,7 @@ namespace nvic
 					m_CPUClockTicks++;
 //					cpuClockStart = now;
 
+					m_CPU.Update();
 					m_CPU.Execute();
 
 					m_CIA1.Update();
@@ -190,6 +191,7 @@ namespace nvic
 			}
 
 			auto endTime = std::chrono::steady_clock::now();
+		
 
 			if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - CPU_Clock_StartTime).count() / 1000.0 > 1.0)
 			{
