@@ -13,16 +13,11 @@ namespace nvic
 	constexpr std::uint8_t TODClockNTSC = 60;
 	constexpr std::uint8_t TODClockPAL = 50;
 
-	std::chrono::steady_clock::time_point CIA1_TimerA_StartTime{};
-	std::uint16_t fps{ 0 };
-
 
 	CIA::CIA(std::uint8_t id, MemoryChunk& ioMemory, Signals& signals, Registers& registers)
 		: m_ID(id), m_Memory(ioMemory), m_Signals(signals), m_Registers(registers)
 	{
 		m_TODClock = TODClockNTSC;
-
-//		CIA1_TimerA_StartTime = std::chrono::steady_clock::now();
 
 		if (id == 0)
 		{
@@ -40,9 +35,6 @@ namespace nvic
 			{
 				m_Memory.Data[0xC00 + CIA_InterruptControl] |= 0x10;
 				m_Signals.Datassette_READ = false;
-
-				if (m_Registers.CIA1_InterruptMask & 0x10)
-					m_Signals.InterruptRequest = true;
 			}
 
 			m_TimerA_Low = m_Registers.CIA1_TimerA_LowByte_Latch;
@@ -57,8 +49,6 @@ namespace nvic
 			{
 				m_TimerA_Low = m_Registers.CIA1_TimerA_LowByte_Latch;
 				m_TimerA_High = m_Registers.CIA1_TimerA_HighByte_Latch;
-
-//				timerAControlFlag &= ~0x10;
 			}
 
 			if (timerAControlFlag & 0x01)
@@ -72,57 +62,11 @@ namespace nvic
 					}
 
 					m_Memory.Data[0xC0D] |= 0x02;
-
-					if (m_Registers.CIA1_InterruptMask & 0x01)
-						m_Signals.InterruptRequest = true;
-
-					fps++;
 				}
 
 				m_Memory.Data[0xC00 + CIA_TimerALowByte] = m_TimerA_Value & 0xFF;
 				m_Memory.Data[0xC00 + CIA_TimerAHighByte] = m_TimerA_Value >> 8;
 			}
-
-//			if (m_Memory.Data[0xC00 + CIA_ControlTimerA] & 0x1)
-//			{
-//				if (!m_Running)
-//				{
-////					m_TimerA_Low = m_Memory.Data[0xC04];
-////					m_TimerA_High = m_Memory.Data[0xC05];
-//
-//					m_TimerA_Latch = m_TimerA_Value;
-//
-//					CIA1_TimerA_StartTime = std::chrono::steady_clock::now();
-//					
-//					m_Running = true;
-//				}
-//
-//				if ((m_TimerA_Value--) == 0xFFFF)
-//				{
-//					m_TimerA_Value = m_TimerA_Latch;
-//					m_Memory.Data[0xC0D] |= 0x01;
-//
-//					if (m_Registers.CIA1_InterruptMask & 0x01)
-//						m_Signals.InterruptRequest = true;
-//
-//					fps++;
-//				}
-//
-//				m_Memory.Data[0xC00 + CIA_TimerALowByte] = m_TimerA_Value & 0xFF;
-//				m_Memory.Data[0xC00 + CIA_TimerAHighByte] = m_TimerA_Value >> 8;
-//
-//				auto endTime = std::chrono::steady_clock::now();
-//
-//				if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - CIA1_TimerA_StartTime).count() / 1000.0 > 1.0)
-//				{
-//					CIA1_TimerA_StartTime = endTime;
-////					std::println("Latch: {}, FPS: {}", m_TimerA_Latch, fps);
-//					fps = 0;
-//				}
-//			}
-//			else
-//				m_Running = false;
-
 
 			auto &timerBControlFlag = m_Memory.Data[0xC00 + CIA_ControlTimerB];
 
@@ -130,8 +74,6 @@ namespace nvic
 			{
 				m_TimerB_Low = m_Registers.CIA1_TimerB_LowByte_Latch;
 				m_TimerB_High = m_Registers.CIA1_TimerB_HighByte_Latch;
-
-//				timerBControlFlag &= ~0x10;
 			}
 
 			if (timerBControlFlag & 0x01)
@@ -143,26 +85,19 @@ namespace nvic
 					{
 						m_TimerB_Value = m_TimerB_Latch;
 					}
-//					else
-//					{
-//						timerBControlFlag &= ~0x01;
-//					}
 
 					m_Memory.Data[0xC0D] |= 0x02;
-
-					if (m_Registers.CIA1_InterruptMask & 0x02)
-						m_Signals.InterruptRequest = true;
-
-//					fps++;
 				}
 
 				m_Memory.Data[0xC00 + CIA_TimerBLowByte] = m_TimerB_Value & 0xFF;
 				m_Memory.Data[0xC00 + CIA_TimerBHighByte] = m_TimerB_Value >> 8;
 			}
 
+			if (m_Memory.Data[0xC00 + CIA_InterruptControl] |= (m_Memory.Data[0xC00 + CIA_InterruptControl] & m_Registers.CIA1_InterruptMask))
+				m_Signals.InterruptRequest = true;
+
 			if (m_Signals.CIA_ReadDC0D)
 			{
-//				m_Memory.Data[0xC00 + CIA_InterruptControl] &= ~0x10;
 				m_Memory.Data[0xC00 + CIA_InterruptControl] = 0x00;
 				m_Signals.CIA_ReadDC0D = false;
 			}
@@ -182,4 +117,4 @@ namespace nvic
 	}
 
 
-	}
+}
