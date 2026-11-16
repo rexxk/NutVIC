@@ -63,7 +63,7 @@ namespace nvic
 			m_StartCycleTick = cpuClockTicks;
 
 			m_FilePointer++;
-			if (m_FilePointer >= m_Image.DataSize) m_FilePointer = m_Image.DataSize;
+			if (m_FilePointer == m_Image.DataSize) m_FilePointer = m_Image.DataSize - 1;
 		}
 
 	}

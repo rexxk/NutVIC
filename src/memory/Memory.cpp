@@ -84,7 +84,7 @@ namespace nvic
 			if (address == 0xD07) m_Registers.CIA2_TimerB_HighByte_Latch = m_Signals.DataBus;
 
 			if (address == 0xC0D)
-				m_Signals.DataBus & 0x80 ? m_Registers.CIA1_InterruptMask |= (m_Signals.DataBus & 0x7F) : m_Registers.CIA1_InterruptMask &= ~(m_Signals.DataBus & 0x7F);
+				m_Signals.DataBus & 0x80 ? m_Registers.CIA1_InterruptMask |= m_Signals.DataBus : m_Registers.CIA1_InterruptMask &= ~m_Signals.DataBus;
 			
 
 			m_Signals.WriteToIO = false;
