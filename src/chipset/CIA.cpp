@@ -31,76 +31,90 @@ namespace nvic
 	{
 		if (m_ID == 0)
 		{
+			if (m_Signals.CIA_ReadDC0D)
+			{
+				m_Memory.Data[0xC00 + CIA_InterruptControl] = 0x00;
+				m_Signals.CIA_ReadDC0D = false;
+			}
+
+
 			if (m_Signals.Datassette_READ)
 			{
 				m_Memory.Data[0xC00 + CIA_InterruptControl] |= 0x10;
 				m_Signals.Datassette_READ = false;
 			}
 
-			m_TimerA_Low = m_Registers.CIA1_TimerA_LowByte_Latch;
-			m_TimerA_High = m_Registers.CIA1_TimerA_HighByte_Latch;
-
-			m_TimerB_Low = m_Registers.CIA1_TimerB_LowByte_Latch;
-			m_TimerB_High = m_Registers.CIA1_TimerB_HighByte_Latch;
-
-			auto& timerAControlFlag = m_Memory.Data[0xC00 + CIA_ControlTimerA];
-
-			if (timerAControlFlag & 0x10)
+			// Timer A
 			{
 				m_TimerA_Low = m_Registers.CIA1_TimerA_LowByte_Latch;
 				m_TimerA_High = m_Registers.CIA1_TimerA_HighByte_Latch;
-			}
 
-			if (timerAControlFlag & 0x01)
-			{
+				auto& timerAControlFlag = m_Memory.Data[0xC00 + CIA_ControlTimerA];
 
-				if ((m_TimerA_Value--) == 0xFFFF)
+				if (timerAControlFlag & 0x10)
 				{
-					if (!timerAControlFlag & 0x08)
-					{
-						m_TimerA_Value = m_TimerA_Latch;
-					}
-
-					m_Memory.Data[0xC0D] |= 0x02;
+					m_TimerA_Value = m_TimerA_Latch;
+					timerAControlFlag &= ~0x10;
 				}
 
-				m_Memory.Data[0xC00 + CIA_TimerALowByte] = m_TimerA_Value & 0xFF;
-				m_Memory.Data[0xC00 + CIA_TimerAHighByte] = m_TimerA_Value >> 8;
+				if (timerAControlFlag & 0x01)
+				{
+					m_Memory.Data[0xC00 + CIA_TimerALowByte] = m_TimerA_Value & 0xFF;
+					m_Memory.Data[0xC00 + CIA_TimerAHighByte] = m_TimerA_Value >> 8;
+
+					if ((m_TimerA_Value--) == 0xFFFF)
+					{
+						m_Memory.Data[0xC00 + CIA_InterruptControl] |= 0x01;
+
+						if (timerAControlFlag & 0x08)
+						{
+							timerAControlFlag &= ~0x01;
+						}
+						else
+						{
+							m_TimerA_Value = m_TimerA_Latch;
+						}
+					}
+				}
+
 			}
 
-			auto &timerBControlFlag = m_Memory.Data[0xC00 + CIA_ControlTimerB];
-
-			if (timerBControlFlag & 0x10)
+			// Timer B
 			{
 				m_TimerB_Low = m_Registers.CIA1_TimerB_LowByte_Latch;
 				m_TimerB_High = m_Registers.CIA1_TimerB_HighByte_Latch;
-			}
 
-			if (timerBControlFlag & 0x01)
-			{
-
-				if ((m_TimerB_Value--) == 0xFFFF)
-				{
-					if (!timerBControlFlag & 0x08)
-					{
-						m_TimerB_Value = m_TimerB_Latch;
-					}
-
-					m_Memory.Data[0xC0D] |= 0x02;
-				}
+				auto& timerBControlFlag = m_Memory.Data[0xC00 + CIA_ControlTimerB];
 
 				m_Memory.Data[0xC00 + CIA_TimerBLowByte] = m_TimerB_Value & 0xFF;
 				m_Memory.Data[0xC00 + CIA_TimerBHighByte] = m_TimerB_Value >> 8;
+
+				if (timerBControlFlag & 0x10)
+				{
+					m_TimerB_Value = m_TimerB_Latch;
+					timerBControlFlag &= ~0x10;
+				}
+
+				if (timerBControlFlag & 0x01)
+				{
+					if ((m_TimerB_Value--) == 0xFFFF)
+					{
+						m_Memory.Data[0xC00 + CIA_InterruptControl] |= 0x02;
+
+						if (timerBControlFlag & 0x08)
+						{
+							timerBControlFlag &= ~0x01;
+						}
+						else
+						{
+							m_TimerB_Value = m_TimerB_Latch;
+						}
+					}
+				}
 			}
 
 			if (m_Memory.Data[0xC00 + CIA_InterruptControl] |= (m_Memory.Data[0xC00 + CIA_InterruptControl] & m_Registers.CIA1_InterruptMask))
 				m_Signals.InterruptRequest = true;
-
-			if (m_Signals.CIA_ReadDC0D)
-			{
-				m_Memory.Data[0xC00 + CIA_InterruptControl] = 0x00;
-				m_Signals.CIA_ReadDC0D = false;
-			}
 
 		}
 

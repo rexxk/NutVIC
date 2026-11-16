@@ -111,7 +111,7 @@ auto main() -> std::uint32_t
 
 	nvic::Datassette tape{ signals };
 
-	nvic::Clock clock{ nvic::Clock::FrequencyMode::NTSC, signals, cpu, vic2, cia1, cia2, keyboard, tape };
+	nvic::Clock clock{ nvic::Clock::FrequencyMode::PAL, signals, cpu, vic2, cia1, cia2, keyboard, tape };
 
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
