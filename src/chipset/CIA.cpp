@@ -89,10 +89,10 @@ namespace nvic
 				if ((--m_TimerA_Value) == 0xFFFF)
 				{
 					m_TimerA_Value = m_TimerA_Latch;
-					interruptControl |= 0x01;
 
 					if (m_Registers.CIA1_InterruptMask & 0x01)
 					{
+						interruptControl |= 0x01;
 						m_Signals.InterruptRequest = true;
 						m_Signals.InterruptAcknowledge = false;
 					}
@@ -124,10 +124,10 @@ namespace nvic
 				if ((--m_TimerB_Value) == 0xFFFF)
 				{
 					m_TimerB_Value = m_TimerB_Latch;
-					interruptControl |= 0x02;
 
 					if (m_Registers.CIA1_InterruptMask & 0x02)
 					{
+						interruptControl |= 0x02;
 						m_Signals.InterruptRequest = true;
 						m_Signals.InterruptAcknowledge = false;
 					}
