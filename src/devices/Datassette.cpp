@@ -57,6 +57,20 @@ namespace nvic
 
 		std::uint32_t waitTime = m_Image.Data[m_FilePointer] * 8;
 
+		if (waitTime == 0)
+		{
+			if (m_Image.Version == 0) waitTime = 256;
+			else if (m_Image.Version == 1)
+			{
+				m_FilePointer++;
+
+				for (auto i = 0; i < 3; i++)
+				{
+					waitTime += m_Image.Data[m_FilePointer++] << (8 * i);
+				}
+			}
+		}
+
 		if (elapsedTicks >= waitTime)
 		{
 			m_Signals.Datassette_READ = true;

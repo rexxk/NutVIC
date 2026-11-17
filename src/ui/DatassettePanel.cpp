@@ -21,7 +21,8 @@ namespace nvic
 
 		if (ImGui::Button("Load image"))
 		{
-			m_Datassette.OpenTapeImage("data/tapes/Last_Ninja_2.tap");
+//			m_Datassette.OpenTapeImage("data/tapes/Last_Ninja_2.tap");
+			m_Datassette.OpenTapeImage("data/tapes/Pitstop_II.tap");
 			m_Datassette.m_CassetteInserted = true;
 		}
 
