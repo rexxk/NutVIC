@@ -35,6 +35,7 @@ namespace nvic
 
 		bool DisableInterrupts{ false };
 		bool InterruptRequest{ false };
+		bool InterruptAcknowledge{ true };
 		bool BusAvailable{ true };
 
 		bool Break{ false };

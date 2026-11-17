@@ -68,27 +68,33 @@ namespace nvic
 		m_ActiveBanks[chunk] = m_BankSelector;
 //		if (m_Chunks[chunk][m_BankSelector[chunk]]->ReadWrite)
 //			m_Chunks[chunk][m_BankSelector[chunk]]->Data.at(address) = m_Signals.DataBus;
+
+		if (m_Signals.WriteToIO)
+		{
+			m_Signals.WriteToIO = false;
+
+			if (address == 0xC04) { m_Registers.CIA1_TimerA_LowByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xC05) { m_Registers.CIA1_TimerA_HighByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xC06) { m_Registers.CIA1_TimerB_LowByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xC07) { m_Registers.CIA1_TimerB_HighByte_Latch = m_Signals.DataBus; return; }
+
+			if (address == 0xD04) { m_Registers.CIA2_TimerA_LowByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xD05) { m_Registers.CIA2_TimerA_HighByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xD06) { m_Registers.CIA2_TimerB_LowByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xD07) { m_Registers.CIA2_TimerB_HighByte_Latch = m_Signals.DataBus; return; 
+		}
+
+			if (address == 0xC0D)
+			{
+				m_Signals.DataBus & 0x80 ? m_Registers.CIA1_InterruptMask |= m_Signals.DataBus : m_Registers.CIA1_InterruptMask &= ~m_Signals.DataBus;
+				return;
+			}
+
+		}
+
 		m_Chunks[chunk][m_BankSelector]->Data.at(address) = m_Signals.DataBus;
 
 		// Is there a need to set latches in IO?
-		if (m_Signals.WriteToIO)
-		{
-			if (address == 0xC04) m_Registers.CIA1_TimerA_LowByte_Latch = m_Signals.DataBus;
-			if (address == 0xC05) m_Registers.CIA1_TimerA_HighByte_Latch = m_Signals.DataBus;
-			if (address == 0xC06) m_Registers.CIA1_TimerB_LowByte_Latch = m_Signals.DataBus;
-			if (address == 0xC07) m_Registers.CIA1_TimerB_HighByte_Latch = m_Signals.DataBus;
-
-			if (address == 0xD04) m_Registers.CIA2_TimerA_LowByte_Latch = m_Signals.DataBus;
-			if (address == 0xD05) m_Registers.CIA2_TimerA_HighByte_Latch = m_Signals.DataBus;
-			if (address == 0xD06) m_Registers.CIA2_TimerB_LowByte_Latch = m_Signals.DataBus;
-			if (address == 0xD07) m_Registers.CIA2_TimerB_HighByte_Latch = m_Signals.DataBus;
-
-			if (address == 0xC0D)
-				m_Signals.DataBus & 0x80 ? m_Registers.CIA1_InterruptMask |= m_Signals.DataBus : m_Registers.CIA1_InterruptMask &= ~m_Signals.DataBus;
-			
-
-			m_Signals.WriteToIO = false;
-		}
 	}
 
 	auto Memory::ReadAddress(std::uint16_t address) -> std::uint8_t

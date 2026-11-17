@@ -71,7 +71,7 @@ namespace nvic
 			}
 		}
 
-		if (elapsedTicks >= waitTime)
+		if (elapsedTicks >= waitTime && !m_Signals.Datassette_READ)
 		{
 			m_Signals.Datassette_READ = true;
 			m_StartCycleTick = cpuClockTicks;

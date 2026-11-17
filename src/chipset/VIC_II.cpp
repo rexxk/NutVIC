@@ -80,38 +80,8 @@ namespace nvic
 
 	auto VIC_II::Execute() -> void
 	{
-//		std::this_thread::sleep_for(3s);
-
-//		std::println("VIC-II is hijacking address enable control signal");
-
-//		std::uint64_t currentCycle{};
-//		std::uint64_t lastCycle{};
-//		std::uint16_t rasterLine{};
-
-//		while (m_Running)
-//		{
-//			do
-//			{
-//				currentCycle = m_Clock.CPUClockCycles();
-//			} while (currentCycle == lastCycle);
-
-//			lastCycle = currentCycle;
-
-
-//			if (m_Signals.Control & !Signal_ClockPhase1 && !m_Signals.BusAvailable)
-//			{
-//				m_Signals.BusLock = true;
-
-
-
-
-
-
-
-//				m_Signals.BusLock = false;
-
-//				m_Signals.BusAvailable = true;
-//			}
+		auto& vicControlRegister1 = m_IOMemory.Data[VIC_ControlRegister1];
+		bool screenEnable = vicControlRegister1 & 0x10;
 
 		std::uint16_t screenRAMPointer = (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
 		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800) - 0x1000;
@@ -122,8 +92,7 @@ namespace nvic
 			m_VisibleRasterLine = true;
 		else
 			m_VisibleRasterLine = false;
-
-
+		
 		if (m_BadLine)
 		{
 			if (!m_Signals.Executing)
@@ -183,7 +152,7 @@ namespace nvic
 				m_RasterLine = 0;
 
 			if (((m_RasterLine == UpperDisplayRasterLineNTSC) || (((m_RasterLine - UpperDisplayRasterLineNTSC) % 8) == 0) 
-				&& (m_RasterLine >= UpperDisplayRasterLineNTSC)) && (m_RasterLine < LowerDisplayRasterLineNTSC))
+				&& (m_RasterLine >= UpperDisplayRasterLineNTSC)) && (m_RasterLine < LowerDisplayRasterLineNTSC) && screenEnable)
 			{
 				m_BadLine = true;
 				m_BadLineCounter = 0;
@@ -209,7 +178,7 @@ namespace nvic
 
 			if (m_VisibleRasterLine)
 			{
-				if (m_RasterLine >= UpperDisplayRasterLineNTSC && m_RasterLine <= LowerDisplayRasterLineNTSC)
+				if (m_RasterLine >= UpperDisplayRasterLineNTSC && m_RasterLine <= LowerDisplayRasterLineNTSC && screenEnable)
 				{
 					// Main display area
 

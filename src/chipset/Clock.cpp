@@ -162,11 +162,12 @@ namespace nvic
 				if ((cpuHalfClockTicks & 0x1) == 0)
 				{
 					m_Signals.Control |= Signal_AddressEnableControl | Signal_ClockPhase1;
-					m_CPUClockTicks++;
 //					cpuClockStart = now;
 
 					if (m_CPU.Execute())
 					{
+						m_CPUClockTicks++;
+
 						m_CPU.Update();
 
 						m_CIA1.Update();
