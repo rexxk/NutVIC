@@ -19,11 +19,11 @@ namespace nvic
 	{
 		m_TODClock = TODClockNTSC;
 
-		if (id == 0)
-		{
-			m_Memory.Data[0xC02] = 0x3F;
-			m_Memory.Data[0xC03] = 0x7F;
-		}
+//		if (id == 0)
+//		{
+//			m_Memory.Data[0xC02] = 0x3F;
+//			m_Memory.Data[0xC03] = 0x7F;
+//		}
 	}
 
 
