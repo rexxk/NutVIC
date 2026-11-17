@@ -43,6 +43,10 @@ namespace nvic
 			if (m_Signals.Datassette_READ)
 			{
 				m_Memory.Data[0xC00 + CIA_InterruptControl] |= 0x10;
+
+				if (m_Registers.CIA1_InterruptMask & 0x10)
+					m_Signals.InterruptRequest = true;
+
 				m_Signals.Datassette_READ = false;
 			}
 
@@ -66,15 +70,15 @@ namespace nvic
 				{
 					if ((m_TimerA_Value--) == 0xFFFF)
 					{
+						m_TimerA_Value = m_TimerA_Latch;
 						m_Memory.Data[0xC00 + CIA_InterruptControl] |= 0x01;
+
+						if (m_Registers.CIA1_InterruptMask & 0x01)
+							m_Signals.InterruptRequest = true;
 
 						if (timerAControlFlag & 0x08)
 						{
 							timerAControlFlag &= ~0x01;
-						}
-						else
-						{
-							m_TimerA_Value = m_TimerA_Latch;
 						}
 					}
 				}
@@ -101,26 +105,21 @@ namespace nvic
 				{
 					if ((m_TimerB_Value--) == 0xFFFF)
 					{
+						m_TimerB_Value = m_TimerB_Latch;
 						m_Memory.Data[0xC00 + CIA_InterruptControl] |= 0x02;
+
+						if (m_Registers.CIA1_InterruptMask & 0x02)
+							m_Signals.InterruptRequest = true;
 
 						if (timerBControlFlag & 0x08)
 						{
 							timerBControlFlag &= ~0x01;
-						}
-						else
-						{
-							m_TimerB_Value = m_TimerB_Latch;
 						}
 					}
 				}
 
 			}
 
-//			auto& interruptMask = m_Registers.CIA1_InterruptMask;
-//			interruptControl &= m_Registers.CIA1_InterruptMask;
-
-			if (interruptControl & m_Registers.CIA1_InterruptMask)
-				m_Signals.InterruptRequest = true;
 
 		}
 
