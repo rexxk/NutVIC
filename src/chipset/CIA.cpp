@@ -38,6 +38,12 @@ namespace nvic
 
 			m_TimerB_Low = m_Registers.CIA1_TimerB_LowByte_Latch;
 			m_TimerB_High = m_Registers.CIA1_TimerB_HighByte_Latch;
+
+			if (m_Signals.WriteDC07 && !(m_Memory.Data[0xC00 + CIA_ControlTimerB] & 0x01))
+			{
+				m_TimerB_Value = m_TimerB_Latch;
+				m_Signals.WriteDC07 = false;
+			}
 		}
 		else
 		{

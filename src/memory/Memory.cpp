@@ -76,13 +76,12 @@ namespace nvic
 			if (address == 0xC04) { m_Registers.CIA1_TimerA_LowByte_Latch = m_Signals.DataBus; return; }
 			if (address == 0xC05) { m_Registers.CIA1_TimerA_HighByte_Latch = m_Signals.DataBus; return; }
 			if (address == 0xC06) { m_Registers.CIA1_TimerB_LowByte_Latch = m_Signals.DataBus; return; }
-			if (address == 0xC07) { m_Registers.CIA1_TimerB_HighByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xC07) { m_Registers.CIA1_TimerB_HighByte_Latch = m_Signals.DataBus; m_Signals.WriteDC07 = true; return; }
 
 			if (address == 0xD04) { m_Registers.CIA2_TimerA_LowByte_Latch = m_Signals.DataBus; return; }
 			if (address == 0xD05) { m_Registers.CIA2_TimerA_HighByte_Latch = m_Signals.DataBus; return; }
 			if (address == 0xD06) { m_Registers.CIA2_TimerB_LowByte_Latch = m_Signals.DataBus; return; }
-			if (address == 0xD07) { m_Registers.CIA2_TimerB_HighByte_Latch = m_Signals.DataBus; return; 
-		}
+			if (address == 0xD07) { m_Registers.CIA2_TimerB_HighByte_Latch = m_Signals.DataBus; return; }
 
 			if (address == 0xC0D)
 			{

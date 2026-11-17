@@ -71,8 +71,13 @@ namespace nvic
 			}
 		}
 
-		if (elapsedTicks >= waitTime && !m_Signals.Datassette_READ)
+		if (elapsedTicks >= waitTime) // && !m_Signals.Datassette_READ)
 		{
+//			if (elapsedTicks > waitTime)
+//			{
+//				std::println("Overflow @{}: {} ({})", m_FilePointer, elapsedTicks, waitTime);
+//			}
+
 			m_Signals.Datassette_READ = true;
 			m_StartCycleTick = cpuClockTicks;
 
