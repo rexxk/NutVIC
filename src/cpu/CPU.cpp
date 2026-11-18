@@ -311,7 +311,7 @@ namespace nvic
 			m_Registers.ActiveOperand = 0xFF;
 			m_Signals.Executing = true;
 			m_Signals.ExecutionCycle = 0;
-			m_Signals.InterruptRequest = false;
+//			m_Signals.InterruptRequest = false;
 			m_Signals.BusAvailable = true;
 
 //			std::println("Interrupt : {:02x}  ({:02x})", m_Memory->GetChunks()[0xD][2]->Data[0xC0D], m_Registers.CIA1_InterruptMask);

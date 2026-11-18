@@ -74,9 +74,9 @@ namespace nvic
 			m_Signals.WriteToIO = false;
 
 			if (address == 0xC04) { m_Registers.CIA1_TimerA_LowByte_Latch = m_Signals.DataBus; return; }
-			if (address == 0xC05) { m_Registers.CIA1_TimerA_HighByte_Latch = m_Signals.DataBus; return; }
+			if (address == 0xC05) { m_Registers.CIA1_TimerA_HighByte_Latch = m_Signals.DataBus; m_Signals.CIA_WriteDC05 = true; return; }
 			if (address == 0xC06) { m_Registers.CIA1_TimerB_LowByte_Latch = m_Signals.DataBus; return; }
-			if (address == 0xC07) { m_Registers.CIA1_TimerB_HighByte_Latch = m_Signals.DataBus; m_Signals.WriteDC07 = true; return; }
+			if (address == 0xC07) { m_Registers.CIA1_TimerB_HighByte_Latch = m_Signals.DataBus; m_Signals.CIA_WriteDC07 = true; return; }
 
 			if (address == 0xD04) { m_Registers.CIA2_TimerA_LowByte_Latch = m_Signals.DataBus; return; }
 			if (address == 0xD05) { m_Registers.CIA2_TimerA_HighByte_Latch = m_Signals.DataBus; return; }
@@ -86,6 +86,12 @@ namespace nvic
 			if (address == 0xC0D)
 			{
 				m_Signals.DataBus & 0x80 ? m_Registers.CIA1_InterruptMask |= m_Signals.DataBus : m_Registers.CIA1_InterruptMask &= ~m_Signals.DataBus;
+				return;
+			}
+
+			if (address == 0xD0D)
+			{
+				m_Signals.DataBus & 0x80 ? m_Registers.CIA2_InterruptMask |= m_Signals.DataBus : m_Registers.CIA2_InterruptMask &= ~m_Signals.DataBus;
 				return;
 			}
 

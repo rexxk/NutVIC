@@ -35,7 +35,6 @@ namespace nvic
 
 		bool DisableInterrupts{ false };
 		bool InterruptRequest{ false };
-		bool InterruptAcknowledge{ true };
 		bool BusAvailable{ true };
 
 		bool Break{ false };
@@ -43,13 +42,15 @@ namespace nvic
 		std::uint8_t CPU_IOPort{ 0x37 };		
 
 		bool WriteToIO{ false };
-		bool WriteDC07{ false };
 
 		bool PLA_CHARROM{ false };
 		bool PLA_BASIC{ false };
 		bool PLA_KERNAL{ false };
 
 		bool CIA_ReadDC0D{ false };
+		bool CIA_ReadDD0D{ false };
+		bool CIA_WriteDC05{ false };
+		bool CIA_WriteDC07{ false };
 
 		bool Datassette_SENSE{ true };
 		bool Datassette_MOTOR{ true };
