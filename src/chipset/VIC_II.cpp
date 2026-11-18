@@ -18,6 +18,12 @@ constexpr std::uint16_t LowerVisibleRasterLineNTSC = 263;
 constexpr std::uint16_t UpperDisplayRasterLineNTSC = 51;
 constexpr std::uint16_t LowerDisplayRasterLineNTSC = 250;
 
+constexpr std::uint16_t UpperVisibleRasterLinePAL = 0;
+constexpr std::uint16_t LowerVisibleRasterLinePAL = 300;
+constexpr std::uint16_t UpperDisplayRasterLinePAL = 51;
+constexpr std::uint16_t LowerDisplayRasterLinePAL = 250;
+
+
 
 namespace nvic
 {
@@ -54,10 +60,14 @@ namespace nvic
 		m_CharCache.resize(40);
 	
 //		m_Pixels.resize(320 * 200 * 4);
-		m_Pixels.resize(418 * 251);
+		// NTSC 6567R8
+//		m_Pixels.resize(418 * 251);
+		// PAL-B
+		m_Pixels.resize(403 * 312);
 
 //		std::memset(m_Pixels.data(), 0, 320 * 200 * 4);
-		std::memset(m_Pixels.data(), 0, 418 * 251);
+//		std::memset(m_Pixels.data(), 0, 418 * 251);
+		std::memset(m_Pixels.data(), 0, 403 * 312);
 	}
 
 
@@ -86,9 +96,11 @@ namespace nvic
 		std::uint16_t screenRAMPointer = (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
 		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800) - 0x1000;
 
-		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLineNTSC);
+		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLinePAL);
+//		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLineNTSC);
 
-		if (m_RasterLine >= UpperVisibleRasterLineNTSC && m_RasterLine <= LowerVisibleRasterLineNTSC)//250)
+//		if (m_RasterLine >= UpperVisibleRasterLineNTSC && m_RasterLine <= LowerVisibleRasterLineNTSC)//250)
+		if (m_RasterLine >= UpperVisibleRasterLineNTSC && m_RasterLine <= LowerVisibleRasterLinePAL)
 			m_VisibleRasterLine = true;
 		else
 			m_VisibleRasterLine = false;
@@ -138,8 +150,8 @@ namespace nvic
 			}
 		}
 
-		std::uint8_t borderColorIndex = m_IOMemory.Data[VIC_BorderColor];
-		std::uint8_t backgroundColorIndex1 = m_IOMemory.Data[VIC_BackgroundColor0];
+		std::uint8_t borderColorIndex = m_IOMemory.Data[VIC_BorderColor] & 0x0F;
+		std::uint8_t backgroundColorIndex1 = m_IOMemory.Data[VIC_BackgroundColor0] & 0x0F;
 
 //		if (m_CycleCounter >= 63)
 		if (m_CycleCounter >= 60)
@@ -148,11 +160,14 @@ namespace nvic
 			m_CycleCounter = 0;
 			m_RasterLine++;
 
-			if (m_RasterLine == 262)
+//			if (m_RasterLine == 262)
+			if (m_RasterLine == 311)
 				m_RasterLine = 0;
 
-			if (((m_RasterLine == UpperDisplayRasterLineNTSC) || (((m_RasterLine - UpperDisplayRasterLineNTSC) % 8) == 0) 
-				&& (m_RasterLine >= UpperDisplayRasterLineNTSC)) && (m_RasterLine < LowerDisplayRasterLineNTSC) && screenEnable)
+//			if (((m_RasterLine == UpperDisplayRasterLineNTSC) || (((m_RasterLine - UpperDisplayRasterLineNTSC) % 8) == 0)
+//				&& (m_RasterLine >= UpperDisplayRasterLineNTSC)) && (m_RasterLine < LowerDisplayRasterLineNTSC) && screenEnable)
+			if (((m_RasterLine == UpperDisplayRasterLinePAL) || (((m_RasterLine - UpperDisplayRasterLinePAL) % 8) == 0)
+				&& (m_RasterLine >= UpperDisplayRasterLinePAL)) && (m_RasterLine < LowerDisplayRasterLinePAL) && screenEnable)
 			{
 				m_BadLine = true;
 				m_BadLineCounter = 0;
@@ -168,7 +183,8 @@ namespace nvic
 			if (m_VisibleRasterLine)
 			{
 				for (auto i = 0; i < 8; i++)
-					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
+					m_Pixels[((m_CycleCounter - 12) * 8) + i + ((m_RasterLine - UpperVisibleRasterLinePAL) * 403)] = ColorPalette[borderColorIndex];
+//					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
 			}
 
 		}
@@ -178,21 +194,24 @@ namespace nvic
 
 			if (m_VisibleRasterLine)
 			{
-				if (m_RasterLine >= UpperDisplayRasterLineNTSC && m_RasterLine <= LowerDisplayRasterLineNTSC && screenEnable)
+//				if (m_RasterLine >= UpperDisplayRasterLineNTSC && m_RasterLine <= LowerDisplayRasterLineNTSC && screenEnable)
+				if (m_RasterLine >= UpperDisplayRasterLinePAL && m_RasterLine <= LowerDisplayRasterLinePAL && screenEnable)
 				{
 					// Main display area
 
 					for (auto i = 0; i < 8; i++)
 					{
 						auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (8 - i));
-						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
+						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
+//						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
 					}
 //						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[backgroundColorIndex1];
 				}
 				else
 				{
 					for (auto i = 0; i < 8; i++)
-						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
+						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[borderColorIndex];
+//						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
 				}
 
 			}
@@ -203,7 +222,8 @@ namespace nvic
 			if (m_VisibleRasterLine)
 			{
 				for (auto i = 0; i < 8; i++)
-					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
+					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[borderColorIndex];
+//					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
 			}
 		}
 //		if (m_RasterLine == 312)

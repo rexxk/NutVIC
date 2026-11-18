@@ -132,7 +132,8 @@ auto main() -> std::uint32_t
 	nvic::VICPanel vicPanel{ vic2 };
 
 //	nvic::Texture displayTexture{ 320, 200 };
-	nvic::Texture displayTexture{ 418, 251 };
+//	nvic::Texture displayTexture{ 418, 251 };
+	nvic::Texture displayTexture{ 403, 312 };
 
 //	nvic::MemoryChunk charrom{ .ReadWrite{true} };
 //	memory.SetChunk(0, charrom);
@@ -229,7 +230,8 @@ auto main() -> std::uint32_t
 
 			displayTexture.SetData(vic2.GetImageData());
 //			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 640, 400 });
-			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 418 * scale, 235 * scale});
+//			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 418 * scale, 235 * scale});
+			ImGui::Image(displayTexture.GetTexture(), ImVec2{ 403 * scale, 312 * scale});
 
 			ImGui::End();
 		}

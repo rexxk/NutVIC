@@ -67,6 +67,8 @@ namespace nvic
 				for (auto i = 0; i < 3; i++)
 				{
 					waitTime += m_Image.Data[m_FilePointer++] << (8 * i);
+
+					if (m_FilePointer == m_Image.DataSize) m_FilePointer = m_Image.DataSize - 1;
 				}
 			}
 		}

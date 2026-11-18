@@ -308,6 +308,40 @@ namespace nvic
 				return true;
 			};
 
+		constexpr auto OpDC_NOP3bytes = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+
+						return true;
+					}
+
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+
+						return true;
+					}
+
+					case 2:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				signals.Executing = false;
+				return true;
+			};
+
 		constexpr auto OpEA_NOP = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				signals.AddressBus = registers.PC;
