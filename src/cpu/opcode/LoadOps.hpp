@@ -641,7 +641,83 @@ namespace nvic
 				return true;
 			};
 
-		constexpr auto OpBD_LDAabsX = [](Registers& registers, Signals& signals, Memory& memory)
+		constexpr auto OpBC_LDYabsX = [](Registers& registers, Signals& signals, Memory& memory)
+			{
+				switch (signals.ExecutionCycle++)
+				{
+					case 0:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressLow = signals.DataBus;
+
+						return true;
+					}
+					case 1:
+					{
+						signals.AddressBus = registers.PC++;
+						memory.Read();
+						registers.BaseAddressHigh = signals.DataBus;
+
+						return true;
+					}
+					case 2:
+					{
+						bool overrun{ false };
+
+						registers.InternalRegister = registers.BaseAddressLow + registers.X;
+						registers.BaseAddressLow += registers.X;
+
+						if (registers.InternalRegister & 0x100) overrun = true;
+
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						registers.Y = signals.DataBus;
+
+						if (overrun)
+						{
+							return true;
+						}
+
+						if (registers.Y == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (registers.Y & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+					case 3:
+					{
+						registers.BaseAddressHigh++;
+						signals.AddressBus = registers.BaseAddress;
+						memory.Read();
+						registers.A = signals.DataBus;
+
+						if (registers.A == 0)
+							registers.Flags |= Flag_Zero;
+						else
+							registers.Flags &= ~Flag_Zero;
+
+						if (registers.A & 0x80)
+							registers.Flags |= Flag_Negative;
+						else
+							registers.Flags &= ~Flag_Negative;
+
+						signals.Executing = false;
+						return true;
+					}
+				}
+
+				return true;
+			};
+
+			constexpr auto OpBD_LDAabsX = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				switch (signals.ExecutionCycle++)
 				{

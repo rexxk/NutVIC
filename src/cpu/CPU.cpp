@@ -42,6 +42,7 @@ namespace nvic
 			m_OpCodes.at(i) = NotImplementedOpCode;
 
 		m_OpCodes[0x00] = opcode::Op00_BRK;
+		m_OpCodes[0x01] = opcode::Op01_ORAindX;
 		m_OpCodes[0x05] = opcode::Op05_ORAzp;
 		m_OpCodes[0x06] = opcode::Op06_ASLzp;
 		m_OpCodes[0x08] = opcode::Op08_PHP;
@@ -71,6 +72,7 @@ namespace nvic
 		m_OpCodes[0x50] = opcode::Op50_BVC;
 		m_OpCodes[0x56] = opcode::Op56_LSRzpX;
 		m_OpCodes[0x58] = opcode::Op58_CLI;
+		m_OpCodes[0x59] = opcode::Op59_EORabsY;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x65] = opcode::Op65_ADCzp;
 		m_OpCodes[0x66] = opcode::Op66_RORzp;
@@ -83,6 +85,7 @@ namespace nvic
 		m_OpCodes[0x76] = opcode::Op76_RORzpX;
 		m_OpCodes[0x78] = opcode::Op78_SEI;
 		m_OpCodes[0x79] = opcode::Op79_ADCabsY;
+		m_OpCodes[0x7A] = opcode::OpEA_NOP;				// INVALID OP - treated as NOP
 		m_OpCodes[0x84] = opcode::Op84_STYzp;
 		m_OpCodes[0x85] = opcode::Op85_STAzp;
 		m_OpCodes[0x86] = opcode::Op86_STXzp;
@@ -117,6 +120,7 @@ namespace nvic
 		m_OpCodes[0xB6] = opcode::OpB6_LDXzpY;
 		m_OpCodes[0xB9] = opcode::OpB9_LDAabsY;
 		m_OpCodes[0xBA] = opcode::OpBA_TSX;
+		m_OpCodes[0xBC] = opcode::OpBC_LDYabsX;
 		m_OpCodes[0xBD] = opcode::OpBD_LDAabsX;
 		m_OpCodes[0xBE] = opcode::OpBE_LDXabsY;
 		m_OpCodes[0xC0] = opcode::OpC0_CPY;
@@ -133,6 +137,7 @@ namespace nvic
 		m_OpCodes[0xD1] = opcode::OpD1_CMPindY;
 		m_OpCodes[0xD8] = opcode::OpD8_CLD;
 		m_OpCodes[0xD9] = opcode::OpD9_CMPabsY;
+		m_OpCodes[0xDC] = opcode::OpDC_NOP3bytes;		// INVALID OP
 		m_OpCodes[0xDD] = opcode::OpDD_CMPabsX;
 		m_OpCodes[0xE0] = opcode::OpE0_CPX;
 		m_OpCodes[0xE4] = opcode::OpE4_CPXzp;
