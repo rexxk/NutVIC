@@ -173,15 +173,22 @@ namespace nvic
 						std::uint8_t charChunk = charAddress >> 12;
 						std::uint16_t newAddress = charAddress & 0x0FFF;
 
-						if (charChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
+						if (vicControlRegister1 & 0x20)
 						{
-							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[newAddress + i];
+
 						}
 						else
 						{
-							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(charChunk).Data[newAddress + i];
+							if (charChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
+							{
+								for (auto i = 0; i < 8; i++)
+									m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[newAddress + i];
+							}
+							else
+							{
+								for (auto i = 0; i < 8; i++)
+									m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(charChunk).Data[newAddress + i];
+							}
 						}
 					}
 
@@ -240,13 +247,20 @@ namespace nvic
 				{
 					// Main display area
 
-					for (auto i = 0; i < 8; i++)
+					// Check for bitmap or text mode?
+					if (vicControlRegister1 & 0x20)
 					{
-						auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (8 - i));
-						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
-//						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
+//						for (auto i = 0; i < 8; i++)
+//							m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[borderColorIndex];
 					}
-//						m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[backgroundColorIndex1];
+					else
+					{
+						for (auto i = 0; i < 8; i++)
+						{
+							auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (8 - i));
+							m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
+						}
+					}
 				}
 				else
 				{
