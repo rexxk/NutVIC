@@ -36,9 +36,9 @@ namespace nvic
 		{
 			if (ImGui::Button("Insert"))
 			{
-//				m_Datassette.OpenTapeImage("data/tapes/Pitstop_II.tap");
+				m_Datassette.OpenTapeImage("data/tapes/Pitstop_II.tap");
 //				m_Datassette.OpenTapeImage("data/tapes/Last_Ninja_2.tap");
-				m_Datassette.OpenTapeImage("data/tapes/Olympic_Skier.tap");
+//				m_Datassette.OpenTapeImage("data/tapes/Olympic_Skier.tap");
 
 				m_Datassette.m_CassetteInserted = true;
 			}
@@ -73,7 +73,7 @@ namespace nvic
 			ImGui::Text("Status: %s", m_Datassette.m_Signals.Datassette_PLAY ? "PLAY" : "STOP");
 
 			ImGui::SameLine();
-			ImGui::Text("Pointer: %lu", m_Datassette.GetFilePointer());
+			ImGui::Text("Pointer: %lu  (%lu)", m_Datassette.GetFilePointer(), m_Datassette.m_Image.DataSize);
 
 			m_Datassette.m_Signals.Datassette_SENSE = !m_Datassette.m_Signals.Datassette_PLAY;
 		}

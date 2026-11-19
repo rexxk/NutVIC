@@ -28,6 +28,14 @@ constexpr std::uint16_t LowerDisplayRasterLinePAL = 250;
 namespace nvic
 {
 
+	constexpr std::array<std::uint16_t, 4> BankAddress
+	{
+		0x0000,
+		0x4000,
+		0x8000,
+		0xC000,
+	};
+
 	constexpr std::array<std::uint32_t, 16> ColorPalette
 	{
 		0xff000000,			// Black
@@ -97,9 +105,9 @@ namespace nvic
 
 		
 
-		std::uint16_t screenRAMPointer = (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
+		std::uint16_t screenRAMPointer = BankAddress[m_RAMSelect] + (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
 //		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800) - 0x1000;
-		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800);
+		std::uint16_t charsetDataPointer = BankAddress[m_RAMSelect] + (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800);
 
 		if (charsetDataPointer >= 0x1000) charsetDataPointer -= 0x1000;
 
