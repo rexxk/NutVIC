@@ -87,6 +87,7 @@ namespace nvic
 		m_OpCodes[0x78] = opcode::Op78_SEI;
 		m_OpCodes[0x79] = opcode::Op79_ADCabsY;
 		m_OpCodes[0x7A] = opcode::OpEA_NOP;				// INVALID OP - treated as NOP
+		m_OpCodes[0x7D] = opcode::Op7D_ADCabsX;
 		m_OpCodes[0x84] = opcode::Op84_STYzp;
 		m_OpCodes[0x85] = opcode::Op85_STAzp;
 		m_OpCodes[0x86] = opcode::Op86_STXzp;

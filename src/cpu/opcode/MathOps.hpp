@@ -263,7 +263,109 @@ namespace nvic
 				return true;
 			};
 
-		constexpr auto Op88_DEY = [](Registers& registers, Signals& signals, Memory& memory)
+			constexpr auto Op7D_ADCabsX = [](Registers& registers, Signals& signals, Memory& memory)
+				{
+					switch (signals.ExecutionCycle++)
+					{
+						case 0:
+						{
+							signals.AddressBus = registers.PC++;
+							memory.Read();
+							registers.BaseAddressLow = signals.DataBus;
+
+							return true;
+						}
+
+						case 1:
+						{
+							signals.AddressBus = registers.PC++;
+							memory.Read();
+							registers.BaseAddressHigh = signals.DataBus;
+
+							return true;
+						}
+
+						case 2:
+						{
+							registers.InternalRegister = static_cast<std::uint16_t>(registers.BaseAddressLow) + registers.X;
+							registers.BaseAddressLow = registers.InternalRegister & 0xFF;
+
+							signals.AddressBus = registers.BaseAddress;
+							memory.Read();
+
+							if (registers.InternalRegister & 0x100)
+								return true;
+
+							std::uint8_t carry = static_cast<std::uint8_t>(registers.Flags & Flag_Carry);
+							std::uint16_t result = static_cast<std::uint8_t>(registers.A) + static_cast<std::uint8_t>(signals.DataBus) + static_cast<std::uint8_t>(carry);
+
+							registers.A = static_cast<std::uint8_t>(result);
+
+							if (result & 0x100)
+								registers.Flags |= Flag_Carry;
+							else
+								registers.Flags &= ~Flag_Carry;
+
+							if (registers.A == 0)
+								registers.Flags |= Flag_Zero;
+							else
+								registers.Flags &= ~Flag_Zero;
+
+							if (registers.A & 0x80)
+								registers.Flags |= Flag_Negative;
+							else
+								registers.Flags &= ~Flag_Negative;
+
+							if (~(registers.A ^ signals.DataBus) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
+								registers.Flags |= Flag_Overflow;
+							else
+								registers.Flags &= ~Flag_Overflow;
+
+							signals.Executing = false;
+							return true;
+						}
+
+						case 3:
+						{
+							registers.BaseAddressHigh++;
+
+							signals.AddressBus = registers.BaseAddress;
+							memory.Read();
+
+							std::uint8_t carry = static_cast<std::uint8_t>(registers.Flags & Flag_Carry);
+							std::uint16_t result = static_cast<std::uint8_t>(registers.A) + static_cast<std::uint8_t>(signals.DataBus) + static_cast<std::uint8_t>(carry);
+
+							registers.A = static_cast<std::uint8_t>(result);
+
+							if (result & 0x100)
+								registers.Flags |= Flag_Carry;
+							else
+								registers.Flags &= ~Flag_Carry;
+
+							if (registers.A == 0)
+								registers.Flags |= Flag_Zero;
+							else
+								registers.Flags &= ~Flag_Zero;
+
+							if (registers.A & 0x80)
+								registers.Flags |= Flag_Negative;
+							else
+								registers.Flags &= ~Flag_Negative;
+
+							if (~(registers.A ^ signals.DataBus) & (registers.A ^ static_cast<std::uint8_t>(result)) & 0x80)
+								registers.Flags |= Flag_Overflow;
+							else
+								registers.Flags &= ~Flag_Overflow;
+
+							signals.Executing = false;
+							return true;
+						}
+					}
+
+					return true;
+				};
+
+			constexpr auto Op88_DEY = [](Registers& registers, Signals& signals, Memory& memory)
 			{
 				registers.Y--;
 
