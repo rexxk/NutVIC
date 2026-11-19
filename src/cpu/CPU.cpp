@@ -82,6 +82,7 @@ namespace nvic
 		m_OpCodes[0x6A] = opcode::Op6A_ROR;
 		m_OpCodes[0x6C] = opcode::Op6C_JMPind;
 		m_OpCodes[0x6D] = opcode::Op6D_ADCabs;
+		m_OpCodes[0x6E] = opcode::Op6E_RORabs;
 		m_OpCodes[0x70] = opcode::Op70_BVS;
 		m_OpCodes[0x76] = opcode::Op76_RORzpX;
 		m_OpCodes[0x78] = opcode::Op78_SEI;

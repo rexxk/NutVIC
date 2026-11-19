@@ -101,15 +101,18 @@ namespace nvic
 		auto& vicControlRegister1 = m_IOMemory.Data[VIC_ControlRegister1];
 		auto& vicInterruptRegister = m_IOMemory.Data[VIC_InterruptRegister];
 		auto& vicInterruptMask = m_IOMemory.Data[VIC_InterruptEnabled];
+		auto& vicMemoryPointers = m_IOMemory.Data[VIC_MemoryPointers];
 		bool screenEnable = vicControlRegister1 & 0x10;
 
 		
-
 		std::uint16_t screenRAMPointer = BankAddress[m_RAMSelect] + (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
 //		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800) - 0x1000;
 		std::uint16_t charsetDataPointer = BankAddress[m_RAMSelect] + (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800);
+//		std::uint16_t charsetDataPointer = (((vicMemoryPointers >> 1) & 0x7) * 0x800);
 
-		if (charsetDataPointer >= 0x1000) charsetDataPointer -= 0x1000;
+//		if (charsetDataPointer >= 0x1000) charsetDataPointer -= 0x1000;
+//		if (m_RAMSelect == 0) charsetDataPointer -= 0x1000;
+//		else if (m_RAMSelect == 2) charsetDataPointer -= 0x9000;
 
 		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLinePAL);
 //		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLineNTSC);
@@ -159,12 +162,27 @@ namespace nvic
 
 					std::uint8_t ramEntry = m_RAM.at(chunk).Data[address];
 
-					std::uint16_t charAddress = charsetDataPointer + /*0x800 +*/ ramEntry * 8;
+					std::uint16_t charAddress = charsetDataPointer + ramEntry * 8;
+//					std::uint16_t charAddress = ramEntry * 8 - charsetDataPointer;
+
+//					if (charAddress >= 0x2000)
+//						std::println("ooooops");
 
 					if (!(m_RAMSelect & 0x01))
 					{
-						for (auto i = 0; i < 8; i++)
-							m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[charAddress + i];
+						std::uint8_t charChunk = charAddress >> 12;
+						std::uint16_t newAddress = charAddress & 0x0FFF;
+
+						if (charChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
+						{
+							for (auto i = 0; i < 8; i++)
+								m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[newAddress + i];
+						}
+						else
+						{
+							for (auto i = 0; i < 8; i++)
+								m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(charChunk).Data[newAddress + i];
+						}
 					}
 
 					return;
