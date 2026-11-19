@@ -60,6 +60,7 @@ namespace nvic
 		m_OpCodes[0x29] = opcode::Op29_AND;
 		m_OpCodes[0x2A] = opcode::Op2A_ROL;
 		m_OpCodes[0x2C] = opcode::Op2C_BIT;
+		m_OpCodes[0x2D] = opcode::Op2D_ANDabs;
 		m_OpCodes[0x30] = opcode::Op30_BMI;
 		m_OpCodes[0x38] = opcode::Op38_SEC;
 		m_OpCodes[0x40] = opcode::Op40_RTI;
