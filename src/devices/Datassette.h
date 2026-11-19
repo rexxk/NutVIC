@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <string>
 
 namespace nvic
 {
@@ -32,6 +33,8 @@ namespace nvic
 		std::uint32_t m_FilePointer{};
 		std::uint64_t m_StartCycleTick{};
 		std::uint64_t m_WaitCycles{};
+
+		std::string m_ImageName{};
 
 		TAPFile m_Image;
 

@@ -199,6 +199,8 @@ namespace nvic
 				cpuClockStart = now;
 			}
 
+			m_Signals.InterruptRequest = m_CIA1.PendingInterrupt() || m_CIA2.PendingInterrupt() || m_VIC2.PendingInterrupt();
+
 			auto endTime = std::chrono::steady_clock::now();
 		
 

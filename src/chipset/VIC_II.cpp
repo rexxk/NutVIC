@@ -48,8 +48,8 @@ namespace nvic
 		0xffadadad,			// Bright grey
 	};
 
-	VIC_II::VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals)
-		: m_IOMemory(ioMemory), m_CharROM(charrom), m_RAM(ram), m_Signals(signals)
+	VIC_II::VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals, Registers& registers)
+		: m_IOMemory(ioMemory), m_CharROM(charrom), m_RAM(ram), m_Signals(signals), m_Registers(registers)
 	{
 		// Set default values
 		m_IOMemory.Data[VIC_ControlRegister1] = 0x9B;
@@ -91,10 +91,17 @@ namespace nvic
 	auto VIC_II::Execute() -> void
 	{
 		auto& vicControlRegister1 = m_IOMemory.Data[VIC_ControlRegister1];
+		auto& vicInterruptRegister = m_IOMemory.Data[VIC_InterruptRegister];
+		auto& vicInterruptMask = m_IOMemory.Data[VIC_InterruptEnabled];
 		bool screenEnable = vicControlRegister1 & 0x10;
 
+		
+
 		std::uint16_t screenRAMPointer = (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
-		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800) - 0x1000;
+//		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800) - 0x1000;
+		std::uint16_t charsetDataPointer = (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800);
+
+		if (charsetDataPointer >= 0x1000) charsetDataPointer -= 0x1000;
 
 		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLinePAL);
 //		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLineNTSC);
@@ -105,6 +112,12 @@ namespace nvic
 		else
 			m_VisibleRasterLine = false;
 		
+		// Trigger raster interrupt
+		if (m_RasterLine == m_Registers.VIC_RasterInterruptLine && vicInterruptMask & 0x01)
+		{
+			vicInterruptRegister |= 0x81;
+		}
+
 		if (m_BadLine)
 		{
 			if (!m_Signals.Executing)
@@ -140,9 +153,11 @@ namespace nvic
 
 					std::uint16_t charAddress = charsetDataPointer + /*0x800 +*/ ramEntry * 8;
 
-
-					for (auto i = 0; i < 8; i++)
-						m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[charAddress + i];
+					if (!(m_RAMSelect & 0x01))
+					{
+						for (auto i = 0; i < 8; i++)
+							m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[charAddress + i];
+					}
 
 					return;
 				}
@@ -262,6 +277,7 @@ namespace nvic
 
 //		}
 
+		m_PendingInterrupt = vicInterruptRegister & 0x80;
 	}
 
 	auto VIC_II::Update() -> void

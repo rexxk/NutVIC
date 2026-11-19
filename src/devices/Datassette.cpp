@@ -43,6 +43,8 @@ namespace nvic
 
 		std::println("Opening image: {} ({}) bytes, data: {} bytes", filepath.stem().string(), filesize, m_Image.DataSize);
 
+		m_ImageName = filepath.stem().string();
+
 		fp.close();
 	}
 
@@ -68,7 +70,11 @@ namespace nvic
 				{
 					waitTime += m_Image.Data[m_FilePointer++] << (8 * i);
 
-					if (m_FilePointer == m_Image.DataSize) m_FilePointer = m_Image.DataSize - 1;
+					if (m_FilePointer == m_Image.DataSize)
+					{
+						m_FilePointer = m_Image.DataSize - 1;
+						m_Signals.Datassette_PLAY = false;
+					}
 				}
 			}
 		}
@@ -86,7 +92,11 @@ namespace nvic
 //			std::println("Cycles: {}", elapsedTicks);
 
 			m_FilePointer++;
-			if (m_FilePointer == m_Image.DataSize) m_FilePointer = m_Image.DataSize - 1;
+			if (m_FilePointer == m_Image.DataSize)
+			{
+				m_FilePointer = m_Image.DataSize - 1;
+				m_Signals.Datassette_PLAY = false;
+			}
 		}
 
 	}

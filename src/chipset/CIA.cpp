@@ -157,7 +157,7 @@ namespace nvic
 			}
 		}
 
-		m_Signals.InterruptRequest = (m_Memory.Data[0xC00 + CIA_InterruptControl] & 0x80) | (m_Memory.Data[0xD00 + CIA_InterruptControl] & 0x80);
+		m_PendingInterrupt = (m_Memory.Data[0xC00 + CIA_InterruptControl] & 0x80) | (m_Memory.Data[0xD00 + CIA_InterruptControl] & 0x80);
 	}
 
 

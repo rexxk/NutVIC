@@ -35,6 +35,8 @@ namespace nvic
 
 		auto Update() -> void;
 
+		auto PendingInterrupt() const -> bool { return m_PendingInterrupt; }
+
 	private:
 		MemoryChunk& m_Memory;
 		Signals& m_Signals;
@@ -68,7 +70,7 @@ namespace nvic
 		std::uint16_t m_TimerA_Value{};
 		std::uint16_t m_TimerB_Value{};
 
-		bool m_Running{ false };
+		bool m_PendingInterrupt{ false };
 	};
 
 }

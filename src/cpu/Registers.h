@@ -45,6 +45,8 @@ namespace nvic
 		std::uint8_t CIA1_InterruptMask{};
 		std::uint8_t CIA2_InterruptMask{};
 
+		std::uint8_t VIC_RasterInterruptLine{};
+
 		std::int8_t RelativeOffset;
 
 		std::uint16_t LastPC{};

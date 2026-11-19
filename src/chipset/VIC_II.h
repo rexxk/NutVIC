@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cpu/Registers.h"
 #include "cpu/Signals.h"
 #include "memory/Memory.h"
 
@@ -64,7 +65,7 @@ namespace nvic
 	class VIC_II
 	{
 	public:
-		VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals);
+		VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals, Registers& registers);
 
 		auto Execute() -> void;
 
@@ -78,6 +79,8 @@ namespace nvic
 
 		auto GetImageData() -> std::vector<std::uint32_t>& { return m_Pixels; }
 
+		auto PendingInterrupt() const -> bool { return m_PendingInterrupt; }
+
 	private:
 		void ThreadFunc();
 
@@ -86,6 +89,7 @@ namespace nvic
 		MemoryChunk& m_CharROM;
 		std::array<nvic::MemoryChunk, 16>& m_RAM;
 
+		Registers& m_Registers;
 		Signals& m_Signals;
 
 		std::vector<std::uint32_t> m_Pixels{};
@@ -106,6 +110,8 @@ namespace nvic
 		std::uint16_t m_BadLineCounter{};
 
 		std::vector<std::array<std::uint8_t, 8>> m_CharCache;
+
+		bool m_PendingInterrupt{ false };
 	};
 
 }
