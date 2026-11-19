@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cpu/Signals.h"
 #include "memory/Memory.h"
 
 #include <array>

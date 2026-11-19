@@ -5,6 +5,7 @@
 #include "cpu/CPU.h"
 #include "cpu/Signals.h"
 #include "devices/Datassette.h"
+#include "devices/Joystick.h"
 #include "devices/Keyboard.h"
 
 #include <atomic>
@@ -25,7 +26,7 @@ namespace nvic
 		};
 
 	public:
-		Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2, Keyboard& keyboard, Datassette& datassette);
+		Clock(FrequencyMode mode, Signals& signals, CPU& cpu, VIC_II& vic2, CIA& cia1, CIA& cia2, Keyboard& keyboard, Joystick& joystick, Datassette& datassette);
 
 		auto Start() -> void;
 		auto Stop() -> void;
@@ -50,6 +51,7 @@ namespace nvic
 		VIC_II& m_VIC2;
 		CIA& m_CIA1;
 		CIA& m_CIA2;
+		Joystick& m_Joystick;
 		Keyboard& m_Keyboard;
 		Datassette& m_Datassette;
 

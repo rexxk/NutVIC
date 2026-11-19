@@ -6,6 +6,7 @@
 #include "cpu/Signals.h"
 #include "devices/Datassette.h"
 #include "devices/Input.h"
+#include "devices/Joystick.h"
 #include "devices/Keyboard.h"
 #include "display/Texture.h"
 #include "memory/Memory.h"
@@ -108,10 +109,11 @@ auto main() -> std::uint32_t
 
 	nvic::VIC_II vic2{ ioData, chargenROM[0], ram, signals, cpu.GetRegisters() };
 	nvic::Keyboard keyboard{ ioData };
+	nvic::Joystick joystick{ ioData, 1 };
 
 	nvic::Datassette tape{ signals };
 
-	nvic::Clock clock{ nvic::Clock::FrequencyMode::PAL, signals, cpu, vic2, cia1, cia2, keyboard, tape };
+	nvic::Clock clock{ nvic::Clock::FrequencyMode::PAL, signals, cpu, vic2, cia1, cia2, keyboard, joystick, tape };
 
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)

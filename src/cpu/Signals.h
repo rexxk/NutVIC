@@ -49,6 +49,7 @@ namespace nvic
 
 		bool CIA_ReadDC0D{ false };
 		bool CIA_ReadDD0D{ false };
+		bool CIA_WriteDC00{ false };
 		bool CIA_WriteDC05{ false };
 		bool CIA_WriteDC07{ false };
 
