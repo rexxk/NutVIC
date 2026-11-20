@@ -62,6 +62,8 @@ namespace nvic
 	constexpr std::uint8_t VIC_ColorSprite7 = 0x2E;
 
 
+	class VICPanel;
+
 	class VIC_II
 	{
 	public:
@@ -112,6 +114,14 @@ namespace nvic
 		std::vector<std::array<std::uint8_t, 8>> m_CharCache;
 
 		bool m_PendingInterrupt{ false };
+
+		bool m_BitmapMode{ false };
+
+		std::uint16_t m_VideoCounterBase{};
+		std::uint16_t m_VideoCounter{};
+		std::uint8_t m_RowCounter{};
+
+		friend class VICPanel;
 	};
 
 }
