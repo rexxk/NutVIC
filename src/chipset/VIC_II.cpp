@@ -111,8 +111,7 @@ namespace nvic
 
 		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLinePAL);
 
-		if (m_RasterLine >= UpperDisplayRasterLinePAL && m_RasterLine < LowerDisplayRasterLinePAL)
-			m_VideoCounterBase = ((m_RasterLine - UpperDisplayRasterLinePAL) * 40) & 0x3F;
+		std::uint16_t bitmapDataOffset = vicMemoryPointers & 0x08 ? 0x2000 : 0x0000;
 
 //		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLineNTSC);
 
@@ -134,8 +133,6 @@ namespace nvic
 			{
 				m_BadLineCounter++;
 
-				m_VideoCounter = m_VideoCounterBase + m_BadLineCounter - 1;
-
 				if (m_BadLineCounter == 40)
 				{
 					m_BadLine = false;
@@ -153,6 +150,8 @@ namespace nvic
 //					{
 //						currentRasterLine &= 0xFFFF;
 //					}
+					m_VideoCounterBase = bitmapDataOffset + (currentRasterLine / 8 * 40) & 0x3FF;
+					m_VideoCounter = m_VideoCounterBase + (m_BadLineCounter - 1);// *8;
 
 					std::uint16_t ramAddress = screenRAMPointer + (currentRasterLine * 5) + m_BadLineCounter - 1;
 
@@ -168,9 +167,8 @@ namespace nvic
 //					if (charAddress >= 0x2000)
 //						std::println("ooooops");
 
-					if (!(m_RAMSelect & 0x01))
+					if (m_RAMSelect & 0x01)
 					{
-
 						if (vicControlRegister1 & 0x20)
 						{
 //							std::uint16_t bitmapDataStart = BankAddress[m_RAMSelect] + (vicMemoryPointers & 0x08) * 0x2000;
@@ -183,23 +181,24 @@ namespace nvic
 							for (auto i = 0; i < 8; i++)
 								m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(bmChunk).Data[bmAddress + i];
 						}
+					}
+					else
+					{
+
+						std::uint16_t charAddress = charsetDataPointer + ramEntry * 8;
+
+						std::uint8_t charChunk = charAddress >> 12;
+						std::uint16_t newAddress = charAddress & 0x0FFF;
+
+						if (charChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
+						{
+							for (auto i = 0; i < 8; i++)
+								m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[newAddress + i];
+						}
 						else
 						{
-							std::uint16_t charAddress = charsetDataPointer + ramEntry * 8;
-
-							std::uint8_t charChunk = charAddress >> 12;
-							std::uint16_t newAddress = charAddress & 0x0FFF;
-
-							if (charChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
-							{
-								for (auto i = 0; i < 8; i++)
-									m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[newAddress + i];
-							}
-							else
-							{
-								for (auto i = 0; i < 8; i++)
-									m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(charChunk).Data[newAddress + i];
-							}
+							for (auto i = 0; i < 8; i++)
+								m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(charChunk).Data[newAddress + i];
 						}
 					}
 
@@ -262,7 +261,8 @@ namespace nvic
 					if (vicControlRegister1 & 0x20)
 					{
 //						std::uint16_t colorAddress = 0xD800 + m_BadLineCounter;
-						std::uint8_t color = m_IOMemory.Data[0x800 + m_BadLineCounter];
+						std::uint8_t color = m_IOMemory.Data[0x800 + (currentRasterLine / 8) * 40 + (m_BadLineCounter - 1)];
+//						std::uint8_t color = m_IOMemory.Data[0x800 + m_VideoCounter];
 
 						for (auto i = 0; i < 8; i++)
 						{
