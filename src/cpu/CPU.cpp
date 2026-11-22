@@ -70,6 +70,7 @@ namespace nvic
 		m_OpCodes[0x49] = opcode::Op49_EOR;
 		m_OpCodes[0x4A] = opcode::Op4A_LSR;
 		m_OpCodes[0x4C] = opcode::Op4C_JMP;
+		m_OpCodes[0x4D] = opcode::Op4D_EORabs;
 		m_OpCodes[0x50] = opcode::Op50_BVC;
 		m_OpCodes[0x56] = opcode::Op56_LSRzpX;
 		m_OpCodes[0x58] = opcode::Op58_CLI;
