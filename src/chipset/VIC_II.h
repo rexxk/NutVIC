@@ -61,6 +61,12 @@ namespace nvic
 	constexpr std::uint8_t VIC_ColorSprite6 = 0x2D;
 	constexpr std::uint8_t VIC_ColorSprite7 = 0x2E;
 
+	constexpr std::uint8_t VIC_ScreenModeStandardCharacter = 0x00;
+	constexpr std::uint8_t VIC_ScreenModeMulticolorCharacter = 0x01;
+	constexpr std::uint8_t VIC_ScreenModeStandardBitmap = 0x02;
+	constexpr std::uint8_t VIC_ScreenModeMulticolorBitmap = 0x03;
+	constexpr std::uint8_t VIC_ScreenModeExtendedBackgroundColor = 0x04;
+
 
 	class VICPanel;
 
@@ -110,12 +116,12 @@ namespace nvic
 
 		bool m_BadLine{ false };
 
-		std::vector<std::array<std::uint16_t, 8>> m_CharCache;
+		std::vector<std::array<std::uint32_t, 8>> m_CharCache;
 //		std::vector<std::uint8_t> m_CharCache;
 
 		bool m_PendingInterrupt{ false };
 
-		bool m_BitmapMode{ false };
+//		bool m_BitmapMode{ false };
 
 		std::uint16_t m_VideoCounterBase{};
 		std::uint16_t m_VideoCounter{};
@@ -124,6 +130,8 @@ namespace nvic
 
 		std::uint16_t m_CAddress{};
 		std::uint16_t m_GAddress{};
+
+		std::uint16_t m_CAccessData{};
 
 		std::uint8_t m_ScreenMode{};
 
