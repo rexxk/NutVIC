@@ -102,18 +102,32 @@ namespace nvic
 		auto& vicInterruptRegister = m_IOMemory.Data[VIC_InterruptRegister];
 		auto& vicInterruptMask = m_IOMemory.Data[VIC_InterruptEnabled];
 		auto& vicMemoryPointers = m_IOMemory.Data[VIC_MemoryPointers];
+		auto& vicControlRegister2 = m_IOMemory.Data[VIC_ControlRegister2];
 		bool screenEnable = vicControlRegister1 & 0x10;
 
+		m_ScreenMode = 0;
+		m_ScreenMode |= (vicControlRegister2 & 0x10) ? 1 << 0 : 0;
+		m_ScreenMode |= (vicControlRegister1 & 0x20) ? 1 << 1 : 0;
+		m_ScreenMode |= (vicControlRegister1 & 0x40) ? 1 << 2 : 0;
+
+		// Could be removed and replaced by m_ScreenMode
 		m_BitmapMode = vicControlRegister1 & 0x20;
-		
+
+		// VIC graphics accesses
+		// 1 - video matrix (c-access, 12 bits)
+		// 2 - pixel data (g-access, 8 bits)
+		// 3 - sprite data pointers (p-access, 8 bits)
+		// 4 - sprite data (s-access, 8 bits)
+
+
+
+
 		std::uint16_t screenRAMPointer = BankAddress[m_RAMSelect] + (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
 		std::uint16_t charsetDataPointer = BankAddress[m_RAMSelect] + (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800);
 
 		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLinePAL);
 
 		std::uint16_t bitmapDataOffset = vicMemoryPointers & 0x08 ? 0x2000 : 0x0000;
-
-//		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLineNTSC);
 
 //		if (m_RasterLine >= UpperVisibleRasterLineNTSC && m_RasterLine <= LowerVisibleRasterLineNTSC)
 		if (m_RasterLine >= UpperVisibleRasterLinePAL && m_RasterLine <= LowerVisibleRasterLinePAL)
@@ -131,12 +145,12 @@ namespace nvic
 		{
 			if (!m_Signals.Executing)
 			{
-				m_BadLineCounter++;
+				m_VideoMemoryLineIndex++;
 
-				if (m_BadLineCounter == 40)
+				if (m_VideoMemoryLineIndex > 40)
 				{
 					m_BadLine = false;
-					m_BadLineCounter = 0;
+					m_VideoMemoryLineIndex = 0;
 
 					m_Signals.BusAvailable = true;
 				}
@@ -146,59 +160,61 @@ namespace nvic
 					// TODO(da): Bad line start is also dependent of YScroll variable, that is not
 					// implemented at the moment.
 
-//					if (currentRasterLine == 8)
-//					{
-//						currentRasterLine &= 0xFFFF;
-//					}
+					// Address generator - start by calculating c-address
 					m_VideoCounterBase = bitmapDataOffset + (currentRasterLine / 8 * 40) & 0x3FF;
-					m_VideoCounter = m_VideoCounterBase + (m_BadLineCounter - 1);// *8;
+					m_VideoCounter = m_VideoCounterBase + (m_VideoMemoryLineIndex - 1);
 
-					std::uint16_t ramAddress = screenRAMPointer + (currentRasterLine * 5) + m_BadLineCounter - 1;
+					// VM13/VM12/VM11/VM10
+					m_CAddress = (vicMemoryPointers & 0xF0) << 6;
+					m_CAddress |= m_VideoCounter;
 
-					std::uint8_t chunk = ramAddress >> 12;
-					std::uint16_t address = ramAddress & 0x0FFF;
+					std::uint8_t cChunk = m_CAddress >> 12;
+					std::uint16_t cAddress = m_CAddress & 0x0FFF;
 
-//					std::println("Current rasterline: {}", currentRasterLine);
+					// Read out the location of the 8x8/4x8 chunk in character/data memory
+					std::uint8_t ramLocation = m_RAM.at(cChunk).Data[cAddress];
 
-					std::uint8_t ramEntry = m_RAM.at(chunk).Data[address];
+					// Calculate g-address
+					m_GAddress = (vicMemoryPointers & 0x0E) << 10;
+					m_GAddress |= ramLocation << 3;
+					m_GAddress |= (currentRasterLine & 0x7);
 
-//					std::uint16_t charAddress = ramEntry * 8 - charsetDataPointer;
+					std::uint8_t gChunk = m_GAddress >> 12;
+					std::uint16_t gAddress = m_GAddress & 0x0FFF;
 
-//					if (charAddress >= 0x2000)
-//						std::println("ooooops");
+					std::uint16_t color = m_IOMemory.Data[0x800 + m_VideoCounter];
 
+
+					// Is there a Chargen ROM mapped in the area? If not....
 					if (m_RAMSelect & 0x01)
 					{
-						if (vicControlRegister1 & 0x20)
-						{
+//						if (vicControlRegister1 & 0x20)
+//						{
 //							std::uint16_t bitmapDataStart = BankAddress[m_RAMSelect] + (vicMemoryPointers & 0x08) * 0x2000;
 
-							std::uint16_t bitmapAddress = screenRAMPointer + m_VideoCounter;
+//							std::uint16_t bitmapAddress = screenRAMPointer + m_VideoCounter;
+//
+//							std::uint8_t bmChunk = bitmapAddress >> 12;
+//							std::uint16_t bmAddress = bitmapAddress & 0x0FFF;
 
-							std::uint8_t bmChunk = bitmapAddress >> 12;
-							std::uint16_t bmAddress = bitmapAddress & 0x0FFF;
-
-							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(bmChunk).Data[bmAddress + i];
-						}
+						for (auto i = 0; i < 8; i++)
+							m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i];
+//						}
 					}
+					// ... yes there is
 					else
 					{
-
-						std::uint16_t charAddress = charsetDataPointer + ramEntry * 8;
-
-						std::uint8_t charChunk = charAddress >> 12;
-						std::uint16_t newAddress = charAddress & 0x0FFF;
-
-						if (charChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
+						// Check if CharROM is the target
+						if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_BadLineCounter - 1][i] = m_CharROM.Data[newAddress + i];
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_CharROM.Data[gAddress + i] + (color << 8);
 						}
+						// - if not, read from RAM
 						else
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_BadLineCounter - 1][i] = m_RAM.at(charChunk).Data[newAddress + i];
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + (color << 8);
 						}
 					}
 
@@ -228,7 +244,7 @@ namespace nvic
 				&& (m_RasterLine >= UpperDisplayRasterLinePAL)) && (m_RasterLine < LowerDisplayRasterLinePAL) && screenEnable)
 			{
 				m_BadLine = true;
-				m_BadLineCounter = 0;
+				m_VideoMemoryLineIndex = 0;
 
 				m_Signals.BusAvailable = false;
 //				std::println("Raster start: {}", m_RasterLine);
@@ -261,12 +277,13 @@ namespace nvic
 					if (vicControlRegister1 & 0x20)
 					{
 //						std::uint16_t colorAddress = 0xD800 + m_BadLineCounter;
-						std::uint8_t color = m_IOMemory.Data[0x800 + (currentRasterLine / 8) * 40 + (m_BadLineCounter - 1)];
+						std::uint8_t color = m_IOMemory.Data[0x800 + (currentRasterLine / 8) * 40 + (m_VideoMemoryLineIndex - 1)];
 //						std::uint8_t color = m_IOMemory.Data[0x800 + m_VideoCounter];
 
 						for (auto i = 0; i < 8; i++)
 						{
-							auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (8 - i));
+							auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (7 - i));
+//							auto pixel = m_CharCache[m_CycleCounter - 16] & (1 << (8 - i));
 							m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[color >> 4] : ColorPalette[color & 0x0F];
 						}
 					}
@@ -274,8 +291,10 @@ namespace nvic
 					{
 						for (auto i = 0; i < 8; i++)
 						{
-							auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (8 - i));
-							m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[borderColorIndex] : ColorPalette[backgroundColorIndex1];
+//							auto pixel = m_CharCache[m_CycleCounter - 16] & (1 << (8 - i));
+							auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (7 - i));
+							std::uint8_t color = (m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] >> 8) & 0x0F;
+							m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[color] : ColorPalette[backgroundColorIndex1];
 						}
 					}
 				}

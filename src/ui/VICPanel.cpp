@@ -21,6 +21,7 @@ namespace nvic
 		ImGui::Text("Base address: %02x", m_VIC.GetBaseAddress());
 
 		ImGui::Text("Mode: %s", m_VIC.m_BitmapMode ? "Bitmap" : "Text");
+		ImGui::Text("Screen mode: %d", m_VIC.m_ScreenMode);
 
 		ImGui::End();
 	}

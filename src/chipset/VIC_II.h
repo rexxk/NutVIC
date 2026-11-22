@@ -109,9 +109,9 @@ namespace nvic
 		bool m_VisibleRasterLine{ false };
 
 		bool m_BadLine{ false };
-		std::uint16_t m_BadLineCounter{};
 
-		std::vector<std::array<std::uint8_t, 8>> m_CharCache;
+		std::vector<std::array<std::uint16_t, 8>> m_CharCache;
+//		std::vector<std::uint8_t> m_CharCache;
 
 		bool m_PendingInterrupt{ false };
 
@@ -120,6 +120,12 @@ namespace nvic
 		std::uint16_t m_VideoCounterBase{};
 		std::uint16_t m_VideoCounter{};
 		std::uint8_t m_RowCounter{};
+		std::uint8_t m_VideoMemoryLineIndex{};
+
+		std::uint16_t m_CAddress{};
+		std::uint16_t m_GAddress{};
+
+		std::uint8_t m_ScreenMode{};
 
 		friend class VICPanel;
 	};
