@@ -175,32 +175,69 @@ namespace nvic
 
 					m_CAccessData = ramLocation;
 
-					// Calculate g-address
-					m_GAddress = (vicMemoryPointers & 0x0E) << 10;
-					m_GAddress |= ramLocation << 3;
-					m_GAddress |= (currentRasterLine & 0x7);
+					switch (m_ScreenMode)
+					{
+						case VIC_ScreenModeStandardCharacter:
+						{
+							// Calculate g-address
+							m_GAddress = (vicMemoryPointers & 0x0E) << 10;
+							m_GAddress |= ramLocation << 3;
+							m_GAddress |= (currentRasterLine & 0x7);
+							
+							break;
+						}
+
+						case VIC_ScreenModeMulticolorCharacter:
+						{
+							// Calculate g-address
+							m_GAddress = (vicMemoryPointers & 0x0E) << 10;
+							m_GAddress |= ramLocation << 3;
+							m_GAddress |= (currentRasterLine & 0x7);
+
+							m_CAccessData |= (m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 8;
+							m_CAccessData |= (vicControlRegister1 & 0x10) ? 1 << 11 : 0;
+
+							break;
+						}
+
+						case VIC_ScreenModeStandardBitmap:
+						{
+							// Calculate g-address
+							m_GAddress = (vicMemoryPointers & 0x08) << 10;
+							m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
+							m_GAddress |= (currentRasterLine & 0x7);
+
+							break;
+						}
+
+						case VIC_ScreenModeMulticolorBitmap:
+						{
+							// Calculate g-address
+							m_GAddress = (vicMemoryPointers & 0x08) << 10;
+							m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
+							m_GAddress |= (currentRasterLine & 0x7);
+
+							break;
+						}
+
+						case VIC_ScreenModeExtendedBackgroundColor:
+						{
+							__debugbreak();
+							break;
+						}
+					}
+
+					m_GAddress += BankAddress[m_RAMSelect];
 
 					std::uint8_t gChunk = m_GAddress >> 12;
 					std::uint16_t gAddress = m_GAddress & 0x0FFF;
-
-					std::uint16_t color = m_IOMemory.Data[0x800 + m_VideoCounter];
-
+					std::uint16_t colormapData = m_IOMemory.Data[0x800 + m_VideoCounter];
 
 					// Is there a Chargen ROM mapped in the area? If not....
 					if (m_RAMSelect & 0x01)
 					{
-//						if (vicControlRegister1 & 0x20)
-//						{
-//							std::uint16_t bitmapDataStart = BankAddress[m_RAMSelect] + (vicMemoryPointers & 0x08) * 0x2000;
-
-//							std::uint16_t bitmapAddress = screenRAMPointer + m_VideoCounter;
-//
-//							std::uint8_t bmChunk = bitmapAddress >> 12;
-//							std::uint16_t bmAddress = bitmapAddress & 0x0FFF;
-
 						for (auto i = 0; i < 8; i++)
-							m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + (color << 8) + (m_CAccessData << 16);
-//						}
+							m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16);
 					}
 					// ... yes there is
 					else
@@ -209,13 +246,13 @@ namespace nvic
 						if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_CharROM.Data[gAddress + i] + (color << 8) + (m_CAccessData << 16);
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_CharROM.Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16);
 						}
 						// - if not, read from RAM
 						else
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + (color << 8) + (m_CAccessData << 16);
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16);
 						}
 					}
 
@@ -227,6 +264,8 @@ namespace nvic
 
 		std::uint8_t borderColorIndex = m_IOMemory.Data[VIC_BorderColor] & 0x0F;
 		std::uint8_t backgroundColorIndex1 = m_IOMemory.Data[VIC_BackgroundColor0] & 0x0F;
+		std::uint8_t backgroundColorIndex2 = m_IOMemory.Data[VIC_BackgroundColor1] & 0x0F;
+		std::uint8_t backgroundColorIndex3 = m_IOMemory.Data[VIC_BackgroundColor2] & 0x0F;
 
 //		if (m_CycleCounter >= 63)
 		if (m_CycleCounter >= 60)
@@ -248,7 +287,6 @@ namespace nvic
 				m_VideoMemoryLineIndex = 0;
 
 				m_Signals.BusAvailable = false;
-//				std::println("Raster start: {}", m_RasterLine);
 			}
 
 		}
@@ -290,40 +328,63 @@ namespace nvic
 
 						case VIC_ScreenModeMulticolorCharacter:
 						{
+							std::uint8_t color{};
+
+							if (m_CAccessData & 0x400)
+							{
+								for (auto i = 0; i < 4; i++)
+								{
+									auto value = (m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] >> 8) & 0xFF;
+									auto pixel = ((m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & 0xFF) >> ((3 - i) * 2) & 0x03);
+
+									if (pixel == 0) color = backgroundColorIndex1; // m_IOMemory.Data[0x021] & 0x0F;
+									if (pixel == 1) color = backgroundColorIndex2; // m_IOMemory.Data[0x022] & 0x0F;
+									if (pixel == 2) color = backgroundColorIndex3; // m_IOMemory.Data[0x023] & 0x0F;
+									if (pixel == 3) color = value & 0x07;
+
+									m_Pixels[((m_CycleCounter - 12) * 8) + (i * 2) + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[color];
+									m_Pixels[((m_CycleCounter - 12) * 8) + ((i * 2) + 1) + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[color];
+								}
+							}
+							else
+							{
+								for (auto i = 0; i < 8; i++)
+								{
+									auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (7 - i));
+									std::uint8_t color = (m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] >> 8) & 0x0F;
+									m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[color] : ColorPalette[backgroundColorIndex1];
+								}
+							}
+
 							break;
 						}
 
 						case VIC_ScreenModeStandardBitmap:
 						{
+							for (auto i = 0; i < 8; i++)
+							{
+								auto value = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8];
+								auto pixel = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & (1 << (7 - i));
+
+								m_Pixels[((m_CycleCounter - 12) * 8) + (i * 2) + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[(value >> 20) & 0x0F] : ColorPalette[(value >> 16) & 0x0F];
+							}
 
 							break;
 						}
 
 						case VIC_ScreenModeMulticolorBitmap:
 						{
-//							std::uint16_t colorAddress = 0xD800 + m_BadLineCounter;
 							std::uint8_t color{};
-							std::uint8_t color11 = m_IOMemory.Data[0x800 + (currentRasterLine / 8) * 40 + (m_VideoMemoryLineIndex - 1)];
-//							std::uint8_t color = m_IOMemory.Data[0x800 + m_VideoCounter];
 
 							for (auto i = 0; i < 4; i++)
 							{
-
-//								76 54 32 10
-//								11 00 00 00
-//								00 11 00 00
-//								00 00 11 00
-//								00 00 00 11
-
 								auto value = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8];
+								auto pixel = ((m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & 0xFF) >> ((3 - i) * 2) & 0x03);
 
-								auto pixel = ((m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & 0xFF) >> ((3 - i) * 2) & 0x03); //& (3 << (7 - i));
-//								auto pixel = m_CharCache[m_CycleCounter - 16] & (1 << (8 - i));
-
-								if (pixel == 0) color = m_IOMemory.Data[0xD21] & 0x0F;
+								if (pixel == 0) color = m_IOMemory.Data[0x021] & 0x0F;
 								if (pixel == 1) color = (value >> 20) & 0x0F;
 								if (pixel == 2) color = (value >> 16) & 0x0F;
-								if (pixel == 3) color = color11 & 0x0F;
+								if (pixel == 3) color = (value >> 8) & 0x0F;
 
 								m_Pixels[((m_CycleCounter - 12) * 8) + (i * 2) + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[color];
 								m_Pixels[((m_CycleCounter - 12) * 8) + ((i * 2) + 1) + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[color];
@@ -334,14 +395,15 @@ namespace nvic
 
 						case VIC_ScreenModeExtendedBackgroundColor:
 						{
+							__debugbreak();
 							break;
 						}
 					}
 
-					// Check for bitmap or text mode?
-					if (vicControlRegister1 & 0x20)
-					{
-					}
+//					// Check for bitmap or text mode?
+//					if (vicControlRegister1 & 0x20)
+//					{
+//					}
 				}
 				else
 				{

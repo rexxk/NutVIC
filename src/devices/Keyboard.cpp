@@ -171,7 +171,7 @@ namespace nvic
 
 			default:
 			{
-				std::println("Invalid row: {}", rowSelect);
+//				std::println("Invalid row: {}", rowSelect);
 				col = 0xFF;
 				break;
 			}
