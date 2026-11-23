@@ -72,6 +72,12 @@ namespace nvic
 
 	class VIC_II
 	{
+		struct CG
+		{
+			std::uint16_t CData{};
+			std::uint16_t GData{};
+		};
+
 	public:
 		VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals, Registers& registers);
 
@@ -116,7 +122,7 @@ namespace nvic
 
 		bool m_BadLine{ false };
 
-		std::vector<std::array<std::uint32_t, 8>> m_CharCache;
+		std::vector<std::array<CG, 8>> m_CharCache;
 //		std::vector<std::uint8_t> m_CharCache;
 
 		bool m_PendingInterrupt{ false };
