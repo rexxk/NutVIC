@@ -118,9 +118,9 @@ auto main() -> std::uint32_t
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
-			if (action == GLFW_PRESS)
+			if ((action == GLFW_PRESS) || (action == GLFW_REPEAT))
 				nvic::Input::SetKey(key);
-			else
+			else if (action == GLFW_RELEASE)
 				nvic::Input::ReleaseKey(key);
 		});
 
