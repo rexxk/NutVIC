@@ -36,10 +36,15 @@ namespace nvic
 		{
 			if (ImGui::Button("Insert"))
 			{
+//				m_Datassette.OpenTapeImage("data/tapes/Kikstart_2.tap");
+//				m_Datassette.OpenTapeImage("data/tapes/Krakout.tap");
 //				m_Datassette.OpenTapeImage("data/tapes/Last_Ninja_2.tap");
 //				m_Datassette.OpenTapeImage("data/tapes/Olympic_Skier.tap");
+				m_Datassette.OpenTapeImage("data/tapes/Pirates!_Side_1.tap");
+//				m_Datassette.OpenTapeImage("data/tapes/Pirates!_Side_2.tap");
 //				m_Datassette.OpenTapeImage("data/tapes/Pitstop_II.tap");
-				m_Datassette.OpenTapeImage("data/tapes/Summer_Games_II_Side_1.tap");
+//				m_Datassette.OpenTapeImage("data/tapes/Poster_Paster.tap");
+//				m_Datassette.OpenTapeImage("data/tapes/Summer_Games_II_Side_1.tap");
 //				m_Datassette.OpenTapeImage("data/tapes/Summer_Games_II_Side_2.tap");
 
 				m_Datassette.m_CassetteInserted = true;
