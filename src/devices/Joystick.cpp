@@ -4,6 +4,7 @@
 #include "memory/Memory.h"
 
 #include <cstdint>
+#include <print>
 
 #include <GLFW/glfw3.h>
 
@@ -22,7 +23,9 @@ namespace nvic
 	{
 		auto& keys = Input::Keys();
 
-		std::uint8_t value{ 0xFF };
+//		std::uint8_t value{ 0xFF };
+
+		std::uint8_t value = m_IOMemory.Data[0xC00 + 1 - m_Port];
 
 		if (!keys[GLFW_KEY_KP_8]) value &= ~0x01;
 		if (!keys[GLFW_KEY_KP_2]) value &= ~0x02;
@@ -31,6 +34,15 @@ namespace nvic
 		if (!keys[GLFW_KEY_KP_0]) value &= ~0x10;
 
 		m_IOMemory.Data[0xC00 + 1 - m_Port] &= value;
+
+//		if (m_IOMemory.Data[0xC02 + 1 - m_Port] == 0xFF)
+//		{
+//
+//		}
+//		else
+//		{
+////			std::println("Joystick data");
+//		}
 	}
 
 }

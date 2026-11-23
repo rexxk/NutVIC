@@ -17,8 +17,7 @@ namespace nvic
 	auto Input::SetKey(std::uint16_t key) -> void
 	{
 		m_Keys.at(key) = false;
-
-		std::println("Key {} pressed", key);
+//		std::println("Key {} pressed", key);
 	}
 
 	auto Input::ReleaseKey(std::uint16_t key) -> void

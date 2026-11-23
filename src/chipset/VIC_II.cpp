@@ -195,7 +195,7 @@ namespace nvic
 							m_GAddress |= (currentRasterLine & 0x7);
 
 							m_CAccessData |= (m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 8;
-							m_CAccessData |= (vicControlRegister1 & 0x10) ? 1 << 11 : 0;
+//							m_CAccessData |= (vicControlRegister2 & 0x10) ? 1 << 11 : 0;
 
 							break;
 						}
@@ -237,7 +237,7 @@ namespace nvic
 					if (m_RAMSelect & 0x01)
 					{
 						for (auto i = 0; i < 8; i++)
-							m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16);
+							m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicControlRegister2 & 0x10) ? 0x80000000 : 0);
 					}
 					// ... yes there is
 					else
@@ -246,13 +246,13 @@ namespace nvic
 						if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_CharROM.Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16);
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_CharROM.Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicControlRegister2 & 0x10) ? 0x80000000 : 0);
 						}
 						// - if not, read from RAM
 						else
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16);
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicControlRegister2 & 0x10) ? 0x80000000 : 0);
 						}
 					}
 
@@ -330,7 +330,7 @@ namespace nvic
 						{
 							std::uint8_t color{};
 
-							if (m_CAccessData & 0x400)
+							if (m_CharCache[m_CycleCounter - 16][currentRasterLine % 8] & 0x80000000)
 							{
 								for (auto i = 0; i < 4; i++)
 								{

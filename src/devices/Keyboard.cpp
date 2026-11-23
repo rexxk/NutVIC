@@ -108,76 +108,85 @@ namespace nvic
 		if (!keys[GLFW_KEY_Q]) col8 &= ~0x40;
 		if (!keys[GLFW_KEY_ESCAPE]) col8 &= ~0x80;
 
-		switch (rowSelect)
+		if (m_Memory.Data[0xC02] == 0xFF)
 		{
-			case 0x00:
+			switch (rowSelect)
 			{
-				col = col1 & col2 & col3 & col4 & col5 & col6 & col7 & col8;
-				break;
-			}
+				case 0x00:
+				{
+					col = col1 & col2 & col3 & col4 & col5 & col6 & col7 & col8;
+					break;
+				}
 
-			case 0xFE:
-			{
-				col = col1;
-				break;
-			}
-			case 0xFD:
-			{
-				col = col2;
-				break;
-			}
-			case 0xFB:
-			{
-				col = col3;
-				break;
-			}
-			case 0xF7:
-			{
-				col = col4;
-				break;
-			}
-			case 0xEF:
-			{
-				col = col5;
-				break;
-			}
-			case 0xDF:
-			{
-				col = col6;
-				break;
-			}
-			case 0xBF:
-			{
-				col = col7;
-				break;
-			}
-			case 0x7F:
-			{
-				col = col8;
-				break;
-			}
+				case 0xFE:
+				{
+					col = col1;
+					break;
+				}
+				case 0xFD:
+				{
+					col = col2;
+					break;
+				}
+				case 0xFB:
+				{
+					col = col3;
+					break;
+				}
+				case 0xF7:
+				{
+					col = col4;
+					break;
+				}
+				case 0xEF:
+				{
+					col = col5;
+					break;
+				}
+				case 0xDF:
+				{
+					col = col6;
+					break;
+				}
+				case 0xBF:
+				{
+					col = col7;
+					break;
+				}
+				case 0x7F:
+				{
+					col = col8;
+					break;
+				}
 
-			case 0xFF:
-			{
-				col = 0xFF;
-				break;
-			}
+				case 0xFF:
+				{
+					col = 0xFF;
+					break;
+				}
 
-			case 0xBD:
-			{
-				col = col2 & col7;
-				break;
-			}
+				case 0xBD:
+				{
+					col = col2 & col7;
+					break;
+				}
 
-			default:
-			{
-//				std::println("Invalid row: {}", rowSelect);
-				col = 0xFF;
-				break;
+				default:
+				{
+//					std::println("Invalid row: {}", rowSelect);
+					col = 0x01;
+					break;
+				}
 			}
 		}
 
-		m_Memory.Data[0xC01] = col;
+		if (col == 0x01)
+		{
+		}
+		else
+		{
+			m_Memory.Data[0xC01] = col;
+		}
 	}
 
 }
