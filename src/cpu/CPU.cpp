@@ -75,6 +75,7 @@ namespace nvic
 		m_OpCodes[0x56] = opcode::Op56_LSRzpX;
 		m_OpCodes[0x58] = opcode::Op58_CLI;
 		m_OpCodes[0x59] = opcode::Op59_EORabsY;
+		m_OpCodes[0x5D] = opcode::Op5D_EORabsX;
 		m_OpCodes[0x60] = opcode::Op60_RTS;
 		m_OpCodes[0x65] = opcode::Op65_ADCzp;
 		m_OpCodes[0x66] = opcode::Op66_RORzp;
