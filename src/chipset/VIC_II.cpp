@@ -237,7 +237,7 @@ namespace nvic
 					if (m_RAMSelect & 0x01)
 					{
 						for (auto i = 0; i < 8; i++)
-							m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicControlRegister2 & 0x10) ? 0x80000000 : 0);
+							m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicMemoryPointers & 0x80) ? 0x80000000 : 0);
 					}
 					// ... yes there is
 					else
@@ -246,13 +246,13 @@ namespace nvic
 						if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1))
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_CharROM.Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicControlRegister2 & 0x10) ? 0x80000000 : 0);
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_CharROM.Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicMemoryPointers & 0x80) ? 0x80000000 : 0);
 						}
 						// - if not, read from RAM
 						else
 						{
 							for (auto i = 0; i < 8; i++)
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicControlRegister2 & 0x10) ? 0x80000000 : 0);
+								m_CharCache[m_VideoMemoryLineIndex - 1][i] = m_RAM.at(gChunk).Data[gAddress + i] + ((colormapData & 0xFF) << 8) + (m_CAccessData << 16) + ((vicMemoryPointers & 0x80) ? 0x80000000 : 0);
 						}
 					}
 

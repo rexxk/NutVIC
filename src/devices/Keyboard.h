@@ -14,12 +14,13 @@ namespace nvic
 	class Keyboard
 	{
 	public:
-		Keyboard(MemoryChunk& ioMemory);
+		Keyboard(MemoryChunk& ioMemory, Signals& signals);
 
 		auto Update() -> void;
 
 	private:
 		MemoryChunk& m_Memory;
+		Signals& m_Signals;
 
 		std::array<std::uint8_t, 8> m_KeyMatrix{};
 	};

@@ -108,8 +108,8 @@ auto main() -> std::uint32_t
 	nvic::CIA cia2{ 1, ioData, signals, cpu.GetRegisters() };
 
 	nvic::VIC_II vic2{ ioData, chargenROM[0], ram, signals, cpu.GetRegisters() };
-	nvic::Keyboard keyboard{ ioData };
-	nvic::Joystick joystick{ ioData, 1 };
+	nvic::Keyboard keyboard{ ioData, signals };
+	nvic::Joystick joystick{ ioData, signals, 1 };
 
 	nvic::Datassette tape{ signals };
 
