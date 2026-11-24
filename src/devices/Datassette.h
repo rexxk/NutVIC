@@ -38,6 +38,9 @@ namespace nvic
 
 		TAPFile m_Image;
 
+		std::uint32_t m_WaitTime{};
+
+		bool m_IsWaiting{ false };
 		bool m_CassetteInserted{ false };
 
 		friend class DatassettePanel;

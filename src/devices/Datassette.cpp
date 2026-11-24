@@ -57,46 +57,38 @@ namespace nvic
 	{
 		auto elapsedTicks = cpuClockTicks - m_StartCycleTick;
 
-		std::uint32_t waitTime = m_Image.Data[m_FilePointer] * 8;
-
-		if (waitTime == 0)
+		if (!m_IsWaiting)
 		{
-			if (m_Image.Version == 0) waitTime = 256;
-			else if (m_Image.Version == 1)
+			m_WaitTime = m_Image.Data[m_FilePointer++] * 8;
+
+			if (m_WaitTime == 0)
 			{
-				m_FilePointer++;
-
-				for (auto i = 0; i < 3; i++)
+				if (m_Image.Version == 0) m_WaitTime = 256;
+				else if (m_Image.Version == 1)
 				{
-					waitTime += m_Image.Data[m_FilePointer++] << (8 * i);
-
-					if (m_FilePointer == m_Image.DataSize)
+					for (auto i = 0; i < 3; i++)
 					{
-						m_FilePointer = m_Image.DataSize - 1;
-						m_Signals.Datassette_PLAY = false;
+						m_WaitTime += m_Image.Data[m_FilePointer++] << (8 * i);
 					}
 				}
 			}
 		}
 
-		if (elapsedTicks >= waitTime) // && !m_Signals.Datassette_READ)
+		if (elapsedTicks >= m_WaitTime) // && !m_Signals.Datassette_READ)
 		{
-//			if (elapsedTicks > waitTime)
-//			{
-//				std::println("Overflow @{}: {} ({})", m_FilePointer, elapsedTicks, waitTime);
-//			}
+			m_IsWaiting = false;
 
 			m_Signals.Datassette_READ = true;
 			m_StartCycleTick = cpuClockTicks;
 
-//			std::println("Cycles: {}", elapsedTicks);
-
-			m_FilePointer++;
-			if (m_FilePointer == m_Image.DataSize)
+			if (m_FilePointer >= m_Image.DataSize)
 			{
-				m_FilePointer = m_Image.DataSize - 1;
 				m_Signals.Datassette_PLAY = false;
 			}
+		}
+		else
+		{
+			m_IsWaiting = true;
 		}
 
 	}
