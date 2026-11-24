@@ -135,7 +135,7 @@ namespace nvic
 		// Trigger raster interrupt
 		if ((m_RasterLine == m_Registers.VIC_RasterInterruptLine) && (vicInterruptMask & 0x01))
 		{
-	//		vicInterruptRegister |= 0x81;
+			vicInterruptRegister |= 0x81;
 		}
 
 		if (m_BadLine)
@@ -302,8 +302,8 @@ namespace nvic
 		std::uint8_t backgroundColorIndex2 = m_IOMemory.Data[VIC_BackgroundColor1] & 0x0F;
 		std::uint8_t backgroundColorIndex3 = m_IOMemory.Data[VIC_BackgroundColor2] & 0x0F;
 
-//		if (m_CycleCounter >= 63)
-		if (m_CycleCounter >= 60)
+		if (m_CycleCounter >= 63)
+//		if (m_CycleCounter >= 60)
 		{
 			// Sprite fetch and line wrap
 			m_CycleCounter = 0;
