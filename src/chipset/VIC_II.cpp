@@ -218,9 +218,9 @@ namespace nvic
 							for (auto i = 0; i < 8; i++)
 							{
 								CG cgData{};
-								cgData.CData = ((vicControlRegister2 & 0x10) << 10) + ((m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 8) + ramLocation;
+								cgData.CData = ((vicControlRegister2 & 0x10) << 6) + ((m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 7) + ramLocation;
 
-								if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1) && !(m_RAMSelect & 0x01))
+								if ((gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1)) && !(m_RAMSelect & 0x01))
 									cgData.GData = m_CharROM.Data[gAddress + i];
 								else
 									cgData.GData = m_RAM.at(gChunk).Data[gAddress + i];
