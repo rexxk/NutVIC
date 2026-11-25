@@ -53,6 +53,8 @@ namespace nvic
 		bool CIA_WriteDC05{ false };
 		bool CIA_WriteDC07{ false };
 
+		bool VIC_WriteD019{ false };
+
 		bool Datassette_SENSE{ true };
 		bool Datassette_MOTOR{ true };
 		bool Datassette_READ{ false };

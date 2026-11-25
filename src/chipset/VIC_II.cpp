@@ -117,6 +117,15 @@ namespace nvic
 		// 4 - sprite data (s-access, 8 bits)
 
 
+		if (m_Signals.VIC_WriteD019)
+		{
+			if (m_IOMemory.Data[VIC_InterruptRegister] & 0x80)
+			{
+				m_IOMemory.Data[VIC_InterruptRegister] = 0;
+			}
+
+			m_Signals.VIC_WriteD019 = false;
+		}
 
 
 		std::uint16_t screenRAMPointer = BankAddress[m_RAMSelect] + (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
@@ -482,7 +491,7 @@ namespace nvic
 			m_RasterInterruptLine = (m_Registers.VIC_RasterInterruptHighByte << 8) + m_Registers.VIC_RasterInterruptLowByte;
 
 			// Trigger raster interrupt
-			if ((m_RasterLine == m_RasterInterruptLine) && (vicInterruptEnabled & 0x01))
+			if (((m_RasterLine + m_RasterInterruptOffset) == m_RasterInterruptLine) && (vicInterruptEnabled & 0x01))
 			{
 				vicInterruptRegister |= 0x81;
 			}

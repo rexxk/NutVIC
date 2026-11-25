@@ -76,6 +76,8 @@ namespace nvic
 			if (address == 0x011) { m_Registers.VIC_RasterInterruptHighByte = (m_Signals.DataBus & 0x80) ? 1 : 0; }
 			if (address == 0x012) { m_Registers.VIC_RasterInterruptLowByte = m_Signals.DataBus; return; }
 
+			if (address == 0x019) { m_Signals.VIC_WriteD019 = true; }
+
 			if (address == 0xC00) { m_Signals.CIA_WriteDC00 = true; }
 
 			if (address == 0xC04) { m_Registers.CIA1_TimerA_LowByte_Latch = m_Signals.DataBus; return; }
