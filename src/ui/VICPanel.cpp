@@ -22,6 +22,9 @@ namespace nvic
 
 		ImGui::Text("Screen mode: %d", m_VIC.m_ScreenMode);
 
+		ImGui::SliderInt("Row adjust", &m_VIC.m_RowAdjust, 50, 70);
+		ImGui::Text("Raster interrupt: %04x", m_VIC.m_RasterInterruptLine);
+
 		ImGui::End();
 	}
 

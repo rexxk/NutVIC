@@ -100,7 +100,7 @@ namespace nvic
 	{
 		auto& vicControlRegister1 = m_IOMemory.Data[VIC_ControlRegister1];
 		auto& vicInterruptRegister = m_IOMemory.Data[VIC_InterruptRegister];
-		auto& vicInterruptMask = m_IOMemory.Data[VIC_InterruptEnabled];
+		auto& vicInterruptEnabled = m_IOMemory.Data[VIC_InterruptEnabled];
 		auto& vicMemoryPointers = m_IOMemory.Data[VIC_MemoryPointers];
 		auto& vicControlRegister2 = m_IOMemory.Data[VIC_ControlRegister2];
 		bool screenEnable = vicControlRegister1 & 0x10;
@@ -132,12 +132,6 @@ namespace nvic
 		else
 			m_VisibleRasterLine = false;
 		
-		// Trigger raster interrupt
-		if ((m_RasterLine == m_Registers.VIC_RasterInterruptLine) && (vicInterruptMask & 0x01))
-		{
-			vicInterruptRegister |= 0x81;
-		}
-
 		if (m_BadLine)
 		{
 			if (!m_Signals.Executing)
@@ -218,7 +212,20 @@ namespace nvic
 							for (auto i = 0; i < 8; i++)
 							{
 								CG cgData{};
-								cgData.CData = ((vicControlRegister2 & 0x10) << 6) + ((m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 7) + ramLocation;
+
+//								auto vcr2 = vicControlRegister2 & 0x10;
+//								auto col = m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07;
+								// 11 MC 10-8 col 7-0 data
+
+//								0x1000'0000'0000
+//								0x0000'0001'0000
+
+								if (vicControlRegister2 & 0x10)
+								{
+									cgData.CData = 0x800;
+								}
+
+								cgData.CData = ((vicControlRegister2 & 0x10) << 7) + ((m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 8) + ramLocation;
 
 								if ((gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1)) && !(m_RAMSelect & 0x01))
 									cgData.GData = m_CharROM.Data[gAddress + i];
@@ -251,6 +258,14 @@ namespace nvic
 							m_GAddress += BankAddress[m_RAMSelect];
 
 							// Calculate g-address
+//							10'0000'0000'0000
+//							00'0000'0000'1000
+
+							if (vicMemoryPointers & 0x08)
+							{
+								m_GAddress = (vicMemoryPointers & 0x08) << 10;
+							}
+
 							m_GAddress = (vicMemoryPointers & 0x08) << 10;
 							m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
 							m_GAddress |= (currentRasterLine & 0x7);
@@ -302,7 +317,8 @@ namespace nvic
 		std::uint8_t backgroundColorIndex2 = m_IOMemory.Data[VIC_BackgroundColor1] & 0x0F;
 		std::uint8_t backgroundColorIndex3 = m_IOMemory.Data[VIC_BackgroundColor2] & 0x0F;
 
-		if (m_CycleCounter >= 63)
+//		if (m_CycleCounter >= 63)
+		if (m_CycleCounter >= m_RowAdjust)
 //		if (m_CycleCounter >= 60)
 		{
 			// Sprite fetch and line wrap
@@ -393,9 +409,11 @@ namespace nvic
 
 							break;
 						}
-//
-//						case VIC_ScreenModeStandardBitmap:
-//						{
+
+						case VIC_ScreenModeStandardBitmap:
+						{
+//							__debugbreak();
+
 //							for (auto i = 0; i < 8; i++)
 //							{
 //								auto value = m_CharCache[m_CycleCounter - 16][currentRasterLine % 8];
@@ -403,10 +421,10 @@ namespace nvic
 //
 //								m_Pixels[((m_CycleCounter - 12) * 8) + (i * 2) + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = pixel ? ColorPalette[(value >> 20) & 0x0F] : ColorPalette[(value >> 16) & 0x0F];
 //							}
-//
-//							break;
-//						}
-//
+
+							break;
+						}
+
 						case VIC_ScreenModeMulticolorBitmap:
 						{
 							std::uint8_t color{};
@@ -458,6 +476,17 @@ namespace nvic
 					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLinePAL) * 403] = ColorPalette[borderColorIndex];
 //					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
 			}
+		}
+		else if (m_CycleCounter == 1)
+		{
+			m_RasterInterruptLine = (m_Registers.VIC_RasterInterruptHighByte << 8) + m_Registers.VIC_RasterInterruptLowByte;
+
+			// Trigger raster interrupt
+			if ((m_RasterLine == m_RasterInterruptLine) && (vicInterruptEnabled & 0x01))
+			{
+				vicInterruptRegister |= 0x81;
+			}
+
 		}
 //		if (m_RasterLine == 312)
 

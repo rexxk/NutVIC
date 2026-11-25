@@ -73,7 +73,8 @@ namespace nvic
 		{
 			m_Signals.WriteToIO = false;
 
-			if (address == 0x012) { m_Registers.VIC_RasterInterruptLine = m_Signals.DataBus; return; }
+			if (address == 0x011) { m_Registers.VIC_RasterInterruptHighByte = (m_Signals.DataBus & 0x80) ? 1 : 0; }
+			if (address == 0x012) { m_Registers.VIC_RasterInterruptLowByte = m_Signals.DataBus; return; }
 
 			if (address == 0xC00) { m_Signals.CIA_WriteDC00 = true; }
 

@@ -45,7 +45,8 @@ namespace nvic
 		std::uint8_t CIA1_InterruptMask{};
 		std::uint8_t CIA2_InterruptMask{};
 
-		std::uint8_t VIC_RasterInterruptLine{};
+		std::uint8_t VIC_RasterInterruptHighByte{};
+		std::uint8_t VIC_RasterInterruptLowByte{};
 
 		std::int8_t RelativeOffset;
 

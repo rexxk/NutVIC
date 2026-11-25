@@ -129,6 +129,8 @@ namespace nvic
 
 //		bool m_BitmapMode{ false };
 
+		std::uint16_t m_RasterInterruptLine{};
+
 		std::uint16_t m_VideoCounterBase{};
 		std::uint16_t m_VideoCounter{};
 		std::uint8_t m_RowCounter{};
@@ -140,6 +142,8 @@ namespace nvic
 		std::uint16_t m_CAccessData{};
 
 		std::uint8_t m_ScreenMode{};
+
+		int m_RowAdjust{ 62 };
 
 		friend class VICPanel;
 	};
