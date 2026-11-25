@@ -143,7 +143,7 @@ namespace nvic
 
 		std::uint8_t m_ScreenMode{};
 
-		int m_RowAdjust{ 63 };
+		int m_RowAdjust{ 62 };
 		int m_RasterInterruptOffset{ -1 };
 
 		friend class VICPanel;
