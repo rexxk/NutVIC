@@ -78,24 +78,6 @@ namespace nvic
 		std::memset(m_Pixels.data(), 0, 403 * 312);
 	}
 
-
-	auto VIC_II::Start() -> void
-	{
-		m_Running.store(true);
-		m_Thread = std::jthread(&VIC_II::ThreadFunc, this);
-	}
-
-	auto VIC_II::Stop() -> void
-	{
-		m_Running.store(false);
-		m_Thread.join();
-	}
-
-	auto VIC_II::ThreadFunc() -> void
-	{
-
-	}
-
 	auto VIC_II::Execute() -> void
 	{
 		auto& vicControlRegister1 = m_IOMemory.Data[VIC_ControlRegister1];
@@ -110,13 +92,6 @@ namespace nvic
 		m_ScreenMode |= (vicControlRegister1 & 0x20) ? 1 << 1 : 0;
 		m_ScreenMode |= (vicControlRegister1 & 0x40) ? 1 << 2 : 0;
 
-		// VIC graphics accesses
-		// 1 - video matrix (c-access, 12 bits)
-		// 2 - pixel data (g-access, 8 bits)
-		// 3 - sprite data pointers (p-access, 8 bits)
-		// 4 - sprite data (s-access, 8 bits)
-
-
 		if (m_Signals.VIC_WriteD019)
 		{
 			if (m_IOMemory.Data[VIC_InterruptRegister] & 0x80)
@@ -128,196 +103,181 @@ namespace nvic
 		}
 
 
-		std::uint16_t screenRAMPointer = BankAddress[m_RAMSelect] + (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
-		std::uint16_t charsetDataPointer = BankAddress[m_RAMSelect] + (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800);
-
+//		std::uint16_t screenRAMPointer = BankAddress[m_RAMSelect] + (m_IOMemory.Data[VIC_MemoryPointers] >> 4) * 0x400;
+//		std::uint16_t charsetDataPointer = BankAddress[m_RAMSelect] + (((m_IOMemory.Data[VIC_MemoryPointers] >> 1) & 0x7) * 0x800);
+//
 		std::uint16_t currentRasterLine = (m_RasterLine - UpperDisplayRasterLinePAL);
-
-		std::uint16_t bitmapDataOffset = vicMemoryPointers & 0x08 ? 0x2000 : 0x0000;
+//		std::uint16_t bitmapDataOffset = vicMemoryPointers & 0x08 ? 0x2000 : 0x0000;
 
 //		if (m_RasterLine >= UpperVisibleRasterLineNTSC && m_RasterLine <= LowerVisibleRasterLineNTSC)
 		if (m_RasterLine >= UpperVisibleRasterLinePAL && m_RasterLine <= LowerVisibleRasterLinePAL)
 			m_VisibleRasterLine = true;
 		else
 			m_VisibleRasterLine = false;
-		
+
+		if ((m_RasterLine >= 0x30) && (m_RasterLine <= 0xF7) && ((m_RasterLine & 0x7) == (vicControlRegister1 & 0x7)) && !m_BadLine && m_LineRendered)
+		{
+			m_BadLine = true;
+			m_LineRendered = false;
+			m_Signals.BusAvailable = false;
+
+			m_VideoMemoryLineIndex = 0;
+		}
+
 		if (m_BadLine)
 		{
-			if (!m_Signals.Executing)
+			if (m_Signals.Executing)
 			{
-				m_VideoMemoryLineIndex++;
+				return;
+			}
 
-				if (m_VideoMemoryLineIndex > 40)
-				{
-					m_BadLine = false;
-					m_VideoMemoryLineIndex = 0;
+			if (m_VideoMemoryLineIndex >= 40)
+			{
+				m_BadLine = false;
+				m_Signals.BusAvailable = true;
+			}
+			else
+			{
+				// Do bad line calculation
+				m_VideoCounterBase = currentRasterLine * 5;
+				m_VideoCounter = (m_VideoCounterBase + m_VideoMemoryLineIndex) & 0x3FF;
 
-					m_Signals.BusAvailable = true;
-				}
+				// CAddress calculation - same for all screen modes
+				m_CAddress = (vicMemoryPointers & 0xF0) << 6;
+				m_CAddress |= m_VideoCounter;
+				// Adjust for current VIC bank
+				m_CAddress += BankAddress[m_RAMSelect];
+
+				std::uint8_t cChunk = m_CAddress >> 12;
+				std::uint16_t cAddress = m_CAddress & 0x0FFF;
+
+				std::uint8_t cData{};
+
+				// Read out the location of the 8x8/4x8 chunk in character/data memory
+				if (cChunk == ((BankAddress[m_RAMSelect] >> 12) + 1) && !(m_RAMSelect & 0x01))
+					cData = m_CharROM.Data[cAddress];
 				else
+					cData = m_RAM.at(cChunk).Data[cAddress];
+
+				switch (m_ScreenMode)
 				{
-					// Perform bad line operations (i.e read text line data)
-					// TODO(da): Bad line start is also dependent of YScroll variable, that is not
-					// implemented at the moment.
-
-					// Address generator - start by calculating c-address
-					m_VideoCounterBase = bitmapDataOffset + (currentRasterLine / 8 * 40) & 0x3FF;
-					m_VideoCounter = m_VideoCounterBase + (m_VideoMemoryLineIndex - 1);
-
-					// VM13/VM12/VM11/VM10
-					m_CAddress = (vicMemoryPointers & 0xF0) << 6;
-					m_CAddress |= m_VideoCounter;
-
-					m_CAddress += BankAddress[m_RAMSelect];
-
-					std::uint8_t cChunk = m_CAddress >> 12;
-					std::uint16_t cAddress = m_CAddress & 0x0FFF;
-
-					// Read out the location of the 8x8/4x8 chunk in character/data memory
-					std::uint8_t ramLocation = m_RAM.at(cChunk).Data[cAddress];
-
-					m_CAccessData = ramLocation;
-
-					switch (m_ScreenMode)
+					case VIC_ScreenModeStandardCharacter:
 					{
-						case VIC_ScreenModeStandardCharacter:
+						// Calculate g-address
+						m_GAddress = (vicMemoryPointers & 0x0E) << 10;
+						m_GAddress |= cData << 3;
+						m_GAddress |= (currentRasterLine & 0x7);
+						m_GAddress += BankAddress[m_RAMSelect];
+
+						std::uint8_t gChunk = m_GAddress >> 12;
+						std::uint16_t gAddress = m_GAddress & 0x0FFF;
+
+						for (auto i = 0; i < 8; i++)
 						{
-							// Calculate g-address
-							m_GAddress = (vicMemoryPointers & 0x0E) << 10;
-							m_GAddress |= ramLocation << 3;
-							m_GAddress |= (currentRasterLine & 0x7);							
-							m_GAddress += BankAddress[m_RAMSelect];
+							CG cgData{};
+							cgData.CData = (m_IOMemory.Data[0x800 + m_VideoCounter] << 8) + cData;
 
-							std::uint8_t gChunk = m_GAddress >> 12;
-							std::uint16_t gAddress = m_GAddress & 0x0FFF;
+							if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1) && !(m_RAMSelect & 0x01))
+								cgData.GData = m_CharROM.Data[gAddress + i];
+							else
+								cgData.GData = m_RAM.at(gChunk).Data[gAddress + i];
 
-							for (auto i = 0; i < 8; i++)
-							{
-								CG cgData{};
-								cgData.CData = (m_IOMemory.Data[0x800 + m_VideoCounter] << 8) + ramLocation;
-
-								if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1) && !(m_RAMSelect & 0x01))
-									cgData.GData = m_CharROM.Data[gAddress + i];
-								else
-									cgData.GData = m_RAM.at(gChunk).Data[gAddress + i];
-
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = cgData;
-							}
-
-							break;
+							m_CharCache[m_VideoMemoryLineIndex][i] = cgData;
 						}
 
-						case VIC_ScreenModeMulticolorCharacter:
-						{
-							// Calculate g-address
-							m_GAddress = (vicMemoryPointers & 0x0E) << 10;
-							m_GAddress |= ramLocation << 3;
-							m_GAddress |= (currentRasterLine & 0x7);
-							m_GAddress += BankAddress[m_RAMSelect];
-
-							std::uint8_t gChunk = m_GAddress >> 12;
-							std::uint16_t gAddress = m_GAddress & 0x0FFF;
-
-							for (auto i = 0; i < 8; i++)
-							{
-								CG cgData{};
-
-//								auto vcr2 = vicControlRegister2 & 0x10;
-//								auto col = m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07;
-								// 11 MC 10-8 col 7-0 data
-
-//								0x1000'0000'0000
-//								0x0000'0001'0000
-
-								if (vicControlRegister2 & 0x10)
-								{
-									cgData.CData = 0x800;
-								}
-
-								cgData.CData = ((vicControlRegister2 & 0x10) << 7) + ((m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 8) + ramLocation;
-
-								if ((gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1)) && !(m_RAMSelect & 0x01))
-									cgData.GData = m_CharROM.Data[gAddress + i];
-								else
-									cgData.GData = m_RAM.at(gChunk).Data[gAddress + i];
-
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = cgData;
-							}
-
-							break;
-						}
-
-						case VIC_ScreenModeStandardBitmap:
-						{
-							// Calculate g-address
-							m_GAddress = (vicMemoryPointers & 0x08) << 10;
-							m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
-							m_GAddress |= (currentRasterLine & 0x7);
-							m_GAddress += BankAddress[m_RAMSelect];
-
-							break;
-						}
-
-						case VIC_ScreenModeMulticolorBitmap:
-						{
-							// Calculate g-address
-							m_GAddress = (vicMemoryPointers & 0x08) << 10;
-							m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
-							m_GAddress |= (currentRasterLine & 0x7);
-							m_GAddress += BankAddress[m_RAMSelect];
-
-							// Calculate g-address
-//							10'0000'0000'0000
-//							00'0000'0000'1000
-
-							if (vicMemoryPointers & 0x08)
-							{
-								m_GAddress = (vicMemoryPointers & 0x08) << 10;
-							}
-
-							m_GAddress = (vicMemoryPointers & 0x08) << 10;
-							m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
-							m_GAddress |= (currentRasterLine & 0x7);
-							m_GAddress += BankAddress[m_RAMSelect];
-
-							std::uint8_t gChunk = m_GAddress >> 12;
-							std::uint16_t gAddress = m_GAddress & 0x0FFF;
-
-							for (auto i = 0; i < 8; i++)
-							{
-								CG cgData{};
-								cgData.CData = (m_IOMemory.Data[0x800 + m_VideoCounter] << 8) + ramLocation;
-
-								if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1) && !(m_RAMSelect & 0x01))
-									cgData.GData = m_CharROM.Data[gAddress + i];
-								else
-									cgData.GData = m_RAM.at(gChunk).Data[gAddress + i];
-
-								m_CharCache[m_VideoMemoryLineIndex - 1][i] = cgData;
-							}
-
-							break;
-						}
-
-						case VIC_ScreenModeExtendedBackgroundColor:
-						{
-							__debugbreak();
-							break;
-						}
+						break;
 					}
 
-//					m_GAddress += BankAddress[m_RAMSelect];
+					case VIC_ScreenModeMulticolorCharacter:
+					{
+						// Calculate g-address
+						m_GAddress = (vicMemoryPointers & 0x0E) << 10;
+						m_GAddress |= cData << 3;
+						m_GAddress |= (currentRasterLine & 0x7);
+						m_GAddress += BankAddress[m_RAMSelect];
 
-//					std::uint8_t gChunk = m_GAddress >> 12;
-//					std::uint16_t gAddress = m_GAddress & 0x0FFF;
-//					std::uint16_t colormapData = m_IOMemory.Data[0x800 + m_VideoCounter];
+						std::uint8_t gChunk = m_GAddress >> 12;
+						std::uint16_t gAddress = m_GAddress & 0x0FFF;
 
-//					for (auto i = 0; i < 8; i++)
-//						m_CharCache[m_VideoMemoryLineIndex - 1][i] = cgData;
+						for (auto i = 0; i < 8; i++)
+						{
+							CG cgData{};
 
-					return;
+							if (vicControlRegister2 & 0x10)
+							{
+								cgData.CData = 0x800;
+							}
+
+							cgData.CData = ((vicControlRegister2 & 0x10) << 7) + ((m_IOMemory.Data[0x800 + m_VideoCounter] & 0x07) << 8) + cData;
+
+							if ((gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1)) && !(m_RAMSelect & 0x01))
+								cgData.GData = m_CharROM.Data[gAddress + i];
+							else
+								cgData.GData = m_RAM.at(gChunk).Data[gAddress + i];
+
+							m_CharCache[m_VideoMemoryLineIndex][i] = cgData;
+						}
+
+						break;
+					}
+
+	//				case VIC_ScreenModeStandardBitmap:
+	//				{
+	//					// Calculate g-address
+	//					m_GAddress = (vicMemoryPointers & 0x08) << 10;
+	//					m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
+	//					m_GAddress |= (currentRasterLine & 0x7);
+	//					m_GAddress += BankAddress[m_RAMSelect];
+	//
+	//					break;
+	//				}
+
+					case VIC_ScreenModeMulticolorBitmap:
+					{
+						// Calculate g-address
+//						m_GAddress = (vicMemoryPointers & 0x08) << 10;
+//						m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
+//						m_GAddress |= (currentRasterLine & 0x7);
+//						m_GAddress += BankAddress[m_RAMSelect];
+//
+//						if (vicMemoryPointers & 0x08)
+//						{
+//							m_GAddress = (vicMemoryPointers & 0x08) << 10;
+//						}
+
+						m_GAddress = (vicMemoryPointers & 0x08) << 10;
+						m_GAddress |= (m_VideoCounter & 0x3FF) << 3;
+						m_GAddress |= (currentRasterLine & 0x7);
+						m_GAddress += BankAddress[m_RAMSelect];
+
+						for (auto i = 0; i < 8; i++)
+						{
+							CG cgData{};
+							cgData.CData = (m_IOMemory.Data[0x800 + m_VideoCounter] << 8) + cData;
+
+							std::uint8_t gChunk = (m_GAddress + i) >> 12;
+							std::uint16_t gAddress = (m_GAddress + i) & 0x0FFF;
+
+							if (gChunk == ((BankAddress[m_RAMSelect] >> 12) + 1) && !(m_RAMSelect & 0x01))
+								cgData.GData = m_CharROM.Data[gAddress];
+							else
+								cgData.GData = m_RAM.at(gChunk).Data[gAddress];
+
+							m_CharCache[m_VideoMemoryLineIndex][i] = cgData;
+						}
+
+						break;
+					}
+
+					case VIC_ScreenModeExtendedBackgroundColor:
+					{
+						__debugbreak();
+						break;
+					}
 				}
 
+				m_VideoMemoryLineIndex++;
+				return;
 			}
 		}
 
@@ -343,7 +303,8 @@ namespace nvic
 			if (((m_RasterLine == UpperDisplayRasterLinePAL) || (((m_RasterLine - UpperDisplayRasterLinePAL) % 8) == 0)
 				&& (m_RasterLine >= UpperDisplayRasterLinePAL)) && (m_RasterLine < LowerDisplayRasterLinePAL) && screenEnable)
 			{
-				m_BadLine = true;
+				m_LineRendered = true;
+//				m_BadLine = true;
 				m_VideoMemoryLineIndex = 0;
 
 				m_Signals.BusAvailable = false;

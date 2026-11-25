@@ -83,9 +83,6 @@ namespace nvic
 
 		auto Execute() -> void;
 
-		auto Start() -> void;
-		auto Stop() -> void;
-
 		auto Update() -> void;
 
 		auto GetRAMSelect() const -> const std::uint8_t { return m_RAMSelect; }
@@ -94,9 +91,6 @@ namespace nvic
 		auto GetImageData() -> std::vector<std::uint32_t>& { return m_Pixels; }
 
 		auto PendingInterrupt() const -> bool { return m_PendingInterrupt; }
-
-	private:
-		void ThreadFunc();
 
 	private:
 		MemoryChunk& m_IOMemory;
@@ -110,8 +104,6 @@ namespace nvic
 
 		std::atomic<bool> m_Running{ false };
 
-		std::jthread m_Thread;
-
 		std::uint8_t m_RAMSelect{};
 
 		std::uint8_t m_BaseAddress{};
@@ -121,6 +113,7 @@ namespace nvic
 		bool m_VisibleRasterLine{ false };
 
 		bool m_BadLine{ false };
+		bool m_LineRendered{ false };
 
 		std::vector<std::array<CG, 8>> m_CharCache;
 //		std::vector<std::uint8_t> m_CharCache;
