@@ -111,7 +111,7 @@ namespace nvic
 			m_VisibleRasterLine = false;
 
 //		if ((m_RasterLine >= 0x30) && (m_RasterLine <= 0xF7) && ((m_RasterLine & 0x7) == (vicControlRegister1 & 0x7)) && (vicControlRegister1 & 0x10) && !m_BadLine && (m_LinesRendered == 0))
-		if ((m_RasterLine >= 0x30) && (m_RasterLine <= 0xF7) && ((m_RasterLine & 0x7) == (vicControlRegister1 & 0x7)) && (vicControlRegister1 & 0x10) && m_BadLineRequest)
+		if ((m_RasterLine >= 0x30) && (m_RasterLine <= 0xF7) && ((m_RasterLine & 0x7) == (vicControlRegister1 & 0x7)) && (vicControlRegister1 & 0x10) && !m_BadLine && m_BadLineRequest)
 		{
 			m_BadLineRequest = false;
 
@@ -121,7 +121,7 @@ namespace nvic
 		}
 
 		// Do video position calculation
-		m_VideoCounterBase = currentRasterLine * 5;
+		m_VideoCounterBase = (currentRasterLine / 8) * 40;
 
 		// Bad line reads the character position for each "chunk"
 		if (m_BadLine)
@@ -183,7 +183,7 @@ namespace nvic
 
 					case VIC_ScreenModeMulticolorBitmap:
 					{
-						m_CharCache[m_VideoMemoryLineIndex] |= ((color << 8) & 0xFFF);
+						m_CharCache[m_VideoMemoryLineIndex] |= (color << 8);
 						break;
 					}
 
@@ -429,7 +429,7 @@ namespace nvic
 //					m_Pixels[((m_CycleCounter - 12) * 8) + i + (m_RasterLine - UpperVisibleRasterLineNTSC) * 418] = ColorPalette[borderColorIndex];
 			}
 		}
-		else if (m_CycleCounter == m_RowAdjust)
+		else if (m_CycleCounter == 62)
 		{
 			// Sprite fetch and line wrap
 			m_CycleCounter = 0;
