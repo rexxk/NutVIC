@@ -72,12 +72,6 @@ namespace nvic
 
 	class VIC_II
 	{
-		struct CG
-		{
-			std::uint16_t CData{};
-			std::uint16_t GData{};
-		};
-
 	public:
 		VIC_II(MemoryChunk& ioMemory, MemoryChunk& charrom, std::array<nvic::MemoryChunk, 16>& ram, Signals& signals, Registers& registers);
 
@@ -113,26 +107,22 @@ namespace nvic
 		bool m_VisibleRasterLine{ false };
 
 		bool m_BadLine{ false };
-		bool m_LineRendered{ false };
+		bool m_BadLineRequest{ false };
+		bool m_LineFinished{ false };
+		std::uint8_t m_LinesRendered{};
 
-		std::vector<std::array<CG, 8>> m_CharCache;
-//		std::vector<std::uint8_t> m_CharCache;
+		std::vector<std::uint16_t> m_CharCache;
 
 		bool m_PendingInterrupt{ false };
-
-//		bool m_BitmapMode{ false };
 
 		std::uint16_t m_RasterInterruptLine{};
 
 		std::uint16_t m_VideoCounterBase{};
 		std::uint16_t m_VideoCounter{};
-		std::uint8_t m_RowCounter{};
 		std::uint8_t m_VideoMemoryLineIndex{};
 
 		std::uint16_t m_CAddress{};
 		std::uint16_t m_GAddress{};
-
-		std::uint16_t m_CAccessData{};
 
 		std::uint8_t m_ScreenMode{};
 
